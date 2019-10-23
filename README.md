@@ -125,4 +125,37 @@ error 查询过程发生的错误信息，如果为nil说明没有发生错误
 2. 下载zip压缩版
 3. 解压到go根目录或者当前项目vendor目录中的github.com/zhixinlian/zxl-go-sdk目录中
 
-## 使用
+## 使用示例
+```
+package main
+
+import (
+	"fmt"
+	zxl "github.com/zhixinlian/zxl-go-sdk"
+)
+
+func main() {
+	//初始化应用
+	zxl, err := zxl.NewZxlImpl("123456000110000", "appkey")
+	if err != nil {
+		panic(err)
+	}
+
+	//生成公私钥对
+	pk, sk, err := zxl.GenerateKeyPair()
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println("公钥:", pk)
+	fmt.Println("私钥:", sk)
+
+	//计算文件hash
+	hashStr, err := zxl.CalculateHash("G:\\channel.zip")
+	if err != nil {
+		panic(err.Error())
+	}
+	fmt.Print(hashStr)
+}
+
+```
+
