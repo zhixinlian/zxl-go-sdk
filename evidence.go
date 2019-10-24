@@ -1,0 +1,217 @@
+package zxl_go_sdk
+
+import (
+	"bytes"
+	"crypto/aes"
+	"crypto/cipher"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
+	"strconv"
+	"strings"
+)
+
+const (
+	InvalidAppId = "无效的appId"
+	InvalidAppKey = "无效的appKey"
+	InvalidAppType = "无效的appType"
+	BadCipherKey = "加密密码不能为空"
+	BadCipherData = "加密内容不能为空"
+
+	TypeTengXun = 0
+	TypeWangAn = 1
+)
+
+type zxlCipher interface {
+	//生成公私钥对
+	GenerateKeyPair() (pk string, sk string, err error)
+	//签名
+	Sign(sk string, rawData []byte) (string, error)
+	//验证签名
+	Verify(pk, signedStr string, rawData []byte) (bool, error)
+	//保存证据
+	EvidenceSave(evHash, extendInfo, sk, pk string) (interface{}, error)
+	//计算文件hash
+	CalculateHash(path string) (string, error)
+
+}
+
+func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
+	if len(appId) < 11 {
+		return nil, errors.New(InvalidAppId)
+	}
+	if len(appKey) == 0 {
+		return nil, errors.New(InvalidAppKey)
+	}
+	typeInt, err := strconv.Atoi(appId[10:11])
+	if err != nil{
+		return nil, errors.New(InvalidAppId)
+	}
+	if typeInt == TypeTengXun {
+		return &zxlImpl{appId: appId, appKey: appKey, appType:typeInt, zxlCipher: &trustSDKImpl{AppId:appId, AppKey:appKey}}, nil
+	} else if typeInt == TypeWangAn {
+		return &zxlImpl{appId: appId, appKey: appKey, appType:typeInt, zxlCipher: &cetcSDKImpl{AppId:appId, AppKey:appKey}}, nil
+	} else {
+		return nil, errors.New(InvalidAppType)
+	}
+}
+
+type zxlImpl struct {
+	zxlCipher
+	appKey string
+	appId string
+	appType int
+}
+
+//绑定用户证书
+func (zxl *zxlImpl) BindUserCert(pk, sk string) error{
+	rawData := strings.Join([]string{zxl.appId, pk}, ",")
+	signedStr, err := zxl.Sign(sk, []byte(rawData))
+	if err != nil {
+		return errors.New("BindUserCertError (Sign): " + err.Error())
+	}
+	certReq := UserCertReq{Pk: pk, Sign: signedStr}
+	dataBytes, err := json.Marshal(&certReq)
+	if err != nil {
+		return errors.New("BindUserCertError (Marshal): " + err.Error())
+	}
+	_, err =sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr + defConf.UserCert, dataBytes)
+	if err != nil {
+		return errors.New("BindUserCertError (sendRequest): " + err.Error())
+	}
+
+	//var bindResp UserCertResp
+	//err = json.Unmarshal(respBytes, &bindResp)
+	//if err != nil {
+	//	return errors.New("BindUserCertError (Unmarshal): " + err.Error())
+	//}
+	return nil
+}
+
+//更新用户证书
+func (zxl *zxlImpl) UpdateUserCert(pk, sk string) error{
+	rawData := strings.Join([]string{zxl.appId, pk}, ",")
+	signedStr, err := zxl.Sign(sk, []byte(rawData))
+	if err != nil {
+		return errors.New("UpdateUserCert (Sign): " + err.Error())
+	}
+	certReq := UserCertReq{Pk: pk, Sign: signedStr}
+	dataBytes, err := json.Marshal(&certReq)
+	if err != nil {
+		return errors.New("UpdateUserCert (Marshal): " + err.Error())
+	}
+	_, err = sendRequest(zxl.appId, zxl.appKey, "PUT", defConf.ServerAddr + defConf.UserCert, dataBytes)
+	if err != nil {
+		return errors.New("UpdateUserCert (sendRequest): " + err.Error())
+	}
+
+	return nil
+}
+
+//加密信息
+func (zxl *zxlImpl) EncryptData(pwd string, rawData []byte) (string, error){
+	if len(pwd) == 0 {
+		return "", errors.New(BadCipherKey)
+	}
+	if len(rawData) == 0 {
+		return "", errors.New(BadCipherData)
+	}
+
+	pwdData := sm3.SumSM3([]byte(pwd))
+
+	block, err := aes.NewCipher(pwdData)
+	if err != nil {
+		return "", err
+	}
+	tmpData := padding(rawData,block.BlockSize())
+	blockMode:=cipher.NewCBCEncrypter(block,pwdData[:block.BlockSize()])
+	blockMode.CryptBlocks(tmpData,tmpData)
+	return hex.EncodeToString(tmpData), nil
+}
+
+//解密信息
+func (zxl *zxlImpl) DecryptData(pwd string, encryptedData string) ([]byte, error){
+	if len(pwd) == 0 {
+		return nil, errors.New(BadCipherKey)
+	}
+	if len(encryptedData) == 0 {
+		return nil, errors.New(BadCipherData)
+	}
+	pwdData := sm3.SumSM3([]byte(pwd))
+
+	block,_:=aes.NewCipher(pwdData)
+	blockMode:=cipher.NewCBCDecrypter(block,pwdData[:block.BlockSize()])
+
+	encryptedBytes, err := hex.DecodeString(encryptedData)
+	if err != nil {
+		return nil, err
+	}
+	blockMode.CryptBlocks(encryptedBytes,encryptedBytes)
+	return unpadding(encryptedBytes), nil
+
+}
+
+//通过证据id查找证据
+func (zxl *zxlImpl) QueryWithEvId(evId string) ([]QueryResp, error){
+	if len(evId) == 0 {
+		return nil, errors.New("evId 不能为空")
+	}
+	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr + defConf.QueryWithEvId + evId, nil)
+	if err != nil {
+		return nil, errors.New("QueryWithEvId (sendRequest) error: " + err.Error())
+	}
+	var result []QueryResp
+	err = json.Unmarshal(respBytes, &result)
+	if err != nil {
+		return nil, errors.New("QueryWithEvId (Unmarshal) error: " + err.Error())
+	}
+	return result, nil
+}
+
+//通过交易id查找证据
+func (zxl *zxlImpl) QueryWithTxHash(txHash string) ([]QueryResp, error){
+	if len(txHash) == 0 {
+		return nil, errors.New("txHash 不能为空")
+	}
+	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr + defConf.QueryWithTxHash + txHash, nil)
+	if err != nil {
+		return nil, errors.New("QueryWithTxHash (sendRequest) error: " + err.Error())
+	}
+	var result []QueryResp
+	err = json.Unmarshal(respBytes, &result)
+	if err != nil {
+		return nil, errors.New("QueryWithTxHash (Unmarshal) error: " + err.Error())
+	}
+	return result, nil
+}
+
+//通过证据hash查找证据
+func (zxl *zxlImpl) QueryWithEvHash(evHash string) ([]QueryResp, error){
+
+	if len(evHash) == 0 {
+		return nil, errors.New("evHash 不能为空")
+	}
+	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr + defConf.QueryWithEvHash + evHash, nil)
+	if err != nil {
+		return nil, errors.New("QueryWithEvHash (sendRequest) error: " + err.Error())
+	}
+	var result []QueryResp
+	err = json.Unmarshal(respBytes, &result)
+	if err != nil {
+		return nil, errors.New("QueryWithEvHash (Unmarshal) error: " + err.Error())
+	}
+	return result, nil
+}
+
+func padding(src []byte,blocksize int) []byte {
+	padnum:=blocksize-len(src)%blocksize
+	pad:=bytes.Repeat([]byte{byte(padnum)},padnum)
+	return append(src,pad...)
+}
+
+func unpadding(src []byte) []byte {
+	n:=len(src)
+	unpadnum:=int(src[n-1])
+	return src[:n-unpadnum]
+}
