@@ -118,9 +118,13 @@ error 查询过程发生的错误信息，如果为nil说明没有发生错误
 
 ## 下载安装  
 ### 方法一：go get 命令  
-运行命令 go get https://github.com/zhixinlian/zxl-go-sdk
+运行命令 go get https://github.com/zhixinlian/zxl-go-sdk  
 
-### 方法二：手动下载
+### 方法二：git 命令  
+1. 进入到go根目录或者当前项目的vendor目录中的github.com/zhixinlian目录下
+2. 运行命令 git clone https://github.com/zhixinlian/zxl-go-sdk.git
+
+### 方法三：手动下载
 1. 进入网页https://github.com/zhixinlian/zxl-go-sdk
 2. 下载zip压缩版
 3. 解压到go根目录或者当前项目vendor目录中的github.com/zhixinlian/zxl-go-sdk目录中
