@@ -102,7 +102,7 @@ func (sdk *trustSDKImpl) Verify(pubKey string, sign string, data []byte) (bool, 
 	return signature.Verify(datahash, pub), nil
 }
 
-func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (EvSaveResult, error) {
+func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSaveResult, error) {
 	uid, err := generateUid()
 	if err != nil {
 		return nil, errors.New("EvidenceSave (generateUid) error:"+err.Error())

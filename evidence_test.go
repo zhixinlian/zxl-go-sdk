@@ -76,12 +76,12 @@ func TestTencent(t *testing.T) {
 	fmt.Println(formatData.TxHash, formatData.CreateTime, formatData.BlockHeight)
 
 	time.Sleep(time.Second * 10)
-	queryResult1, err := zxl.QueryWithTxHash(formatData.TxHash)
+	queryResult1, err := zxl.QueryWithTxHash(result.GetTxHash())
 	if err != nil || queryResult1[0].EvHash != evHash{
 		t.Error("QueryWithTxHash error")
 	}
 
-	queryResult2, err := zxl.QueryWithEvId(queryResult1[0].EvId)
+	queryResult2, err := zxl.QueryWithEvId(result.GetEvId())
 	if err != nil || queryResult2[0].EvHash != evHash{
 		t.Error("QueryWithEvId error")
 	}

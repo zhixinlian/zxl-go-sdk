@@ -31,7 +31,7 @@ type zxlCipher interface {
 	//验证签名
 	Verify(pk, signedStr string, rawData []byte) (bool, error)
 	//保存证据
-	EvidenceSave(evHash, extendInfo, sk, pk string) (interface{}, error)
+	EvidenceSave(evHash, extendInfo, sk, pk string) (EvSaveResult, error)
 	//计算文件hash
 	CalculateHash(path string) (string, error)
 
