@@ -89,7 +89,7 @@ extendInfo 扩展信息
 sk 用户私钥  
 pk 用户公钥  
 返回值：  
-*EvSaveResult 存证结果，如果用户的appId类型是腾讯，返回类型是*TencentEvidenceResp；如果用户appId类型是网安，返回类型是*CetcEvidenceResp  
+*EvSaveResult 存证结果
 error 存证过程的错误信息，如果为nil说明没有错误 
 
 ### QueryWithEvId(evId string) ([]QueryResp, error)  

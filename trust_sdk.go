@@ -102,7 +102,7 @@ func (sdk *trustSDKImpl) Verify(pubKey string, sign string, data []byte) (bool, 
 	return signature.Verify(datahash, pub), nil
 }
 
-func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (EvSaveResult, error) {
+func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSaveResult, error) {
 	uid, err := generateUid()
 	if err != nil {
 		return nil, errors.New("EvidenceSave (generateUid) error:"+err.Error())
@@ -145,7 +145,7 @@ func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (EvSave
 	if err != nil {
 		return nil, errors.New("EvidenceSave (sendRequest2) error:"+err.Error())
 	}
-	var tencentResp TencentEvidenceResp
+	var tencentResp EvSaveResult
 	err = json.Unmarshal(submitRetBytes, &tencentResp)
 	if err != nil {
 		return nil, errors.New("EvidenceSave (Unmarshal2) error:"+err.Error())

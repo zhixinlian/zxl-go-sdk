@@ -24,6 +24,7 @@ func TestCetc(t *testing.T) {
 	err = zxl.UpdateUserCert(pk, sk)
 	if err != nil {
 		t.Error(err.Error())
+		return
 	}
 
 	hashData := sm3.SumSM3([]byte("123123123"))
@@ -32,11 +33,11 @@ func TestCetc(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	formatData, _ := result.(*CetcEvidenceResp)
-	fmt.Println(formatData.EvId, formatData.TxHash, formatData.CreateTime)
+
+	fmt.Println(result.EvId, result.TxHash, result.CreateTime)
 
 	time.Sleep(time.Second * 10)
-	queryResult1, err := zxl.QueryWithTxHash(formatData.TxHash)
+	queryResult1, err := zxl.QueryWithTxHash(result.TxHash)
 	if err != nil || queryResult1[0].EvHash != evHash{
 		t.Error("QueryWithTxHash error")
 	}
@@ -72,8 +73,8 @@ func TestTencent(t *testing.T) {
 	if err != nil {
 		t.Error(err.Error())
 	}
-	formatData, _ := result.(*TencentEvidenceResp)
-	fmt.Println(formatData.TxHash, formatData.CreateTime, formatData.BlockHeight)
+
+	fmt.Println(result.TxHash, result.CreateTime, result.BlockHeight)
 
 	time.Sleep(time.Second * 10)
 	queryResult1, err := zxl.QueryWithTxHash(result.GetTxHash())
@@ -121,7 +122,7 @@ func TestCipher(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(encryptedData, err)
-	decryptedData, err := zxl.DecryptData(pwd, encryptedData)
+	decryptedData, err := zxl.DecryptData("asdf", encryptedData)
 	fmt.Println(string(decryptedData), err)
 }
 

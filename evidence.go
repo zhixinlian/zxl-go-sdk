@@ -31,7 +31,7 @@ type zxlCipher interface {
 	//验证签名
 	Verify(pk, signedStr string, rawData []byte) (bool, error)
 	//保存证据
-	EvidenceSave(evHash, extendInfo, sk, pk string) (EvSaveResult, error)
+	EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSaveResult, error)
 	//计算文件hash
 	CalculateHash(path string) (string, error)
 
@@ -148,7 +148,7 @@ func (zxl *zxlImpl) DecryptData(pwd string, encryptedData string) ([]byte, error
 		return nil, err
 	}
 	blockMode.CryptBlocks(encryptedBytes,encryptedBytes)
-	return unpadding(encryptedBytes), nil
+	return unpadding(encryptedBytes)
 
 }
 
@@ -210,8 +210,11 @@ func padding(src []byte,blocksize int) []byte {
 	return append(src,pad...)
 }
 
-func unpadding(src []byte) []byte {
+func unpadding(src []byte) ([]byte, error) {
 	n:=len(src)
 	unpadnum:=int(src[n-1])
-	return src[:n-unpadnum]
+	if unpadnum > n {
+		return nil, errors.New("password error")
+	}
+	return src[:n-unpadnum], nil
 }

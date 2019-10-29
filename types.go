@@ -111,63 +111,29 @@ type QueryResp struct {
 	CreateTime string `json:"createTime"`
 }
 
-type EvSaveResult interface {
-	GetEvId() string
-	GetEvHash() string
-	GetTxHash() string
-	GetCreateTime() string
-	GetBlockHeight() int64
-}
-
-type TencentEvidenceResp struct {
+type EvSaveResult struct {
 	BlockHeight int64 `json:"blockHeight"`
-	TxHash string `json:"txHash"`
-	CreateTime string `json:"createTime"`
 	EvId string `json:"evId"`
+	TxHash string `json:"txHash"`
 	EvHash string `json:"evHash"`
-}
-
-func (evData *TencentEvidenceResp) GetEvId() string {
-	return evData.EvId
-}
-
-func (evData *TencentEvidenceResp) GetEvHash() string{
-	return evData.EvHash
-}
-
-func (evData *TencentEvidenceResp) GetTxHash() string{
-	return evData.TxHash
-}
-
-func (evData *TencentEvidenceResp) GetCreateTime() string {
-	return evData.CreateTime
-}
-func (evData *TencentEvidenceResp) GetBlockHeight() int64 {
-	return evData.BlockHeight
-}
-
-type CetcEvidenceResp struct {
-	EvId string `json:"evId"`
-	TxHash string `json:"txHash"`
-	EvHash string `json:""`
 	CreateTime string `json:"createTime"`
 }
 
-func (evData *CetcEvidenceResp) GetEvId() string {
+func (evData *EvSaveResult) GetEvId() string {
 	return evData.EvId
 }
 
-func (evData *CetcEvidenceResp) GetEvHash() string{
+func (evData *EvSaveResult) GetEvHash() string{
 	return evData.EvHash
 }
 
-func (evData *CetcEvidenceResp) GetTxHash() string{
+func (evData *EvSaveResult) GetTxHash() string{
 	return evData.TxHash
 }
 
-func (evData *CetcEvidenceResp) GetCreateTime() string {
+func (evData *EvSaveResult) GetCreateTime() string {
 	return evData.CreateTime
 }
-func (evData *CetcEvidenceResp) GetBlockHeight() int64 {
-	return 0
+func (evData *EvSaveResult) GetBlockHeight() int64 {
+	return evData.BlockHeight
 }
