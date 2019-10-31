@@ -6,6 +6,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"github.com/zhixinlian/zxl-go-sdk/trustsql-sdk/encoding"
 	"github.com/zhixinlian/zxl-go-sdk/trustsql-sdk/util/byteutils"
 	"io/ioutil"
@@ -160,10 +161,8 @@ func (sdk *trustSDKImpl) CalculateHash(path string) (string, error){
 	if err != nil {
 		return "", errors.New("CalculateHash (ReadFile) error:" + err.Error())
 	}
-	hasher := sha256.New()
-	hasher.Write(data)
-	datahash := hasher.Sum(nil)
-	return hex.EncodeToString(datahash), nil
+	dataHash := sm3.SumSM3(data)
+	return hex.EncodeToString(dataHash), nil
 }
 
 //func main() {

@@ -29,11 +29,11 @@ func (sdk *cetcSDKImpl) GenerateKeyPair() (pk string, sk string, err error){
 func (sdk *cetcSDKImpl) Sign(prvKey string, data []byte) (string, error) {
 	sk, err :=sm2.DecodePrivKey(prvKey)
 	if err != nil {
-		return "", errors.New("Sign (DecodePriKey) error:" + err.Error())
+		return "", errors.New("Sign (DecodePriKey) error ")
 	}
 	signBytes, err := sk.Sign(rand.Reader, data, nil)
 	if err != nil {
-		return "", errors.New("Sign (Sign) error:" + err.Error())
+		return "", errors.New("Sign (Sign) error ")
 	}
 	return hex.EncodeToString(signBytes), nil
 }
@@ -41,11 +41,11 @@ func (sdk *cetcSDKImpl) Sign(prvKey string, data []byte) (string, error) {
 func (sdk *cetcSDKImpl) Verify(pubKey string, sign string, data []byte) (bool, error) {
 	signBytes, err := hex.DecodeString(sign)
 	if err != nil {
-		return false, errors.New("Verify (DecodeString) error:" + err.Error())
+		return false, errors.New("Verify (DecodeString) error ")
 	}
 	pk, err := sm2.DecodePubKey(pubKey)
 	if err != nil {
-		return false, errors.New("Verify (DecodePubKey) error:" + err.Error())
+		return false, errors.New("Verify (DecodePubKey) error ")
 	}
 	return pk.Verify(data, signBytes)
 }

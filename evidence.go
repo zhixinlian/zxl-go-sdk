@@ -145,7 +145,7 @@ func (zxl *zxlImpl) DecryptData(pwd string, encryptedData string) ([]byte, error
 
 	encryptedBytes, err := hex.DecodeString(encryptedData)
 	if err != nil {
-		return nil, err
+		return nil, errors.New("data format error")
 	}
 	blockMode.CryptBlocks(encryptedBytes,encryptedBytes)
 	return unpadding(encryptedBytes)
