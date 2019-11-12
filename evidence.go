@@ -10,6 +10,7 @@ import (
 	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"strconv"
 	"strings"
+	"time"
 )
 
 const (
@@ -31,7 +32,7 @@ type zxlCipher interface {
 	//验证签名
 	Verify(pk, signedStr string, rawData []byte) (bool, error)
 	//保存证据
-	EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSaveResult, error)
+	EvidenceSave(evHash, extendInfo, sk, pk string, timeout time.Duration) (*EvSaveResult, error)
 	//计算文件hash
 	CalculateHash(path string) (string, error)
 
@@ -65,7 +66,7 @@ type zxlImpl struct {
 }
 
 //绑定用户证书
-func (zxl *zxlImpl) BindUserCert(pk, sk string) error{
+func (zxl *zxlImpl) BindUserCert(pk, sk string, timeout time.Duration) error{
 	rawData := strings.Join([]string{zxl.appId, pk}, ",")
 	signedStr, err := zxl.Sign(sk, []byte(rawData))
 	if err != nil {
@@ -76,7 +77,7 @@ func (zxl *zxlImpl) BindUserCert(pk, sk string) error{
 	if err != nil {
 		return errors.New("BindUserCertError (Marshal): " + err.Error())
 	}
-	_, err =sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr + defConf.UserCert, dataBytes)
+	_, err =sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr + defConf.UserCert, dataBytes, timeout)
 	if err != nil {
 		return errors.New("BindUserCertError (sendRequest): " + err.Error())
 	}
@@ -90,7 +91,7 @@ func (zxl *zxlImpl) BindUserCert(pk, sk string) error{
 }
 
 //更新用户证书
-func (zxl *zxlImpl) UpdateUserCert(pk, sk string) error{
+func (zxl *zxlImpl) UpdateUserCert(pk, sk string, timeout time.Duration) error{
 	rawData := strings.Join([]string{zxl.appId, pk}, ",")
 	signedStr, err := zxl.Sign(sk, []byte(rawData))
 	if err != nil {
@@ -101,7 +102,7 @@ func (zxl *zxlImpl) UpdateUserCert(pk, sk string) error{
 	if err != nil {
 		return errors.New("UpdateUserCert (Marshal): " + err.Error())
 	}
-	_, err = sendRequest(zxl.appId, zxl.appKey, "PUT", defConf.ServerAddr + defConf.UserCert, dataBytes)
+	_, err = sendRequest(zxl.appId, zxl.appKey, "PUT", defConf.ServerAddr + defConf.UserCert, dataBytes, timeout)
 	if err != nil {
 		return errors.New("UpdateUserCert (sendRequest): " + err.Error())
 	}
@@ -153,11 +154,11 @@ func (zxl *zxlImpl) DecryptData(pwd string, encryptedData string) ([]byte, error
 }
 
 //通过证据id查找证据
-func (zxl *zxlImpl) QueryWithEvId(evId string) ([]QueryResp, error){
+func (zxl *zxlImpl) QueryWithEvId(evId string, timeout time.Duration) ([]QueryResp, error){
 	if len(evId) == 0 {
 		return nil, errors.New("evId 不能为空")
 	}
-	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr + defConf.QueryWithEvId + evId, nil)
+	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr + defConf.QueryWithEvId + evId, nil, timeout)
 	if err != nil {
 		return nil, errors.New("QueryWithEvId (sendRequest) error: " + err.Error())
 	}
@@ -170,11 +171,11 @@ func (zxl *zxlImpl) QueryWithEvId(evId string) ([]QueryResp, error){
 }
 
 //通过交易id查找证据
-func (zxl *zxlImpl) QueryWithTxHash(txHash string) ([]QueryResp, error){
+func (zxl *zxlImpl) QueryWithTxHash(txHash string, timeout time.Duration) ([]QueryResp, error){
 	if len(txHash) == 0 {
 		return nil, errors.New("txHash 不能为空")
 	}
-	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr + defConf.QueryWithTxHash + txHash, nil)
+	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr + defConf.QueryWithTxHash + txHash, nil, timeout)
 	if err != nil {
 		return nil, errors.New("QueryWithTxHash (sendRequest) error: " + err.Error())
 	}
@@ -187,12 +188,12 @@ func (zxl *zxlImpl) QueryWithTxHash(txHash string) ([]QueryResp, error){
 }
 
 //通过证据hash查找证据
-func (zxl *zxlImpl) QueryWithEvHash(evHash string) ([]QueryResp, error){
+func (zxl *zxlImpl) QueryWithEvHash(evHash string, timeout time.Duration) ([]QueryResp, error){
 
 	if len(evHash) == 0 {
 		return nil, errors.New("evHash 不能为空")
 	}
-	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr + defConf.QueryWithEvHash + evHash, nil)
+	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr + defConf.QueryWithEvHash + evHash, nil,  timeout)
 	if err != nil {
 		return nil, errors.New("QueryWithEvHash (sendRequest) error: " + err.Error())
 	}

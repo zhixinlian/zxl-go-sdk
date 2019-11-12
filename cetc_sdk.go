@@ -50,7 +50,7 @@ func (sdk *cetcSDKImpl) Verify(pubKey string, sign string, data []byte) (bool, e
 	return pk.Verify(data, signBytes)
 }
 
-func (sdk *cetcSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSaveResult, error) {
+func (sdk *cetcSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout time.Duration) (*EvSaveResult, error) {
 	uid, err := generateUid()
 	if err != nil {
 		return nil, errors.New("EvidenceSave (cetc generateUid) error:"+err.Error())
@@ -65,7 +65,7 @@ func (sdk *cetcSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSave
 	ed.Sign = signStr
 
 	bodyData, _ := json.Marshal(&ed)
-	respBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.EvidenceSave, bodyData)
+	respBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.EvidenceSave, bodyData, timeout)
 	if err != nil {
 		return nil, errors.New("EvidenceSave (cetc sendRequest) error:"+err.Error())
 	}

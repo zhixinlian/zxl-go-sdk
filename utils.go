@@ -10,6 +10,7 @@ import (
 	"io/ioutil"
 	"net/http"
 	"strings"
+	"time"
 )
 
 func generateUid() (string,error) {
@@ -21,7 +22,7 @@ func generateUid() (string,error) {
 	return idStr, nil
 }
 
-func sendRequest(appId, appKey, method, url string, body []byte) ([]byte, error) {
+func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) ([]byte, error) {
 	var byteReader io.Reader = nil
 	if body != nil {
 		byteReader = bytes.NewReader(body)
@@ -29,7 +30,7 @@ func sendRequest(appId, appKey, method, url string, body []byte) ([]byte, error)
 
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 
-	cli := http.Client{Transport: tr}
+	cli := http.Client{Transport: tr, Timeout: timeout}
 
 	req, err := http.NewRequest(method, url, byteReader)
 	if err != nil {

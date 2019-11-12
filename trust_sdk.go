@@ -103,7 +103,7 @@ func (sdk *trustSDKImpl) Verify(pubKey string, sign string, data []byte) (bool, 
 	return signature.Verify(datahash, pub), nil
 }
 
-func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSaveResult, error) {
+func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout time.Duration) (*EvSaveResult, error) {
 	uid, err := generateUid()
 	if err != nil {
 		return nil, errors.New("EvidenceSave (generateUid) error:"+err.Error())
@@ -117,7 +117,8 @@ func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSav
 		return nil, errors.New("EvidenceSave (Sign) error:"+err.Error())
 	}
 	applyBodyBytes, _ := json.Marshal(&TencentEvidenceReq{BodyData: string(applyBytes), BodySign:applySign})
-	applyRetBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.EvidenceApply, applyBodyBytes)
+	applyRetBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST",
+		defConf.ServerAddr+defConf.EvidenceApply, applyBodyBytes, timeout)
 	if err != nil {
 		return nil, errors.New("EvidenceSave (sendRequest) error:"+err.Error())
 	}
@@ -142,7 +143,7 @@ func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSav
 	}
 	submitBodyBytes, _ := json.Marshal(&TencentEvidenceReq{BodyData: string(submitBytes), BodySign: submitSign2})
 	submitRetBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST",
-		defConf.ServerAddr+defConf.EvidenceSubmit, submitBodyBytes)
+		defConf.ServerAddr+defConf.EvidenceSubmit, submitBodyBytes,timeout)
 	if err != nil {
 		return nil, errors.New("EvidenceSave (sendRequest2) error:"+err.Error())
 	}

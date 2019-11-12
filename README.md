@@ -19,20 +19,22 @@ pk 公钥字符串
 sk 私钥字符串  
 error 生成是否出错，如果不为nil则生成成功，否则生成失败  
 
-### BindUserCert(pk, sk string) error  
+### BindUserCert(pk, sk string, timeout time.Duration) error  
 功能： 绑定用户公钥  
 参数：  
 pk 用户的公钥  
 sk 用户的私钥  
+timeout 调用超时时间，0为不设置  
 返回值：  
 error  
 绑定用户公钥是否成功，如果error为nil则绑定成功，如果不为nil则绑定失败  
 
-### UpdateUserCert(pk, sk string) error 
+### UpdateUserCert(pk, sk string, timeout time.Duration) error 
 功能： 更新用户公钥  
 参数：  
 pk 用户的公钥  
 sk 用户的私钥  
+timeout 调用超时时间，0为不设置  
 返回值：  
 error 更新用户公钥是否成功，如果error为nil则绑定成功，如果不为nil则绑定失败  
 
@@ -81,37 +83,41 @@ rawData 数据内容
 bool 验证是否通过  
 error 验证过程是否发生错误，如果为nil说明没有错误  
 
-### EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSaveResult, error)  
+### EvidenceSave(evHash, extendInfo, sk, pk string, timeout time.Duration) (*EvSaveResult, error)  
 功能： 保存证据  
 参数：   
 evHash 证据的哈希信息  
 extendInfo 扩展信息  
 sk 用户私钥  
 pk 用户公钥  
+timeout 调用超时时间，0为不设置  
 返回值：  
 *EvSaveResult 存证结果
 error 存证过程的错误信息，如果为nil说明没有错误 
 
-### QueryWithEvId(evId string) ([]QueryResp, error)  
+### QueryWithEvId(evId string, timeout time.Duration) ([]QueryResp, error)  
 功能： 通过证据id查找存证数据  
 参数：  
 evId 证据id  
+timeout 调用超时时间，0为不设置  
 返回值：  
 []QueryResp 查询结果  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误  
 
-### QueryWithTxHash(txHash string) ([]QueryResp, error)  
+### QueryWithTxHash(txHash string, timeout time.Duration) ([]QueryResp, error)  
 功能： 通过交易哈希查找存证数据  
 参数：  
 txHash 交易哈希  
+timeout 调用超时时间，0为不设置  
 返回值：  
 []QueryResp 查询结果  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误  
 
-### QueryWithEvHash(evHash string) ([]QueryResp, error)  
+### QueryWithEvHash(evHash string, timeout time.Duration) ([]QueryResp, error)  
 功能： 通过证据哈希查找存证数据  
 参数：  
 evHash 证据哈希  
+timeout 调用超时时间，0为不设置  
 返回值：  
 []QueryResp 查询结果  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误  

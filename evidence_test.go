@@ -21,7 +21,7 @@ func TestCetc(t *testing.T) {
 	//if err != nil {
 	//	t.Error(err)
 	//}
-	err = zxl.UpdateUserCert(pk, sk)
+	err = zxl.UpdateUserCert(pk, sk, 0)
 	if err != nil {
 		t.Error(err.Error())
 		return
@@ -29,7 +29,7 @@ func TestCetc(t *testing.T) {
 
 	hashData := sm3.SumSM3([]byte("123123123"))
 	evHash := hex.EncodeToString(hashData)
-	result, err := zxl.EvidenceSave(evHash, "abc", sk, pk)
+	result, err := zxl.EvidenceSave(evHash, "abc", sk, pk, 0)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -37,16 +37,16 @@ func TestCetc(t *testing.T) {
 	fmt.Println(result.EvId, result.TxHash, result.CreateTime)
 
 	time.Sleep(time.Second * 10)
-	queryResult1, err := zxl.QueryWithTxHash(result.TxHash)
+	queryResult1, err := zxl.QueryWithTxHash(result.TxHash,0)
 	if err != nil || queryResult1[0].EvHash != evHash{
 		t.Error("QueryWithTxHash error")
 	}
 
-	queryResult2, err := zxl.QueryWithEvId(queryResult1[0].EvId)
+	queryResult2, err := zxl.QueryWithEvId(queryResult1[0].EvId,0)
 	if err != nil || queryResult2[0].EvHash != evHash{
 		t.Error("QueryWithEvId error")
 	}
-	queryResult3, err := zxl.QueryWithEvHash(evHash)
+	queryResult3, err := zxl.QueryWithEvHash(evHash, time.Second*2)
 	if err != nil || queryResult3[0].EvHash != evHash{
 		t.Error("QueryWithEvHash error")
 	}
@@ -62,14 +62,14 @@ func TestTencent(t *testing.T) {
 	if err != nil {
 		t.Error(err)
 	}
-	err = zxl.UpdateUserCert(pk, sk)
+	err = zxl.UpdateUserCert(pk, sk, time.Second*2)
 	if err != nil {
 		t.Error(err.Error())
 	}
 
 	hashData := sm3.SumSM3([]byte("123123123"))
 	evHash := hex.EncodeToString(hashData)
-	result, err := zxl.EvidenceSave(evHash, "abc", sk, pk)
+	result, err := zxl.EvidenceSave(evHash, "abc", sk, pk, time.Second*2)
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -77,16 +77,16 @@ func TestTencent(t *testing.T) {
 	fmt.Println(result.TxHash, result.CreateTime, result.BlockHeight)
 
 	time.Sleep(time.Second * 10)
-	queryResult1, err := zxl.QueryWithTxHash(result.GetTxHash())
+	queryResult1, err := zxl.QueryWithTxHash(result.GetTxHash(), time.Second*2)
 	if err != nil || queryResult1[0].EvHash != evHash{
 		t.Error("QueryWithTxHash error")
 	}
 
-	queryResult2, err := zxl.QueryWithEvId(result.GetEvId())
+	queryResult2, err := zxl.QueryWithEvId(result.GetEvId(), time.Second*2)
 	if err != nil || queryResult2[0].EvHash != evHash{
 		t.Error("QueryWithEvId error")
 	}
-	queryResult3, err := zxl.QueryWithEvHash(evHash)
+	queryResult3, err := zxl.QueryWithEvHash(evHash, time.Second*2)
 	if err != nil || queryResult3[0].EvHash != evHash{
 		t.Error("QueryWithEvHash error")
 	}
