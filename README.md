@@ -122,6 +122,12 @@ timeout 调用超时时间，0为不设置
 []QueryResp 查询结果  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误  
 
+###ProxyHost,ProxyPort,IsProxy,ServerCrtPath
+ProxyHost:代理主机
+ProxyPort:代理端口
+IsProxy:是否通过设置代理访问
+ServerCrtPath:证书路径设置
+
 ## 下载安装  
 ### 方法一：go get 命令  
 运行命令 go get https://github.com/zhixinlian/zxl-go-sdk  

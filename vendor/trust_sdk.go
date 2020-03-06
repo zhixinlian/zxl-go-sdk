@@ -13,13 +13,13 @@ import (
 )
 
 type trustSDKImpl struct {
-	AppId string
+	AppId  string
 	AppKey string
 }
 
 // 生成公司钥对
 // 返回值  pk公钥（string），sk私钥（string），err错误信息（error）
-func (sdk *trustSDKImpl) GenerateKeyPair() (pk string, sk string, err error){
+func (sdk *trustSDKImpl) GenerateKeyPair() (pk string, sk string, err error) {
 	var prvKey *btcec.PrivateKey
 	prvKey, err = btcec.NewPrivateKey(btcec.S256())
 	if err != nil {
@@ -105,31 +105,31 @@ func (sdk *trustSDKImpl) Verify(pubKey string, sign string, data []byte) (bool, 
 func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSaveResult, error) {
 	uid, err := generateUid()
 	if err != nil {
-		return nil, errors.New("EvidenceSave (generateUid) error:"+err.Error())
+		return nil, errors.New("EvidenceSave (generateUid) error:" + err.Error())
 	}
 	params := SystemParams{MchType: 1, MchId: sdk.AppId, SignType: "ECDSA", TimeStamp: time.Now().Unix(), Version: "1.0"}
 	content := ApplyContent{Content: evHash, EvId: uid, ExtendInfo: extendInfo}
 	applyData := EvidenceApplyReq{SysParams: params, Content: content, PublicKey: pk}
 	applyBytes, _ := json.Marshal(&applyData)
-	applySign, err := sdk.Sign(sk,  applyBytes)
+	applySign, err := sdk.Sign(sk, applyBytes)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (Sign) error:"+err.Error())
+		return nil, errors.New("EvidenceSave (Sign) error:" + err.Error())
 	}
-	applyBodyBytes, _ := json.Marshal(&TencentEvidenceReq{BodyData: string(applyBytes), BodySign:applySign})
+	applyBodyBytes, _ := json.Marshal(&TencentEvidenceReq{BodyData: string(applyBytes), BodySign: applySign})
 	applyRetBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.EvidenceApply, applyBodyBytes)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (sendRequest) error:"+err.Error())
+		return nil, errors.New("EvidenceSave (sendRequest) error:" + err.Error())
 	}
 	var applyResp EvidenceApplyResp
 	err = json.Unmarshal(applyRetBytes, &applyResp)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (Unmarshal) error:"+err.Error())
+		return nil, errors.New("EvidenceSave (Unmarshal) error:" + err.Error())
 	}
 
 	decodeData, _ := hex.DecodeString(applyResp.ToBeSign)
 	submitSign, err := sdk.OnlySign(sk, decodeData)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (Sign2) error:"+err.Error())
+		return nil, errors.New("EvidenceSave (Sign2) error:" + err.Error())
 	}
 	params.TimeStamp = time.Now().Unix()
 	submitData := EvidenceSubmitReq{SysParams: params, Sign: submitSign,
@@ -137,25 +137,25 @@ func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string) (*EvSav
 	submitBytes, _ := json.Marshal(&submitData)
 	submitSign2, err := sdk.Sign(sk, submitBytes)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (Sign3) error:"+err.Error())
+		return nil, errors.New("EvidenceSave (Sign3) error:" + err.Error())
 	}
 	submitBodyBytes, _ := json.Marshal(&TencentEvidenceReq{BodyData: string(submitBytes), BodySign: submitSign2})
 	submitRetBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST",
 		defConf.ServerAddr+defConf.EvidenceSubmit, submitBodyBytes)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (sendRequest2) error:"+err.Error())
+		return nil, errors.New("EvidenceSave (sendRequest2) error:" + err.Error())
 	}
 	var tencentResp TencentEvidenceResp
 	err = json.Unmarshal(submitRetBytes, &tencentResp)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (Unmarshal2) error:"+err.Error())
+		return nil, errors.New("EvidenceSave (Unmarshal2) error:" + err.Error())
 	}
 	tencentResp.EvId = uid
 	tencentResp.EvHash = evHash
 	return &tencentResp, nil
 }
 
-func (sdk *trustSDKImpl) CalculateHash(path string) (string, error){
+func (sdk *trustSDKImpl) CalculateHash(path string) (string, error) {
 	data, err := ioutil.ReadFile(path)
 	if err != nil {
 		return "", errors.New("CalculateHash (ReadFile) error:" + err.Error())
