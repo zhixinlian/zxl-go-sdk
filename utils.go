@@ -17,10 +17,7 @@ import (
 )
 
 func generateUid() (string, error) {
-	tmpUid, err := uuid.NewV1()
-	if err != nil {
-		return "", err
-	}
+	tmpUid := uuid.NewV1()
 	idStr := strings.ReplaceAll(tmpUid.String(), "-", "")
 	return idStr, nil
 }
