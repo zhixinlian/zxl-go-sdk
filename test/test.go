@@ -2,28 +2,22 @@ package main
 
 import (
 	"fmt"
-	uuid "github.com/zhixinlian/zxl-go-sdk/satori/go.uuid"
+	uuid "github.com/satori/go.uuid"
 	"strings"
 )
 
 func main() {
-	tmpUid, err := uuid.NewV1()
-	fmt.Println(err)
+	tmpUid := uuid.NewV1()
 	fmt.Println(tmpUid.String())
-	tmpUid, err = uuid.NewV1()
-	fmt.Println(err)
+	tmpUid = uuid.NewV1()
 	fmt.Println(tmpUid.String())
-	tmpUid, err = uuid.NewV1()
-	fmt.Println(err)
+	tmpUid = uuid.NewV1()
 	fmt.Println(tmpUid.String())
-	tmpUid, err = uuid.NewV1()
-	fmt.Println(err)
+	tmpUid = uuid.NewV1()
 	fmt.Println(tmpUid.String())
-	tmpUid, err = uuid.NewV1()
-	fmt.Println(err)
+	tmpUid = uuid.NewV1()
 	fmt.Println(tmpUid.String())
-	tmpUid, err = uuid.NewV1()
-	fmt.Println(err)
+	tmpUid = uuid.NewV1()
 	fmt.Println(tmpUid.String())
 
 	idStr := strings.ReplaceAll(tmpUid.String(), "-", "")

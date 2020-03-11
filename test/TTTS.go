@@ -25,7 +25,7 @@ func main() {
 			fmt.Println("err",i)
 			os.Exit(0)
 		}
-		b:=pk.Verify(msg,sign)
+		b, _ :=pk.Verify(msg,sign)
 		if !b {
 			fmt.Println(b,i)
 			os.Exit(0)
