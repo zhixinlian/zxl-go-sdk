@@ -121,6 +121,7 @@ type EvSaveResult struct {
 	TxHash      string `json:"txHash"`
 	EvHash      string `json:"evHash"`
 	CreateTime  string `json:"createTime"`
+	Ext         string `json:"ext"`
 }
 
 func (evData *EvSaveResult) GetEvId() string {
