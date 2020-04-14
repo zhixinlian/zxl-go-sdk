@@ -1,7 +1,8 @@
 package zxl_go_sdk
 
 var defConf = Config{
-	ServerAddr: "https://testsdk.zxchain.net:9087",
+	ServerAddr: "https://sdk.zxinchain.com",
+	//ServerAddr: "https://testsdk.zxchain.net:9087",
 	//ServerAddr:      "https://127.0.0.1:11123",
 	EvidenceSave:    "/api/v1/spider/evidence?sdkVersion=go-v2.0.0",
 	EvidenceApply:   "/api/v1/spider/evidence/apply?sdkVersion=go-v2.0.0",
