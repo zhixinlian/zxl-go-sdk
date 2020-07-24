@@ -139,17 +139,17 @@ type EvObtainTask struct {
 
 //任务Data
 type TaskEvData struct {
-	status    int    `json:"status"`
-	statusMsg string `json:"statusMsg"`
-	url       string `json:"url"`
-	hash      string `json:"hash"`
+	Status    int    `json:"status"`
+	StatusMsg string `json:"statusMsg"`
+	Url       string `json:"url"`
+	Hash      string `json:"hash"`
 }
 
 //证书状态及结果
 type EvIdData struct {
-	status     int    `json:"status"`
-	evidUrl    string `json:"evidUrl"`
-	voucherUrl string `json:"voucherUrl"`
+	Status     int    `json:"status"`
+	EvidUrl    string `json:"evidUrl"`
+	VoucherUrl string `json:"voucherUrl"`
 }
 
 //定义tx接口返回结构体，最外层
