@@ -133,7 +133,7 @@ func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) 
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-	var taskEvData = TaskEvData{hash: sendRetBytes.Hash, statusMsg: sendRetBytes.StatusMsg, status: sendRetBytes.Status, url: sendRetBytes.Url}
+	var taskEvData = TaskEvData{Hash: sendRetBytes.Hash, StatusMsg: sendRetBytes.StatusMsg, Status: sendRetBytes.Status, Url: sendRetBytes.Url}
 	return &taskEvData, nil
 }
 
@@ -178,6 +178,6 @@ func (sdk *cetcSDKImpl) GetEvidenceStatus(orderNo string, timeout time.Duration)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-	var evIdData = EvIdData{status: sendRetBytes.Status, evidUrl: sendRetBytes.EvIdUrl, voucherUrl: sendRetBytes.VoucherUrl}
+	var evIdData = EvIdData{Status: sendRetBytes.Status, EvidUrl: sendRetBytes.EvIdUrl, VoucherUrl: sendRetBytes.VoucherUrl}
 	return &evIdData, nil
 }
