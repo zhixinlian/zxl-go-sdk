@@ -35,6 +35,18 @@ type zxlCipher interface {
 	EvidenceSave(evHash, extendInfo, sk, pk string, timeout time.Duration) (*EvSaveResult, error)
 	//计算文件hash
 	CalculateHash(path string) (string, error)
+	//录屏任务
+	ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error)
+	//截屏任务
+	ContentCapturePic(webUrls string, timeout time.Duration) (string, error)
+	//获取录屏、截屏任务状态及结果
+	getContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error)
+	//视频取证接口
+	evidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error)
+	//图片取证接口
+	evidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error)
+	//获取取证证书任务状态及结果
+	getEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error)
 }
 
 func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
