@@ -9,18 +9,19 @@ import (
 )
 
 func TestCetc(t *testing.T) {
+	/** 2020-07-24 add start */
 	//zxl, err := NewZxlImpl("200514000200001","9d7f4ba445a54ed2b041e142d5ea12f3")
 	//if err != nil {
 	//	fmt.Println("错误")
 	//}
 	////图片取证
-	//result, err := zxl.evidenceObtainPic("https://www.baidu.com","图片","go_sdk_test",time.Second*2)
+	//result, err := zxl.EvidenceObtainPic("https://www.baidu.com","图片","go_sdk_test",time.Second*2)
 	//if err != nil {
 	//	fmt.Println(err.Error())
 	//}
 	//fmt.Println(result)
 	////根据orderNo查询取证任务状态及结果
-	//result1, err := zxl.getEvidenceStatus("1595503953240243004615586",time.Second*2)
+	//result1, err := zxl.GetEvidenceStatus("1595578460075584005313706",time.Second*2)
 	//if err != nil {
 	//	fmt.Println(err.Error())
 	//}
@@ -36,13 +37,13 @@ func TestCetc(t *testing.T) {
 	//}
 	//fmt.Println(result2)
 	////根据订单号查询截屏任务的状态及结果
-	//result4, err:= zxl1.getContentStatus("1595503953240243004615586",time.Second*2)
+	//result4, err:= zxl1.GetContentStatus("1595578461244000782838012",time.Second*2)
 	//if err != nil {
 	//	fmt.Println(err.Error())
 	//}
 	//fmt.Println(result4)
-
-	zxl, err := NewZxlImpl("xxxxxxxxxx1xxxx", "appTest77")
+	/** 2020-07-24 add end */
+	zxl, err := NewZxlImpl("190725000110077", "appTest77")
 	if err != nil {
 		t.Error(err.Error())
 	}
@@ -62,31 +63,33 @@ func TestCetc(t *testing.T) {
 
 	hashData := sm3.SumSM3([]byte("123123123"))
 	evHash := hex.EncodeToString(hashData)
+	fmt.Print("111111")
 	result, err := zxl.EvidenceSave(evHash, "abc", sk, pk, 0)
+	fmt.Print("2222222")
 	if err != nil {
 		t.Error(err.Error())
 	}
 
 	fmt.Println(result.EvId, result.TxHash, result.CreateTime)
-
-	time.Sleep(time.Second * 10)
-	queryResult1, err := zxl.QueryWithTxHash(result.TxHash, 0)
-	if err != nil || queryResult1[0].EvHash != evHash {
-		t.Error("QueryWithTxHash error")
-	}
-
-	queryResult2, err := zxl.QueryWithEvId(queryResult1[0].EvId, 0)
-	if err != nil || queryResult2[0].EvHash != evHash {
-		t.Error("QueryWithEvId error")
-	}
-	queryResult3, err := zxl.QueryWithEvHash(evHash, time.Second*2)
-	if err != nil || queryResult3[0].EvHash != evHash {
-		t.Error("QueryWithEvHash error")
-	}
+	//
+	//time.Sleep(time.Second * 10)
+	//queryResult1, err := zxl.QueryWithTxHash(result.TxHash,0)
+	//if err != nil || queryResult1[0].EvHash != evHash{
+	//	t.Error("QueryWithTxHash error")
+	//}
+	//
+	//queryResult2, err := zxl.QueryWithEvId(queryResult1[0].EvId,0)
+	//if err != nil || queryResult2[0].EvHash != evHash{
+	//	t.Error("QueryWithEvId error")
+	//}
+	//queryResult3, err := zxl.QueryWithEvHash(evHash, time.Second*2)
+	//if err != nil || queryResult3[0].EvHash != evHash{
+	//	t.Error("QueryWithEvHash error")
+	//}
 }
 
 func TestTencent(t *testing.T) {
-	zxl, err := NewZxlImpl("xxxxxxxxxx0xxxx", "appTestTX")
+	zxl, err := NewZxlImpl("190725000110077", "appTest77")
 	if err != nil {
 		t.Error(err)
 	}
@@ -130,6 +133,8 @@ func TestSign(t *testing.T) {
 		t.Error(err)
 	}
 	pk, sk, err := zxl.GenerateKeyPair()
+	fmt.Println(pk)
+	fmt.Println(sk)
 	if err != nil {
 		t.Error(err)
 	}
@@ -164,6 +169,14 @@ func TestHash(t *testing.T) {
 		t.Error(err)
 	}
 	hashStr, err := zxl.CalculateHash("G:\\channel.zip")
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Print(hashStr)
+}
+func TestStrHash(t *testing.T) {
+	zxl, err := NewZxlImpl("190725000110077", "appTestTX")
+	hashStr, err := zxl.CalculateStrHash("fwejfoiwfjoweifjowf")
 	if err != nil {
 		fmt.Println(err.Error())
 	}

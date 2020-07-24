@@ -4,16 +4,17 @@ import (
 	"bytes"
 	"container/list"
 	"crypto/tls"
+	"crypto/x509"
 	"encoding/json"
 	"errors"
-	"strconv"
-	"strings"
-
+	"fmt"
 	uuid "github.com/satori/go.uuid"
 	"io"
 	"io/ioutil"
 	"net/http"
-
+	"net/url"
+	"strconv"
+	"strings"
 	"time"
 )
 
@@ -22,16 +23,58 @@ func generateUid() (string, error) {
 	idStr := strings.ReplaceAll(tmpUid.String(), "-", "")
 	return idStr, nil
 }
+func addTrust(pool *x509.CertPool, path string) {
+	aCrt, err := ioutil.ReadFile(path)
+	if err != nil {
+		fmt.Println("ReadFile err:", err)
+		return
+	}
+	pool.AppendCertsFromPEM(aCrt)
+}
+func buildHtppClient(isProxy bool, timeout time.Duration) *http.Client {
+	pool := x509.NewCertPool()
 
+	//cliCrt, err := tls.LoadX509KeyPair("D:\\certificate\\go\\server.crt", "D:\\certificate\\go\\server.key")
+	//if err != nil {
+	//	fmt.Println("Loadx509keypair err:", err)
+	//	return nil
+	//}
+	var proxy func(*http.Request) (*url.URL, error) = nil
+	if isProxy {
+		proxy = func(_ *http.Request) (*url.URL, error) {
+			return url.Parse("http://" + defConf.ProxyHost + ":" + defConf.ProxyPort)
+		}
+	}
+	if defConf.ServerCrtPath != "" {
+		addTrust(pool, defConf.ServerCrtPath)
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: pool,
+				//Certificates:       []tls.Certificate{cliCrt},
+				InsecureSkipVerify: false}, Proxy: proxy}
+		client := &http.Client{Transport: transport, Timeout: timeout}
+		return client
+	} else {
+		transport := &http.Transport{
+			TLSClientConfig: &tls.Config{
+				RootCAs: nil,
+				//Certificates:       []tls.Certificate{cliCrt},
+				InsecureSkipVerify: false}, Proxy: proxy}
+		client := &http.Client{Transport: transport, Timeout: timeout}
+		return client
+	}
+
+}
 func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) ([]byte, error) {
 	var byteReader io.Reader = nil
 	if body != nil {
 		byteReader = bytes.NewReader(body)
 	}
 
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
-
-	cli := http.Client{Transport: tr, Timeout: timeout}
+	//tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	//
+	//cli := http.Client{Transport: tr, Timeout: timeout}
+	cli := buildHtppClient(defConf.IsProxy, timeout)
 
 	req, err := http.NewRequest(method, url, byteReader)
 	if err != nil {

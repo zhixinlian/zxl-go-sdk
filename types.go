@@ -28,6 +28,11 @@ type Config struct {
 	QueryWithEvHash string `json:"queryWithEvHash"`
 	QueryWithTxHash string `json:"queryWithTxHash"`
 	UserCert        string `json:"userCert"`
+	QueryWithHash   string `json:"queryWithHash"`
+	ProxyHost       string
+	ProxyPort       string
+	IsProxy         bool
+	ServerCrtPath   string
 	ContentCapture  string `json:"contentCapture"`
 }
 
@@ -53,7 +58,6 @@ type CetcEvidenceReq struct {
 	EvId       string `json:"evId"`
 	EvHash     string `json:"evHash"`
 	ExtendInfo string `json:"extendInfo"`
-	Time       string `json:"time"`
 	Sign       string `json:"sign"`
 }
 
@@ -118,6 +122,7 @@ type EvSaveResult struct {
 	TxHash      string `json:"txHash"`
 	EvHash      string `json:"evHash"`
 	CreateTime  string `json:"createTime"`
+	Ext         string `json:"ext"`
 }
 
 //下发截屏/录屏任务

@@ -35,18 +35,20 @@ type zxlCipher interface {
 	EvidenceSave(evHash, extendInfo, sk, pk string, timeout time.Duration) (*EvSaveResult, error)
 	//计算文件hash
 	CalculateHash(path string) (string, error)
+	//计算字符串hash
+	CalculateStrHash(str string) (string, error)
 	//录屏任务
 	ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error)
 	//截屏任务
 	ContentCapturePic(webUrls string, timeout time.Duration) (string, error)
 	//获取录屏、截屏任务状态及结果
-	getContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error)
+	GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error)
 	//视频取证接口
-	evidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error)
+	EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error)
 	//图片取证接口
-	evidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error)
+	EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error)
 	//获取取证证书任务状态及结果
-	getEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error)
+	GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error)
 }
 
 func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
@@ -60,13 +62,14 @@ func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
 	if err != nil {
 		return nil, errors.New(InvalidAppId)
 	}
-	if typeInt == TypeTengXun {
-		return &zxlImpl{appId: appId, appKey: appKey, appType: typeInt, zxlCipher: &trustSDKImpl{AppId: appId, AppKey: appKey}}, nil
-	} else if typeInt == TypeWangAn {
-		return &zxlImpl{appId: appId, appKey: appKey, appType: typeInt, zxlCipher: &cetcSDKImpl{AppId: appId, AppKey: appKey}}, nil
-	} else {
-		return nil, errors.New(InvalidAppType)
-	}
+	return &zxlImpl{appId: appId, appKey: appKey, appType: typeInt, zxlCipher: &cetcSDKImpl{AppId: appId, AppKey: appKey}}, nil
+	//if typeInt == TypeTengXun {
+	//	return &zxlImpl{appId: appId, appKey: appKey, appType:typeInt, zxlCipher: &trustSDKImpl{AppId:appId, AppKey:appKey}}, nil
+	//} else if typeInt == TypeWangAn {
+	//	return &zxlImpl{appId: appId, appKey: appKey, appType:typeInt, zxlCipher: &cetcSDKImpl{AppId:appId, AppKey:appKey}}, nil
+	//} else {
+	//	return nil, errors.New(InvalidAppType)
+	//}
 }
 
 type zxlImpl struct {
@@ -212,6 +215,24 @@ func (zxl *zxlImpl) QueryWithEvHash(evHash string, timeout time.Duration) ([]Que
 	err = json.Unmarshal(respBytes, &result)
 	if err != nil {
 		return nil, errors.New("QueryWithEvHash (Unmarshal) error: " + err.Error())
+	}
+	return result, nil
+}
+
+//任意输入查找证据
+func (zxl *zxlImpl) QueryWithHash(hash string, timeout time.Duration) ([]QueryResp, error) {
+
+	if len(hash) == 0 {
+		return nil, errors.New("hash 不能为空")
+	}
+	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithHash+hash, nil, timeout)
+	if err != nil {
+		return nil, errors.New("QueryWithHash (sendRequest) error: " + err.Error())
+	}
+	var result []QueryResp
+	err = json.Unmarshal(respBytes, &result)
+	if err != nil {
+		return nil, errors.New("QueryWithHash (Unmarshal) error: " + err.Error())
 	}
 	return result, nil
 }

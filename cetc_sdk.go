@@ -55,9 +55,8 @@ func (sdk *cetcSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout 
 	if err != nil {
 		return nil, errors.New("EvidenceSave (cetc generateUid) error:" + err.Error())
 	}
-	ed := CetcEvidenceReq{EvId: uid, EvHash: evHash, ExtendInfo: extendInfo,
-		Time: time.Now().Format("2006-01-02 15:04:05")}
-	rawStr := []byte(strings.Join([]string{sdk.AppId, ed.EvHash, ed.ExtendInfo, ed.EvId, ed.Time}, ","))
+	ed := CetcEvidenceReq{EvId: uid, EvHash: evHash, ExtendInfo: extendInfo}
+	rawStr := []byte(strings.Join([]string{sdk.AppId, ed.EvHash, ed.ExtendInfo, ed.EvId}, ","))
 	signStr, err := sdk.Sign(sk, rawStr)
 	if err != nil {
 		return nil, errors.New("EvidenceSave (cetc Sign) error:" + err.Error())
@@ -85,6 +84,11 @@ func (sdk *cetcSDKImpl) CalculateHash(path string) (string, error) {
 		return "", errors.New("CalculateHash (ReadFile) error:" + err.Error())
 	}
 	dataHash := sm3.SumSM3(data)
+	return hex.EncodeToString(dataHash), nil
+}
+func (sdk *cetcSDKImpl) CalculateStrHash(str string) (string, error) {
+	signByte := []byte(str)
+	dataHash := sm3.SumSM3(signByte)
 	return hex.EncodeToString(dataHash), nil
 }
 
@@ -119,7 +123,7 @@ func (sdk *cetcSDKImpl) ContentCapturePic(webUrls string, timeout time.Duration)
 	var retResp = sendRetBytes.OrderNo
 	return retResp, nil
 }
-func (sdk *cetcSDKImpl) getContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error) {
+func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error) {
 	if len(orderNo) == 0 {
 		return nil, errors.New("orderNo 不能为空")
 	}
@@ -134,7 +138,7 @@ func (sdk *cetcSDKImpl) getContentStatus(orderNo string, timeout time.Duration) 
 }
 
 //视频取证接口
-func (sdk *cetcSDKImpl) evidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) {
+func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
@@ -149,7 +153,7 @@ func (sdk *cetcSDKImpl) evidenceObtainVideo(webUrls, title, remark string, timeo
 }
 
 //图片取证接口
-func (sdk *cetcSDKImpl) evidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error) {
+func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
@@ -164,7 +168,7 @@ func (sdk *cetcSDKImpl) evidenceObtainPic(webUrls, title, remark string, timeout
 }
 
 //获取取证证书任务状态及结果
-func (sdk *cetcSDKImpl) getEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error) {
+func (sdk *cetcSDKImpl) GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error) {
 	if len(orderNo) == 0 {
 		return nil, errors.New("orderNo 不能为空")
 	}
