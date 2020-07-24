@@ -142,7 +142,7 @@ timeout 调用超时时间，0为不设置
 string 订单号  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误 
 
-### getContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error)
+### GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error)
 
 功能： 获取截屏/录屏任务状态及结果  
 参数：  
@@ -152,7 +152,7 @@ timeout 调用超时时间，0为不设置
 *TaskEvData 任务执行状态信息	{status:0[运行中]|1[成功]|2[失败],statusMsg:任务状态解读[运行中]>>[运行成功]>>[运行失败],url:状态成功时,对应的cosurl,hash:截图成功时,对应的存证hash}  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误 
 
-### evidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error)
+### EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error)
 
 功能： 视频取证接口  
 参数：  
@@ -164,7 +164,7 @@ timeout 调用超时时间，0为不设置
 string 订单号  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误 
 
-### evidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error)
+### EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error)
 
 功能： 图片取证接口  
 参数：  
@@ -176,7 +176,7 @@ timeout 调用超时时间，0为不设置
 string 订单号  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误 
 
-### getEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error)
+### GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error)
 
 功能： 获取取证证书任务状态及结果接口  
 参数：  
