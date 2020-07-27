@@ -172,7 +172,7 @@ func (sdk *trustSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Durati
 	if len(webUrls) == 0 {
 		return "", errors.New("webUrls 不能为空")
 	}
-	param := EvObtainTask{WebUrls: webUrls, Type: 1, AppId: sdk.AppId, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
+	param := EvObtainTask{WebUrls: webUrls, Type: 2, AppId: sdk.AppId, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	applyRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST",
 		defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
@@ -189,7 +189,7 @@ func (sdk *trustSDKImpl) ContentCapturePic(webUrls string, timeout time.Duration
 	if len(webUrls) == 0 {
 		return "", errors.New("webUrls 不能为空")
 	}
-	param := EvObtainTask{WebUrls: webUrls, Type: 0, AppId: sdk.AppId, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
+	param := EvObtainTask{WebUrls: webUrls, Type: 1, AppId: sdk.AppId, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
@@ -218,7 +218,7 @@ func (sdk *trustSDKImpl) evidenceObtainVideo(webUrls, title, remark string, time
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 1, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 2, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
@@ -233,7 +233,7 @@ func (sdk *trustSDKImpl) evidenceObtainPic(webUrls, title, remark string, timeou
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 0, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 1, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
