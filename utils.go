@@ -1,4 +1,4 @@
-package zxl_go_sdk
+package main
 
 import (
 	"bytes"
@@ -8,6 +8,8 @@ import (
 	"encoding/json"
 	"errors"
 	uuid "github.com/satori/go.uuid"
+
+	//uuid "github.com/satori/go.uuid"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -125,6 +127,8 @@ func retErrMsg(msg string) (errMsg string) {
 	errorCodeLst.PushBack(&TxErrorCodeType{"562013", "没有可用的消费套餐"})
 	errorCodeLst.PushBack(&TxErrorCodeType{"562014", "内部错误"})
 	errorCodeLst.PushBack(&TxErrorCodeType{"563006", "更新消费流水状态失败"})
+	errorCodeLst.PushBack(&TxErrorCodeType{"-101", "此编号未查到对应信息"})
+	errorCodeLst.PushBack(&TxErrorCodeType{"3108", "服务不可用,调用后端服务失败"})
 	for e := errorCodeLst.Front(); e != nil; e = e.Next() {
 		if strings.Index(msg, (e.Value).(*TxErrorCodeType).Code) == -1 {
 			continue

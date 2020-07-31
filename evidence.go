@@ -1,4 +1,4 @@
-package zxl_go_sdk
+package main
 
 import (
 	"bytes"
