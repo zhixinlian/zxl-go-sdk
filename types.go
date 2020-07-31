@@ -1,4 +1,4 @@
-package main
+package zxl_go_sdk
 
 type SaveResult struct {
 	//链上存证的hash

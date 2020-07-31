@@ -1,4 +1,4 @@
-package main
+package zxl_go_sdk
 
 import (
 	"crypto/sha256"
