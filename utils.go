@@ -145,7 +145,7 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 		byteReader = bytes.NewReader(body)
 	}
 
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, DisableKeepAlives:true}
 
 	cli := http.Client{Transport: tr, Timeout: timeout}
 
@@ -170,6 +170,7 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 		return nil, errors.New("cli.Do error bad status : " + resp.Status)
 	}
 	data, err := ioutil.ReadAll(resp.Body)
+	defer resp.Body.Close()
 	var commonData TxRetCommonData
 	err = json.Unmarshal(data, &commonData)
 	if err != nil {
