@@ -8,8 +8,6 @@ import (
 	"encoding/json"
 	"errors"
 	uuid "github.com/satori/go.uuid"
-
-	//uuid "github.com/satori/go.uuid"
 	"io"
 	"io/ioutil"
 	"net/http"
@@ -161,7 +159,7 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 		return nil, errors.New("cli.Do error:" + err.Error())
 	}
 	if resp.StatusCode != 200 {
-		if resp.StatusCode == 400 || resp.StatusCode == 500 {
+		if resp.StatusCode == 400 || resp.StatusCode == 500 || resp.StatusCode == 401 {
 			data, _ := ioutil.ReadAll(resp.Body)
 			var commonData CommonRet
 			_ = json.Unmarshal(data, &commonData)
