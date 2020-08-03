@@ -52,7 +52,7 @@ type zxlCipher interface {
 }
 
 func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
-	if len(appId) < 11 {
+	if len(appId) < 15 {
 		return nil, errors.New(InvalidAppId)
 	}
 	if len(appKey) == 0 {
