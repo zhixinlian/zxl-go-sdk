@@ -149,7 +149,7 @@ error 查询过程发生的错误信息，如果为nil说明没有发生错误
 orderNo 订单号  
 timeout 调用超时时间，0为不设置  
 返回值：  
-*TaskEvData 任务执行状态信息	{status:0[运行中]|1[成功]|2[失败],statusMsg:任务状态解读[运行中]>>[运行成功]>>[运行失败],url:状态成功时,对应的cosurl,hash:截图成功时,对应的存证hash}  
+*TaskEvData 任务执行状态信息	{status:0[运行中]|2[成功]|10[失败],statusMsg:任务状态解读[运行中]>>[运行成功]>>[运行失败],url:状态成功时,对应的cosurl,hash:截图成功时,对应的存证hash}  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误 
 
 ### EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error)
@@ -183,7 +183,7 @@ error 查询过程发生的错误信息，如果为nil说明没有发生错误
 orderNo 取证订单号，必填  
 timeout 调用超时时间，0为不设置  
 返回值：  
-*EvIdData 取证任务状态及结果 	｛status:0[运行中]|1[任务完成]|2[失败],evidUrl:取证证据下载地址[当状态为1时],voucherUrl:取证证书下载地址[[当状态为1时]｝  
+*EvIdData 取证任务状态及结果 	｛status:0[运行中]|2[任务完成]|10[失败],evidUrl:取证证据下载地址[当状态为1时],voucherUrl:取证证书下载地址[[当状态为1时]｝  
 error 查询过程发生的错误信息，如果为nil说明没有发生错误 
 
 
