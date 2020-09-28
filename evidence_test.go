@@ -148,3 +148,25 @@ func TestStrHash(t *testing.T) {
 	}
 	fmt.Print(hashStr)
 }
+
+func TestHelloWorld(t *testing.T) {
+	fmt.Println("ha")
+}
+
+func TestVerify(t *testing.T) {
+	zxl, err := NewZxlImpl("xxxxxxxxxx0xxxx", "appTestTX")
+	if err != nil {
+		t.Error(err)
+	}
+
+	var pk = "046bde58352d3360228f71e014d832b00df19c49725eb7ec13986bfce10c54d03e6789cef641961b4a9f69d7bc30c736b60ce62b9674902cff9eecbdb57380341c"
+	//var sk = "c31c4b9e1582fe3fa1c9b9ee8be831c410ce243ffb94c263905c91f40d11cc7a"
+	//rawData := []byte("3045022100f86e124bc0e8063c62078a8ca1f57a047173b90822133890b000adb6a5f414ee0220262dc4043dffd74d5624d08b3def08bbea1f09d584991c8507754f3084395299")
+	rawData := []byte("")
+	var signStr = "304502206dc7a6903269024bc0c42ba6a35493f75015c096be6aded8a4e1e46964f6c165022100c020dc22f8059f69f3447fb76190d157f92890bad5a21ffd174f461155eb75af"
+	//signStr, err := zxl.Sign(sk, rawData)
+	//公钥 签名后数据 签名原数据
+	success, err := zxl.Verify(pk, signStr, rawData)
+	fmt.Println("begin")
+	fmt.Println(success, err)
+}
