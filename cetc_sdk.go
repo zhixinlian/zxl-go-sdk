@@ -106,7 +106,7 @@ func (sdk *cetcSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Duratio
 		return "", errors.New("下发任务异常>>error:" + err.Error())
 	}
 	var applyResp = applyRetBytes.OrderNo
-	return applyResp, errors.New("ssss")
+	return applyResp, nil
 }
 
 //下发录屏任务到取证工具服务
