@@ -93,7 +93,6 @@ func (sdk *cetcSDKImpl) CalculateStrHash(str string) (string, error) {
 }
 
 //下发截屏任务到取证工具服务
-//_, err =sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr + defConf.UserCert, dataBytes, timeout)
 func (sdk *cetcSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 {
 		return "", errors.New("webUrls 不能为空")
@@ -105,7 +104,9 @@ func (sdk *cetcSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Duratio
 	if err != nil {
 		return "", errors.New("下发任务异常>>error:" + err.Error())
 	}
-	var applyResp = applyRetBytes.OrderNo
+	var txRetDetail TxRetDetail
+	json.Unmarshal(applyRetBytes, &txRetDetail)
+	var applyResp = txRetDetail.OrderNo
 	return applyResp, nil
 }
 
@@ -120,7 +121,9 @@ func (sdk *cetcSDKImpl) ContentCapturePic(webUrls string, timeout time.Duration)
 	if err != nil {
 		return "", errors.New("下发任务异常>>error:" + err.Error())
 	}
-	var retResp = sendRetBytes.OrderNo
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var retResp = txRetDetail.OrderNo
 	return retResp, nil
 }
 func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error) {
@@ -133,7 +136,9 @@ func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) 
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-	var taskEvData = TaskEvData{Hash: sendRetBytes.Hash, StatusMsg: sendRetBytes.StatusMsg, Status: sendRetBytes.Status, Url: sendRetBytes.Url}
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var taskEvData = TaskEvData{Hash: txRetDetail.Hash, StatusMsg: txRetDetail.StatusMsg, Status: txRetDetail.Status, Url: txRetDetail.Url}
 	return &taskEvData, nil
 }
 
@@ -148,7 +153,9 @@ func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeo
 	if err != nil {
 		return "", errors.New(err.Error())
 	}
-	var orderNo = sendRetBytes.OrderNo
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var orderNo = txRetDetail.OrderNo
 	return orderNo, nil
 }
 
@@ -163,7 +170,9 @@ func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark string, timeout
 	if err != nil {
 		return "", errors.New(err.Error())
 	}
-	var orderNo = sendRetBytes.OrderNo
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var orderNo = txRetDetail.OrderNo
 	return orderNo, nil
 }
 
@@ -178,6 +187,8 @@ func (sdk *cetcSDKImpl) GetEvidenceStatus(orderNo string, timeout time.Duration)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-	var evIdData = EvIdData{Status: sendRetBytes.Status, EvidUrl: sendRetBytes.EvIdUrl, VoucherUrl: sendRetBytes.VoucherUrl}
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var evIdData = EvIdData{Status: txRetDetail.Status, EvidUrl: txRetDetail.EvIdUrl, VoucherUrl: txRetDetail.VoucherUrl}
 	return &evIdData, nil
 }

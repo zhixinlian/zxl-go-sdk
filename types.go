@@ -34,6 +34,7 @@ type Config struct {
 	IsProxy         bool
 	ServerCrtPath   string
 	ContentCapture  string `json:"contentCapture"`
+	ReqFilePath     string `json:"reqFilePath"`
 }
 
 type CommonRet struct {
@@ -43,8 +44,10 @@ type CommonRet struct {
 }
 
 type UserCertReq struct {
-	Pk   string `json:"pk"`
-	Sign string `json:"sign"`
+	Pk              string `json:"pk"`
+	Sign            string `json:"sign"`
+	RepresentAppId  string `json:"representAppId"`
+	RepresentAppKey string `json:"representAppKey"`
 }
 
 type UserCertResp struct {
@@ -156,7 +159,7 @@ type EvIdData struct {
 type TxRetCommonData struct {
 	RetCode int         `json:"retCode"`
 	RetMsg  string      `json:"retMsg"`
-	Detail  TxRetDetail `json:"detail"`
+	Detail  interface{} `json:"detail"`
 }
 
 //定义tx接口返回结构体,最内层

@@ -179,7 +179,9 @@ func (sdk *trustSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Durati
 	if err != nil {
 		return "", errors.New("下发任务异常>>error:" + err.Error())
 	}
-	var applyResp = applyRetBytes.OrderNo
+	var txRetDetail TxRetDetail
+	json.Unmarshal(applyRetBytes, &txRetDetail)
+	var applyResp = txRetDetail.OrderNo
 	fmt.Print("输出当前结果" + applyResp)
 	return applyResp, nil
 }
@@ -195,7 +197,9 @@ func (sdk *trustSDKImpl) ContentCapturePic(webUrls string, timeout time.Duration
 	if err != nil {
 		return "", errors.New("下发任务异常>>error:" + err.Error())
 	}
-	var retResp = sendRetBytes.OrderNo
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var retResp = txRetDetail.OrderNo
 	fmt.Println("输出当前结果:" + retResp)
 	return retResp, nil
 }
@@ -209,7 +213,9 @@ func (sdk *trustSDKImpl) getContentStatus(orderNo string, timeout time.Duration)
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-	var taskEvData = TaskEvData{Hash: sendRetBytes.Hash, StatusMsg: sendRetBytes.StatusMsg, Status: sendRetBytes.Status, Url: sendRetBytes.Url}
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var taskEvData = TaskEvData{Hash: txRetDetail.Hash, StatusMsg: txRetDetail.StatusMsg, Status: txRetDetail.Status, Url: txRetDetail.Url}
 	return &taskEvData, nil
 }
 
@@ -224,7 +230,9 @@ func (sdk *trustSDKImpl) evidenceObtainVideo(webUrls, title, remark string, time
 	if err != nil {
 		return "", errors.New(err.Error())
 	}
-	var orderNo = sendRetBytes.OrderNo
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var orderNo = txRetDetail.OrderNo
 	return orderNo, nil
 }
 
@@ -239,7 +247,9 @@ func (sdk *trustSDKImpl) evidenceObtainPic(webUrls, title, remark string, timeou
 	if err != nil {
 		return "", errors.New(err.Error())
 	}
-	var orderNo = sendRetBytes.OrderNo
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var orderNo = txRetDetail.OrderNo
 	return orderNo, nil
 }
 
@@ -254,39 +264,8 @@ func (sdk *trustSDKImpl) getEvidenceStatus(orderNo string, timeout time.Duration
 	if err != nil {
 		return nil, errors.New(err.Error())
 	}
-	var evIdData = EvIdData{Status: sendRetBytes.Status, EvidUrl: sendRetBytes.EvIdUrl, VoucherUrl: sendRetBytes.VoucherUrl}
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	var evIdData = EvIdData{Status: txRetDetail.Status, EvidUrl: txRetDetail.EvIdUrl, VoucherUrl: txRetDetail.VoucherUrl}
 	return &evIdData, nil
 }
-
-//func main() {
-//	sdk := NewTrustSK()
-//	prvkey, err := sdk.GeneratePrivateKey()
-//	if err != nil {
-//		logging.CLog().Error("GeneratePrivateKey err", err)
-//	}
-//	logging.CLog().WithFields(logrus.Fields{
-//		"prvkey": prvkey,
-//	}).Info("create private key")
-//	pubkey, err := sdk.GeneratePubKeyFromPrvKey(prvkey)
-//	if err != nil {
-//		logging.CLog().Error("GeneratePubKeyFromPrvKey err", err)
-//	}
-//	logging.CLog().WithFields(logrus.Fields{
-//		"pubkey": pubkey,
-//	}).Info("create public key")
-//	sign, err := sdk.Sign(prvkey, []byte("test"), false)
-//	if err != nil {
-//		logging.CLog().Error("Sign err", err)
-//	}
-//	logging.CLog().WithFields(logrus.Fields{
-//		"sign": sign,
-//	}).Info("sign result")
-//	verifyresult, err := sdk.Verify(pubkey, "test", false,
-//		sign)
-//	if err != nil {
-//		logging.CLog().Error("Verify err", err)
-//	}
-//	logging.CLog().WithFields(logrus.Fields{
-//		"verify result": verifyresult,
-//	}).Info("verify result")
-//}

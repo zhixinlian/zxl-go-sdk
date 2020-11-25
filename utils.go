@@ -137,13 +137,13 @@ func retErrMsg(msg string) (errMsg string) {
 }
 
 //新增腾讯中间件请求操作发送
-func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) (*TxRetDetail, error) {
+func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) ([]byte, error) {
 	var byteReader io.Reader = nil
 	if body != nil {
 		byteReader = bytes.NewReader(body)
 	}
 
-	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, DisableKeepAlives:true}
+	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, DisableKeepAlives: true}
 
 	cli := http.Client{Transport: tr, Timeout: timeout}
 
@@ -177,5 +177,6 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 	if commonData.RetCode != 0 {
 		return nil, errors.New("http response error info : " + retErrMsg(strconv.Itoa(commonData.RetCode)))
 	}
-	return &commonData.Detail, nil
+	retBytes, _ := json.Marshal(&commonData.Detail)
+	return retBytes, nil
 }

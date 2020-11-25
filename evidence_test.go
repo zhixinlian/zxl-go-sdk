@@ -9,48 +9,37 @@ import (
 )
 
 func TestCetc(t *testing.T) {
-	//zxl, err := NewZxlImpl("200515000110001","0e4bce1b0ef8471fb9140b849e776f48")
-	//if err != nil {
-	//	fmt.Println("错误")
-	//}
-	//result ,err := zxl.EvidenceSave("123213123123123321312312","test","04115802b333e51625853f3f8c0d6117041615689e3a1318a3e8fc05dc50dc44255cc33d2304012cf79f0b0fccf150c40a5af5aca4417d441ae4ec95094d1e0c3a",
-	//	"bf8ebcee5542976b7b8a0df6c33862aa09bc274d036bc2007c6190b8a6d20ad4",time.Second*10);
-	//if err != nil {
-	//	fmt.Println(err.Error())
-	//}
-	//fmt.Println(result)
-
 	/** 2020-07-24 add start */
-	zxl, err := NewZxlImpl("200514000200001","9d7f4ba445a54ed2b041e142d5ea12f3")
+	zxl, err := NewZxlImpl("200514000200001", "9d7f4ba445a54ed2b041e142d5ea12f3")
 	if err != nil {
 		fmt.Println("错误")
 	}
 	//图片取证
-	result, err := zxl.EvidenceObtainPic("https://www.baidu.com","图片","go_sdk_test",time.Second*2)
+	result, err := zxl.EvidenceObtainPic("https://www.baidu.com", "图片", "go_sdk_test", time.Second*2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(result)
 	//根据orderNo查询取证任务状态及结果
-	result1, err := zxl.GetEvidenceStatus("1595578460075584005313706",time.Second*2)
+	result1, err := zxl.GetEvidenceStatus("1595578460075584005313706", time.Second*2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(result1)
-	zxl1, err := NewZxlImpl("200515000110001","0e4bce1b0ef8471fb9140b849e776f48")
+	zxl1, err := NewZxlImpl("200515000110001", "0e4bce1b0ef8471fb9140b849e776f48")
 	if err != nil {
 		fmt.Println("错误")
 	}
 	//下发截屏任务
-	result2, err := zxl1.ContentCapturePic("https://www.baidu.com",time.Second*2)
+	result2, err := zxl1.ContentCapturePic("https://www.baidu.com", time.Second*2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(result2)
 	//根据订单号查询截屏任务的状态及结果
-	result4, err:= zxl1.GetContentStatus("1595578461244000782838012",time.Second*2)
+	result4, err := zxl1.GetContentStatus("1595578461244000782838012", time.Second*2)
 	if err != nil {
-		fmt.Println("321321",err.Error())
+		fmt.Println("321321", err.Error())
 	}
 	fmt.Println(result4)
 	/** 2020-07-24 add end */
@@ -192,4 +181,21 @@ func TestStrHash(t *testing.T) {
 		fmt.Println(err.Error())
 	}
 	fmt.Print(hashStr)
+}
+
+/**代理用户注册的相关调用示例*/
+func TestAgentUser(t *testing.T) {
+	var filePath = "E:\\至信链\\sdk接入文档\\inner.png"
+	zxl, err := NewZxlImpl("201112000100001", "3962933ae84349ae83b87b798f1fdf82")
+	if err != nil {
+		fmt.Println(err)
+	}
+	var user = AgentUser{RepresentEmail: "990991@qq.com", Pwd: "w836546028", CardFrontFile: filePath, LetterFile: filePath,
+		CardBackendFile: filePath, LicenseFile: filePath, Representative: "李艳", EpName: "山东拼多多供应链管理有限公司", CreditCode: "91370105MA3P4F040J",
+		Idcard: "511321198912037013", Contact: "刘飞", Title: "cto", Mobile: "18280097243", Category: 1}
+	registerFlag, err := zxl.RegisterUser(user, 0)
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	fmt.Println(registerFlag)
 }
