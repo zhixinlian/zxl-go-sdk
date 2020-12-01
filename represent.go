@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
-	"fmt"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
@@ -542,7 +541,6 @@ func (zxl *zxlImpl) SelectEpInfo(email string, timeout time.Duration) (ReviewDat
 	param["agentAppId"] = zxl.appId
 	bytes, _ := json.Marshal(param)
 	url := defConf.ServerAddr + defConf.ContentCapture
-	fmt.Println(sendTxMidRequest(zxl.appId, zxl.appKey, "POST", url, bytes, timeout))
 	retBytes, err := sendTxMidRequest(zxl.appId, zxl.appKey, "POST", url, bytes, timeout)
 	if err != nil {
 		return ret, errors.New(err.Error())
@@ -593,6 +591,34 @@ func (zxl *zxlImpl) UpdateRepresentUserCert(representAppId, representAppKey, rep
 		return false, errors.New("UpdateUserCertError (sendRequest): " + err.Error())
 	}
 	return true, nil
+}
+
+/**代理用户上链**/
+func (zxl *zxlImpl) representSave(evHash, extendInfo, representSk, representAppId string, timeout time.Duration) (*EvSaveResult, error) {
+	uid, err := generateUid()
+	if err != nil {
+		return nil, errors.New("EvidenceSave (cetc generateUid) error:" + err.Error())
+	}
+	ed := CetcEvidenceReq{EvId: uid, EvHash: evHash, ExtendInfo: extendInfo, AepresentAppId: representAppId}
+	rawStr := []byte(strings.Join([]string{representAppId, ed.EvHash, ed.ExtendInfo, ed.EvId}, ","))
+	signStr, err := zxl.Sign(representSk, rawStr)
+	if err != nil {
+		return nil, errors.New("EvidenceSave (cetc Sign) error:" + err.Error())
+	}
+	ed.Sign = signStr
+	bodyData, _ := json.Marshal(&ed)
+	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.EvidenceSave, bodyData, timeout)
+	if err != nil {
+		return nil, errors.New("EvidenceSave (cetc sendRequest) error:" + err.Error())
+	}
+	var saveResp EvSaveResult
+	err = json.Unmarshal(respBytes, &saveResp)
+	if err != nil {
+		return nil, errors.New("EvidenceSave (cetc Unmarshal) error:" + err.Error())
+	}
+	saveResp.EvHash = evHash
+	saveResp.EvId = uid
+	return &saveResp, nil
 }
 
 /**代理用户的注册*/

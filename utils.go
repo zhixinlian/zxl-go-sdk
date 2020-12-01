@@ -133,7 +133,7 @@ func retErrMsg(msg string) (errMsg string) {
 		}
 		return (e.Value).(*TxErrorCodeType).Msg
 	}
-	return ""
+	return msg
 }
 
 //新增腾讯中间件请求操作发送

@@ -185,17 +185,35 @@ func TestStrHash(t *testing.T) {
 
 /**代理用户注册的相关调用示例*/
 func TestAgentUser(t *testing.T) {
-	var filePath = "E:\\至信链\\sdk接入文档\\inner.png"
-	zxl, err := NewZxlImpl("201112000100001", "3962933ae84349ae83b87b798f1fdf82")
+	//var filePath = "E:\\至信链\\sdk接入文档\\inner.png"
+	zxl, err := NewZxlImpl("201010000210001", "9487fe0f7d1f436fb0ef62ce6608c236")
 	if err != nil {
 		fmt.Println(err)
 	}
-	var user = AgentUser{RepresentEmail: "990991@qq.com", Pwd: "w836546028", CardFrontFile: filePath, LetterFile: filePath,
-		CardBackendFile: filePath, LicenseFile: filePath, Representative: "李艳", EpName: "山东拼多多供应链管理有限公司", CreditCode: "91370105MA3P4F040J",
-		Idcard: "511321198912037013", Contact: "刘飞", Title: "cto", Mobile: "18280097243", Category: 1}
-	registerFlag, err := zxl.RegisterUser(user, 0)
+	//var user = AgentUser{RepresentEmail: "990991011@qq.com", Pwd: "w836546028", CardFrontFile: filePath, LetterFile: filePath,
+	//	CardBackendFile: filePath, LicenseFile: filePath, Representative: "李艳", EpName: "山东拼多多供应链管理有限公司", CreditCode: "91370105MA3P4F040J",
+	//	Idcard: "511321198912037013", Contact: "刘飞", Title: "cto", Mobile: "18280097243", Category: 1}
+	//registerFlag, err := zxl.RegisterUser(user, 0)
+	//if err != nil {
+	//	fmt.Println(err.Error())
+	//}
+	//fmt.Println(registerFlag)
+	//fmt.Println(zxl.SelectEpInfo("990991011@qq.com",0))
+	///**注册审核完毕的appId及appKey -- 201201000110001 1d8b89be2eab4d4e8c9ddbe5843ca983**/
+	////公私钥绑定
+	//fmt.Println(zxl.BindRepresentUserCert("201201000110001","1d8b89be2eab4d4e8c9ddbe5843ca983",
+	//	"04c0eb7f2b60a8752c8852ac255c966fee8aa5accc7a1f74b55d50bbc0faf3d4dbd98144624b5f002e0cd88662337e6e0a90f4875487fef04750b1124fc03cae61",
+	//	"8b387ab63c4238758b762ae5269bb05173312296cb473e9b804b0bd274a37e61"))
+	//公私钥更新
+	//fmt.Println(zxl.UpdateRepresentUserCert("201201000110001","1d8b89be2eab4d4e8c9ddbe5843ca983",
+	//	"04fe7cc425457346d563a1ecde041ae0eabf4abf8e19a20d7087bab1a60be5dcad328049398c9ea0454547c15d54a0053b014da11b87d90aa3ab5fa90dd9ca11f4",
+	//	"8e7b64d470b04000a24be597496449e4573b0e566b8df30420f4c8e5b9821103"))
+	//代理用户上链
+	evHash, err := zxl.CalculateStrHash("test上链")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println(registerFlag)
+	fmt.Println(zxl.representSave(evHash, "测试上链", "8b387ab63c4238758b762ae5269bb05173312296cb473e9b804b0bd274a37e61", "201201000110001", 0))
+	//fmt.Println(zxl.EvidenceSave(evHash,"ceshi","ba35a87f5550d0319c2518db920c40f0bb1b9df6e5aab2142c0c04203fbe8d09",
+	//	"04e347499fc53813a00053612d77e4c2229a586e04a9b384c20be20a662f95b0a94a22ff3b417c779df27243f847a32a7a0c0b108a6745ae56ac8b3fdea0d36683",0))
 }

@@ -58,10 +58,11 @@ type UserCertResp struct {
 }
 
 type CetcEvidenceReq struct {
-	EvId       string `json:"evId"`
-	EvHash     string `json:"evHash"`
-	ExtendInfo string `json:"extendInfo"`
-	Sign       string `json:"sign"`
+	EvId           string `json:"evId"`
+	EvHash         string `json:"evHash"`
+	ExtendInfo     string `json:"extendInfo"`
+	Sign           string `json:"sign"`
+	AepresentAppId string `json:"representAppId"`
 }
 
 type TencentEvidenceReq struct {
