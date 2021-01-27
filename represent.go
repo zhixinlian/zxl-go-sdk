@@ -500,32 +500,32 @@ func (zxl *zxlImpl) RegisterUser(info AgentUser, timeout time.Duration) (bool, e
 	}
 	//上传公函
 	if len(info.LetterFile) != 0 {
-		letterId, err := UploadFile(info, zxl.appId, info.LicenseFile, UploadLetterAddr, UploadLetter)
+		letterId, err := uploadFile(info, zxl.appId, info.LicenseFile, UploadLetterAddr, UploadLetter)
 		if err != nil {
 			return false, errors.New("upload letter fail : " + err.Error())
 		}
 		info.OfficialLetterId = letterId
 	}
 	//上传身份证正面
-	frontId, err := UploadFile(info, zxl.appId, info.CardFrontFile, UploadCardFrontAddr, UploadCardFront)
+	frontId, err := uploadFile(info, zxl.appId, info.CardFrontFile, UploadCardFrontAddr, UploadCardFront)
 	if err != nil {
 		return false, errors.New("upload card front fail : " + err.Error())
 	}
 	info.IdcardFrontId = frontId
 	//上传身份证反面
-	backId, err := UploadFile(info, zxl.appId, info.CardFrontFile, UploadCardBackAddr, UploadCardFront)
+	backId, err := uploadFile(info, zxl.appId, info.CardFrontFile, UploadCardBackAddr, UploadCardFront)
 	if err != nil {
 		return false, errors.New("upload card back fail : " + err.Error())
 	}
 	info.IdcardBackId = backId
 	//上传商务执照
-	busiId, err := UploadFile(info, zxl.appId, info.CardFrontFile, UploadBusAddr, UploadBus)
+	busiId, err := uploadFile(info, zxl.appId, info.CardFrontFile, UploadBusAddr, UploadBus)
 	if err != nil {
 		return false, errors.New("upload busi fail : " + err.Error())
 	}
 	info.BusiLicenseId = busiId
 	//提交商务信息
-	return SubmitBusInfo(info, zxl.appId, zxl.appKey)
+	return submitBusInfo(info, zxl.appId, zxl.appKey)
 }
 
 /**查询代理用户的审核状态信息*/
@@ -594,7 +594,7 @@ func (zxl *zxlImpl) UpdateRepresentUserCert(representAppId, representAppKey, rep
 }
 
 /**代理用户上链**/
-func (zxl *zxlImpl) representSave(evHash, extendInfo, representSk, representAppId string, timeout time.Duration) (*EvSaveResult, error) {
+func (zxl *zxlImpl) RepresentSave(evHash, extendInfo, representSk, representAppId string, timeout time.Duration) (*EvSaveResult, error) {
 	uid, err := generateUid()
 	if err != nil {
 		return nil, errors.New("EvidenceSave (cetc generateUid) error:" + err.Error())
@@ -621,6 +621,7 @@ func (zxl *zxlImpl) representSave(evHash, extendInfo, representSk, representAppI
 	return &saveResp, nil
 }
 
+
 /**代理用户的注册*/
 func submitRegister(appId, appKey string, info AgentUser, timeout time.Duration) error {
 	var req = CommonReq{ReqTypePost, SubmitRegisterUser}
@@ -635,14 +636,14 @@ func submitRegister(appId, appKey string, info AgentUser, timeout time.Duration)
 }
 
 /**上传附件(返回对应的附件id)**/
-func UploadFile(info AgentUser, appId, filename, urlConst, uploadType string) (int, error) {
+func uploadFile(info AgentUser, appId, filename, urlConst, uploadType string) (int, error) {
 	var param = make(map[string]string)
 	param["requestType"] = "POST"
 	param["redirectUrl"] = urlConst
 	param["Agent-App-Id"] = appId
 	param["Represent-App-Email"] = info.RepresentEmail
 	url := defConf.ServerAddr + defConf.ReqFilePath
-	upRet, err := PostFile(filename, url, param)
+	upRet, err := postFile(filename, url, param)
 	if err != nil {
 		return 0, errors.New("send file fail: " + err.Error())
 	}
@@ -660,7 +661,7 @@ func UploadFile(info AgentUser, appId, filename, urlConst, uploadType string) (i
 }
 
 /**提交商务信息*/
-func SubmitBusInfo(user AgentUser, appId, appKey string) (bool, error) {
+func submitBusInfo(user AgentUser, appId, appKey string) (bool, error) {
 	bytes, _ := json.Marshal(user)
 	var a = &LicenseUser{}
 	json.Unmarshal(bytes, a)
@@ -680,7 +681,7 @@ func SubmitBusInfo(user AgentUser, appId, appKey string) (bool, error) {
 }
 
 /**附件上传**/
-func PostFile(filename string, targetUrl string, param map[string]string) (map[string]interface{}, error) {
+func postFile(filename string, targetUrl string, param map[string]string) (map[string]interface{}, error) {
 	bodyBuf := &bytes.Buffer{}
 	bodyWriter := multipart.NewWriter(bodyBuf)
 

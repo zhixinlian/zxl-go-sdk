@@ -88,6 +88,7 @@ func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Du
 	if err != nil {
 		return nil, errors.New("cli.Do error:" + err.Error())
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		if resp.StatusCode == 400 || resp.StatusCode == 500 {
 			data, _ := ioutil.ReadAll(resp.Body)
@@ -158,6 +159,7 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 	if err != nil {
 		return nil, errors.New("cli.Do error:" + err.Error())
 	}
+	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
 		if resp.StatusCode == 400 || resp.StatusCode == 500 || resp.StatusCode == 401 {
 			data, _ := ioutil.ReadAll(resp.Body)
@@ -168,7 +170,7 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 		return nil, errors.New("cli.Do error bad status : " + resp.Status)
 	}
 	data, err := ioutil.ReadAll(resp.Body)
-	defer resp.Body.Close()
+
 	var commonData TxRetCommonData
 	err = json.Unmarshal(data, &commonData)
 	if err != nil {

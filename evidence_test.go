@@ -213,7 +213,7 @@ func TestAgentUser(t *testing.T) {
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println(zxl.representSave(evHash, "测试上链", "8b387ab63c4238758b762ae5269bb05173312296cb473e9b804b0bd274a37e61", "201201000110001", 0))
+	fmt.Println(zxl.RepresentSave(evHash, "测试上链", "8b387ab63c4238758b762ae5269bb05173312296cb473e9b804b0bd274a37e61", "201201000110001", 0))
 	//fmt.Println(zxl.EvidenceSave(evHash,"ceshi","ba35a87f5550d0319c2518db920c40f0bb1b9df6e5aab2142c0c04203fbe8d09",
 	//	"04e347499fc53813a00053612d77e4c2229a586e04a9b384c20be20a662f95b0a94a22ff3b417c779df27243f847a32a7a0c0b108a6745ae56ac8b3fdea0d36683",0))
 }
