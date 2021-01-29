@@ -143,11 +143,11 @@ func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) 
 }
 
 //视频取证接口
-func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
+func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 2, Remark: remark, RepresentAppId: representAppId, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 2, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
@@ -160,11 +160,11 @@ func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark, representApp
 }
 
 //图片取证接口
-func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
+func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 1, Remark: remark, RepresentAppId: representAppId, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 1, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
