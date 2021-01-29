@@ -319,7 +319,7 @@ func initCategory(categoryId int) (cateInfo Category) {
 	if val, ok := cMap[categoryId]; ok {
 		return val
 	}
-	panic("not found Category, please Reselect!")
+	return Category{0, 0, "其他"}
 }
 
 /**
