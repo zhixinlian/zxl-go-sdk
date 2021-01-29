@@ -44,11 +44,11 @@ type zxlCipher interface {
 	//获取录屏、截屏任务状态及结果
 	GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error)
 	//视频取证接口
-	EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error)
+	EvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
 	//图片取证接口
-	EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error)
+	EvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
 	//获取取证证书任务状态及结果
-	GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error)
+	GetEvidenceStatus(orderNo, appId string, timeout time.Duration) (*EvIdData, error)
 }
 
 func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {

@@ -41,9 +41,9 @@
 | ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error) | 下发录屏任务到取证工具服务                         |
 | ContentCapturePic(webUrls string, timeout time.Duration) (string, error) | 下发截屏任务到取证工具服务                         |
 | GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error) | 根据orderNo查询截屏/录屏任务状态                   |
-| EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) | 视频取证接口                                       |
-| EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error) | 图片取证                                           |
-| GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error) | 查询取证结果                                       |
+| EvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) | 视频取证接口                                       |
+| EvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) | 图片取证                                           |
+| GetEvidenceStatus(orderNo, appId string, timeout time.Duration) (*EvIdData, error) | 查询取证结果                                       |
 | RegisterUser(info AgentUser, timeout time.Duration) (bool, error) | 代理用户注册                                       |
 | SelectEpInfo(email string, timeout time.Duration) (ReviewData, error) | 查询代理用户审核结果                                       |
 | BindRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error) | 上传代理用户的证书                                       |
@@ -304,12 +304,12 @@ func main() {
 
   * ```
     //视频取证接口
-    EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error)
+    EvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
     ```
 
   * ```
     //图片取证
-    EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error)
+    EvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
     ```
 
 * 参数说明
@@ -319,7 +319,8 @@ func main() {
   | webUrls | string       |        | 取证的url |
   | title   | string       |        | 标题      |
   | remark  | string       |        | 描述      |
-  | timeout | time.Duratio |        | 超时时间  |
+  | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
+  | timeout | time.Duration |        | 超时时间  |
 
 * 返回值
 
@@ -330,7 +331,7 @@ func main() {
 * 方法原型
 
   * ```
-    GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error)
+    GetEvidenceStatus(orderNo, appId string, timeout time.Duration) (*EvIdData, error)
     ```
 
 * 参数说明
@@ -338,6 +339,7 @@ func main() {
   | 参数名  | 参数类型      | 默认值 | 参数描述           |
   | ------- | ------------- | ------ | ------------------ |
   | orderNo | string        |        | 取证返回的任务单号 |
+  | appId | string        |        | 可为代理商id或代理用户id |
   | timeout | time.Duration |        | 超时时间           |
 
 * 返回值

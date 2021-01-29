@@ -139,6 +139,7 @@ type EvObtainTask struct {
 	OrderNo     string `json:"orderNo"`
 	Title       string `json:"title"`
 	Remark      string `json:"remark"`
+	RepresentAppId string `json:"representAppId"`
 }
 
 //任务Data

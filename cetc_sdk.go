@@ -143,11 +143,11 @@ func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) 
 }
 
 //视频取证接口
-func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) {
+func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 2, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 2, RepresentAppId: representAppId, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
@@ -160,11 +160,11 @@ func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeo
 }
 
 //图片取证接口
-func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error) {
+func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 1, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 1, RepresentAppId: representAppId, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
@@ -177,11 +177,11 @@ func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark string, timeout
 }
 
 //获取取证证书任务状态及结果
-func (sdk *cetcSDKImpl) GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error) {
+func (sdk *cetcSDKImpl) GetEvidenceStatus(orderNo, appId string, timeout time.Duration) (*EvIdData, error) {
 	if len(orderNo) == 0 {
 		return nil, errors.New("orderNo 不能为空")
 	}
-	param := EvObtainTask{AppId: sdk.AppId, OrderNo: orderNo, RequestType: "GET", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/evidinfo"}
+	param := EvObtainTask{AppId: appId, OrderNo: orderNo, RequestType: "GET", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/evidinfo"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
