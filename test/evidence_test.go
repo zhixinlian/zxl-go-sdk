@@ -1,4 +1,4 @@
-package zxl_go_sdk
+package test
 
 import (
 	"encoding/hex"
@@ -6,27 +6,28 @@ import (
 	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"testing"
 	"time"
+	"github.com/zhixinlian/zxl-go-sdk"
 )
 
 func TestCetc(t *testing.T) {
 	/** 2020-07-24 add start */
-	zxl, err := NewZxlImpl("200514000200001", "9d7f4ba445a54ed2b041e142d5ea12f3")
+	zxl, err := zxl_go_sdk.NewZxlImpl("", "")
 	if err != nil {
 		fmt.Println("错误")
 	}
 	//图片取证
-	result, err := zxl.EvidenceObtainPic("https://www.baidu.com", "图片", "go_sdk_test", time.Second*2)
+	result, err := zxl.EvidenceObtainPic("https://www.baidu.com", "图片", "go_sdk_test","1231231", time.Second*2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(result)
 	//根据orderNo查询取证任务状态及结果
-	result1, err := zxl.GetEvidenceStatus("1595578460075584005313706", time.Second*2)
+	result1, err := zxl.GetEvidenceStatus("", "",time.Second*2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(result1)
-	zxl1, err := NewZxlImpl("200515000110001", "0e4bce1b0ef8471fb9140b849e776f48")
+	zxl1, err := zxl_go_sdk.NewZxlImpl("", "")
 	if err != nil {
 		fmt.Println("错误")
 	}
@@ -37,7 +38,7 @@ func TestCetc(t *testing.T) {
 	}
 	fmt.Println(result2)
 	//根据订单号查询截屏任务的状态及结果
-	result4, err := zxl1.GetContentStatus("1595578461244000782838012", time.Second*2)
+	result4, err := zxl1.GetContentStatus("", time.Second*2)
 	if err != nil {
 		fmt.Println("321321", err.Error())
 	}
@@ -89,7 +90,7 @@ func TestCetc(t *testing.T) {
 }
 
 func TestTencent(t *testing.T) {
-	zxl, err := NewZxlImpl("190725000110077", "appTest77")
+	zxl, err := zxl_go_sdk.NewZxlImpl("", "")
 	if err != nil {
 		t.Error(err)
 	}
@@ -128,7 +129,7 @@ func TestTencent(t *testing.T) {
 }
 
 func TestSign(t *testing.T) {
-	zxl, err := NewZxlImpl("xxxxxxxxxx0xxxx", "appTestTX")
+	zxl, err := zxl_go_sdk.NewZxlImpl("xxxxxxxxxx0xxxx", "appTestTX")
 	if err != nil {
 		t.Error(err)
 	}
@@ -148,7 +149,7 @@ func TestSign(t *testing.T) {
 }
 
 func TestCipher(t *testing.T) {
-	zxl, err := NewZxlImpl("xxxxxxxxxx0xxxx", "appTestTX")
+	zxl, err := zxl_go_sdk.NewZxlImpl("xxxxxxxxxx0xxxx", "appTestTX")
 	if err != nil {
 		t.Error(err)
 	}
@@ -164,7 +165,7 @@ func TestCipher(t *testing.T) {
 }
 
 func TestHash(t *testing.T) {
-	zxl, err := NewZxlImpl("xxxxxxxxxx1xxxx", "appTestTX")
+	zxl, err := zxl_go_sdk.NewZxlImpl("xxxxxxxxxx1xxxx", "appTestTX")
 	if err != nil {
 		t.Error(err)
 	}
@@ -175,7 +176,7 @@ func TestHash(t *testing.T) {
 	fmt.Print(hashStr)
 }
 func TestStrHash(t *testing.T) {
-	zxl, err := NewZxlImpl("190725000110077", "appTestTX")
+	zxl, err := zxl_go_sdk.NewZxlImpl("", "appTestTX")
 	hashStr, err := zxl.CalculateStrHash("fwejfoiwfjoweifjowf")
 	if err != nil {
 		fmt.Println(err.Error())
@@ -185,35 +186,13 @@ func TestStrHash(t *testing.T) {
 
 /**代理用户注册的相关调用示例*/
 func TestAgentUser(t *testing.T) {
-	//var filePath = "E:\\至信链\\sdk接入文档\\inner.png"
-	zxl, err := NewZxlImpl("201010000210001", "9487fe0f7d1f436fb0ef62ce6608c236")
+	zxl, err := zxl_go_sdk.NewZxlImpl("", "")
 	if err != nil {
 		fmt.Println(err)
 	}
-	//var user = AgentUser{RepresentEmail: "990991011@qq.com", Pwd: "w836546028", CardFrontFile: filePath, LetterFile: filePath,
-	//	CardBackendFile: filePath, LicenseFile: filePath, Representative: "李艳", EpName: "山东拼多多供应链管理有限公司", CreditCode: "91370105MA3P4F040J",
-	//	Idcard: "511321198912037013", Contact: "刘飞", Title: "cto", Mobile: "18280097243", Category: 1}
-	//registerFlag, err := zxl.RegisterUser(user, 0)
-	//if err != nil {
-	//	fmt.Println(err.Error())
-	//}
-	//fmt.Println(registerFlag)
-	//fmt.Println(zxl.SelectEpInfo("990991011@qq.com",0))
-	///**注册审核完毕的appId及appKey -- 201201000110001 1d8b89be2eab4d4e8c9ddbe5843ca983**/
-	////公私钥绑定
-	//fmt.Println(zxl.BindRepresentUserCert("201201000110001","1d8b89be2eab4d4e8c9ddbe5843ca983",
-	//	"04c0eb7f2b60a8752c8852ac255c966fee8aa5accc7a1f74b55d50bbc0faf3d4dbd98144624b5f002e0cd88662337e6e0a90f4875487fef04750b1124fc03cae61",
-	//	"8b387ab63c4238758b762ae5269bb05173312296cb473e9b804b0bd274a37e61"))
-	//公私钥更新
-	//fmt.Println(zxl.UpdateRepresentUserCert("201201000110001","1d8b89be2eab4d4e8c9ddbe5843ca983",
-	//	"04fe7cc425457346d563a1ecde041ae0eabf4abf8e19a20d7087bab1a60be5dcad328049398c9ea0454547c15d54a0053b014da11b87d90aa3ab5fa90dd9ca11f4",
-	//	"8e7b64d470b04000a24be597496449e4573b0e566b8df30420f4c8e5b9821103"))
-	//代理用户上链
 	evHash, err := zxl.CalculateStrHash("test上链")
 	if err != nil {
 		fmt.Println(err.Error())
 	}
-	fmt.Println(zxl.RepresentSave(evHash, "测试上链", "8b387ab63c4238758b762ae5269bb05173312296cb473e9b804b0bd274a37e61", "201201000110001", 0))
-	//fmt.Println(zxl.EvidenceSave(evHash,"ceshi","ba35a87f5550d0319c2518db920c40f0bb1b9df6e5aab2142c0c04203fbe8d09",
-	//	"04e347499fc53813a00053612d77e4c2229a586e04a9b384c20be20a662f95b0a94a22ff3b417c779df27243f847a32a7a0c0b108a6745ae56ac8b3fdea0d36683",0))
+	fmt.Println(zxl.RepresentSave(evHash, "测试上链", "", "", 0))
 }

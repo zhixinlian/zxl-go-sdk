@@ -190,7 +190,7 @@ error 查询过程发生的错误信息，如果为nil说明没有发生错误
 
 ## 下载安装  
 ### 方法一：go get 命令  
-运行命令 go get [github.com/zhixinlian/zxl-go-sdk](https://github.com/zhixinlian/zxl-go-sdk)  
+运行命令 go get [github.com/zhixinlian/zxl-go-sdk](github.com/zhixinlian/zxl-go-sdk)  
 
 ### 方法二：git 命令  
 1. 进入到go根目录或者当前项目的vendor目录中的github.com/zhixinlian目录下  

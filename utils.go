@@ -32,7 +32,7 @@ func addTrust(pool *x509.CertPool, path string) {
 	aCrt := []byte("-----BEGIN CERTIFICATE-----\nMIICTzCCAbgCCQDx5kTlifTTZDANBgkqhkiG9w0BAQsFADBsMQswCQYDVQQGEwJj\nbjELMAkGA1UECAwCY2QxCzAJBgNVBAcMAmNkMQwwCgYDVQQKDAN6eGwxDDAKBgNV\nBAsMA3p4bDETMBEGA1UEAwwKYWNjZXNzLmNvbTESMBAGCSqGSIb3DQEJARYDYWFh\nMB4XDTE5MDcyNTAyMTM1OVoXDTI5MDcyMjAyMTM1OVowbDELMAkGA1UEBhMCY24x\nCzAJBgNVBAgMAmNkMQswCQYDVQQHDAJjZDEMMAoGA1UECgwDenhsMQwwCgYDVQQL\nDAN6eGwxEzARBgNVBAMMCmFjY2Vzcy5jb20xEjAQBgkqhkiG9w0BCQEWA2FhYTCB\nnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAwwcACPiwpUsDewlQhElDYLNWPz5B\nZ9DDPW5lUiNJey1oTLf2JP+B4O+BF0H+cg9JXtLuiGfiC6OdJG2e3SjbE/+wSAp0\nSBaeeG6hgKfxJClIzXPNxdayCvxwWf5Z3R3b+XRXceHR/hvHgmlCGTZ+E7Bu5mi4\n2UMPNItP694jcQcCAwEAATANBgkqhkiG9w0BAQsFAAOBgQBWNvgT7ut+lMEBm/Vw\nGCOVdyr7lSCxiS/lg31/zwWWuWtqhdAqljPmaWEtihkNjDVJpHS8ur6yuTwdCNcy\nbPo53O5/bIIIVKf7TMr/neEK7TbuTAf7CA9noMqC7K3vDSC8xdlCSAMO9N96QOk/\nJjCnk7d8N539fQPt80FMKkqhVw==\n-----END CERTIFICATE-----")
 	pool.AppendCertsFromPEM(aCrt)
 }
-func buildHtppClient(isProxy bool, timeout time.Duration) *http.Client {
+func buildHttpClient(isProxy bool, timeout time.Duration) *http.Client {
 	pool := x509.NewCertPool()
 
 	//cliCrt, err := tls.LoadX509KeyPair("D:\\certificate\\go\\server.crt", "D:\\certificate\\go\\server.key")
@@ -75,7 +75,7 @@ func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Du
 	//tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	//
 	//cli := http.Client{Transport: tr, Timeout: timeout}
-	cli := buildHtppClient(defConf.IsProxy, timeout)
+	cli := buildHttpClient(defConf.IsProxy, timeout)
 
 	req, err := http.NewRequest(method, url, byteReader)
 	if err != nil {

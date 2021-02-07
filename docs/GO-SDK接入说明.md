@@ -1,70 +1,48 @@
-## 1. 文档描述
+# 接口文档介绍
 
-### 1.1. 功能描述
+## 文档描述
 
-本文档用于描述至信链 GO SDK  所提供的方法及如何通过 GO SDK 接入至信链司法存证服务
+本文档描述了至信链 GO SDK  所提供的所有功能及通过 GO SDK 调用至信链司法存证服务的方法
 
-### 1.2. 文档历史
+### 文档历史
 
 | 修订日期   | 修订内容 | 修订版本 |
 | ---------- | -------- | -------- |
-| 2020.08.11 | 新增接口 | 2.0.1    |
-| 2021.01.28 | 新增代理商相关接口 | 2.0.4    |
+| 2020.08.11 | 新增接口 | v2.0.1   |
+| 2021.01.28 | 新增代理商相关接口 | v2.0.4   |
+| 2021.02.09 | 增加个人用户及确权接口 | v2.1.3 |
 
-### 1.3. 阅读对象
+### 阅读对象
 
 接入至信链的开发者
 
-## 2. 接口简介
-
-### 2.1 协议规则
+### 协议规则
 
 | 分类     | 说明                            |
 | -------- | ------------------------------- |
 | 传输方式 | 为保证传输安全，采用 HTTPS 传输 |
 | 数据格式 | 参考具体方法定义                |
 
-### 2.2 接口清单
-
-| 接口                                                         | 说明                                               |
-| ------------------------------------------------------------ | -------------------------------------------------- |
-| NewZxlImpl(appId, appKey string) (*zxlImpl, error)           | SDK 初始化                                         |
-| GenerateKeyPair() (pk string, sk string, err error)          | 生成公私钥                                         |
-| BindUserCert(pk, sk string, timeout time.Duration) error     | 绑定证书                                           |
-| UpdateUserCert(pk, sk string, timeout time.Duration) error   | 更新证书                                           |
-| CalculateHash(path string) (string, error)                   | 计算文件 HASH                                      |
-| EvidenceSave(evHash, extendInfo, sk, pk string, timeout time.Duration) (*EvSaveResult, error) | 写入存证信息                                       |
-| QueryWithEvId(evId string, timeout time.Duration) ([]QueryResp, error) | 根据证据 ID 查询存证信息                           |
-| QueryWithTxHash(txHash string, timeout time.Duration) ([]QueryResp, error) | 根据交易 HASH 查询存证信息                         |
-| QueryWithEvHash(evHash string, timeout time.Duration) ([]QueryResp, error) | 根据证据 HASH 查询存证 信息                        |
-| QueryWithHash(hash string, timeout time.Duration) ([]QueryResp, error) | 不明确指定，可以是   txHash,evId,evHash 中任意一个 |
-| ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error) | 下发录屏任务到取证工具服务                         |
-| ContentCapturePic(webUrls string, timeout time.Duration) (string, error) | 下发截屏任务到取证工具服务                         |
-| GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error) | 根据orderNo查询截屏/录屏任务状态                   |
-| EvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) | 视频取证接口                                       |
-| EvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) | 图片取证                                           |
-| GetEvidenceStatus(orderNo, appId string, timeout time.Duration) (*EvIdData, error) | 查询取证结果                                       |
-| RegisterUser(info AgentUser, timeout time.Duration) (bool, error) | 代理用户注册                                       |
-| SelectEpInfo(email string, timeout time.Duration) (ReviewData, error) | 查询代理用户审核结果                                       |
-| BindRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error) | 上传代理用户的证书                                       |
-| UpdateRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error) | 更新代理用户证书                                       |
-| RepresentSave(evHash, extendInfo, representSk, representAppId string, timeout time.Duration) (*EvSaveResult, error) | 代理商模式下的用户存证                                       |
 
 
-## 3. 接入流程
+## 接入流程
 
 ![attvar](./接入流程.png)
 
-### 3.1 获取 SDK
+
+
+# 鉴权绑定
+
+## 获取 SDK
 
 1. 进入到 go 根目录或者当前项目的 vendor 目录中的 github.com/zhixinlian目录下  
 2. 运行命令 git clone https://github.com/zhixinlian/zxl-go-sdk.git  
 3. 选择版本，tag：v2.0.1 
 
-### 3.2 使用步骤
+### 使用步骤
 1. 通过至信链线上首页注册账户并完成认证，获取生成的 APPID 与 APPKEY;
 
-2. 获取 SDK ，见 [3.1]()
+2. 获取 SDK
 
 3. 使用 NewZxlImpl 创建 SDK 实例
 
@@ -76,7 +54,7 @@
 
 7. 使用 EvidenceSave  方法，写入存证 HASH 信息
 
-### 3.3 使用示例
+### 使用示例
 
 ```
 package main
@@ -123,8 +101,7 @@ func main() {
 
 
 
-## 4. 方法定义
-### 4.1. 创建 SDK 实例
+## 创建 SDK 实例
 
 * 方法原型
 
@@ -145,7 +122,9 @@ func main() {
   | ---------- | ---------- |
   | NewZxlImpl | SDK 实例   |
 
-### 4.2 证书绑定
+
+
+## 证书绑定
 
 * 方法原型
 
@@ -164,7 +143,9 @@ func main() {
 
   -
 
-### 4.3 计算文件 HASH
+# hash 存证
+
+## 计算文件 HASH
 
 * 方法原型
 
@@ -184,7 +165,8 @@ func main() {
   | string     | 指定文件 SM3 算法后的散列 |
 
 
-### 4.4 写入存证信息
+
+## 数据上链存证
 
 * 方法原型
 
@@ -221,7 +203,7 @@ func main() {
 
   
 
-### 4.4 查询存证信息
+## 链上信息查询
 
 * 方法原型
 
@@ -254,7 +236,11 @@ func main() {
   | ------------ | ------------------------------------------------------------ |
   | EvSaveResult | {<br />"appId":"应用ID",<br />"evId":"记链唯一标识",<br />"evHash":"证据hash",<br />"txHash":"交易hash",<br />"extendInfo":"扩展信息",<br />"createTime": "出块时间",<br />"blockHeight": "区块高度",<br />"ext": "扩展信息，可通过 key ： queryCertUrl,获取证书"<br />} |
 
-### 4.5 下发录屏/截屏任务到取证工具服务
+
+
+# 下发录屏/截屏任务
+
+## 下发录屏/截屏任务到取证工具服务
 
 * 方法原型
 
@@ -277,7 +263,9 @@ func main() {
 
   具体的orderNo（任务单号）
 
-### 4.6 查询录屏/截屏任务状态及结果
+
+
+## 查询录屏/截屏任务状态及结果
 
 * 方法原型
 
@@ -298,7 +286,13 @@ func main() {
   | ---------- | ------------------------------------------------------------ |
   | TaskEvData | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"statusMsg":"任务状态解读:[运行中]>>[运行成功]>>[运行失败]",<br />"url":"状态成功时,对应的cosurl",<br />"hash":"截图成功时,对应的存证hash"<br />} |
 
-### 4.7 视频/图片取证
+
+
+
+
+# 视频/图片取证
+
+## 取证服务
 
 * 方法原型
 
@@ -326,7 +320,7 @@ func main() {
 
   具体的orderNo（任务单号）
 
-### 4.8 查询取证结果
+## 查询取证结果
 
 * 方法原型
 
@@ -348,19 +342,26 @@ func main() {
   | ---------- | ------------------------------------------------------------ |
   | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br />"voucherUrl":"成功状态下,取证证书下载地址"<br />} |
   
-### 4.9 代理用户注册
+
+
+
+# 代理商服务
+
+
+
+## 代理用户注册
 
 * 方法原型
 
   * ```
-    RegisterUser(info AgentUser, timeout time.Duration) (bool, error)
+    RegisterUser(agentUser AgentUser, timeout time.Duration) (bool, error)
     ```
 
 * 参数说明
 
   | 参数名  | 参数类型      | 默认值 | 参数描述           |
   | ------- | ------------- | ------ | ------------------ |
-  | info | AgentUser        |        | 注册用户信息 |
+  | agentUser | AgentUser        |        | 注册用户信息 |
   | timeout | time.Duration |        | 超时时间           |
   接口参数传入`AgentUser`类型对象：
 
@@ -368,10 +369,11 @@ func main() {
   | --------------- | ---------- | -------- | ---------- | ------------------ |
   | RepresentEmail  | string     | 无       | 是         | 代理企业注册邮箱     |
   | Pwd             | string     | 无       | 是         | 代理企业注册密码  |
-  | EpName          | string     | 无       | 是         | 代理企业名称           |
-  | CreditCode      | string     | 无       | 是         | 代理企业信用代码       |
-  | LicenseFile     | String       | 无       | 是         | 代理企业营业执照图片路径       |
-  | Representative  | String     | 无       | 是         | 代理企业法人代表姓名           |
+  | EpName          | string     | 无       | 否        | 代理企业名称           |
+  | PersonName | string | 无 | 否 | 自然人姓名 |
+  | CreditCode      | string     | 无       | 否        | 代理企业信用代码       |
+  | LicenseFile     | String       | 无       | 否        | 代理企业营业执照图片路径       |
+  | Representative  | String     | 无       | 否        | 代理企业法人代表姓名           |
   | LetterFile      | String       | 无       | 否         | 至信链委托公函图片路径       |
   | Category        | int | 无       | 否         | 代理企业行业信息，枚举     |
   | Contact         | String     | 无       | 是         | 联系人姓名         |
@@ -380,6 +382,10 @@ func main() {
   | Idcard          | String     | 无       | 是         | 联系人身份证号码         |
   | CardFrontFile   | String       | 无       | 是         | 联系人身份证正面图片路径     |
   | CardBackendFile | String       | 无       | 是         | 联系人身份证反面图片路径     |
+  | userType | Integer | 1 | 否 | 用户类型 |
+  | platformName | String | 无 | 否 | 接入平台名称 |
+  | platformUrl | String | 无 | 否 | 接入平台地址 |
+  | businessType | Integer | 4 | 否 | 平台业务类型 |
   ​     
 * 返回值
 
@@ -387,7 +393,69 @@ func main() {
   | ---------- | ------------------------------------------------------------ |
   | bool   | 注册成功与否，成功true，失败抛出对应异常信息|
   
-### 4.10 查询代理用户审核结果
+* 示例
+
+  ```go
+  
+  // 企业用户注册
+  zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
+  if err != nil {
+    fmt.Println("初始化 SDK 错误")
+  }
+  
+  user := zxl_go_sdk.AgentUser{
+    EpName:          "XX集团有限公司",
+    Pwd:             "123456aaa",
+    RepresentEmail:  "zxin3@admin.com",
+    Representative:  "XXX",
+    CreditCode:      "914400002311176XXX",
+    Contact:         "XXX",
+    Idcard:          "140502197311051XXX",
+    Mobile:          "18600213476",
+    PlatformName:    "小说平台",
+    PlatformUrl:     "https://www.xiaoshuo.com",
+    BusinessType:    constants.BUSINESS_COPYRIGHT,
+    UserType:        constants.USER_LEGAL_PERSON,
+    CardFrontFile:   "/root/workspace/zx-demo/idcard_front.jpeg",
+    CardBackendFile: "/root/workspace/zx-demo/idcard_front.jpeg",
+    LicenseFile:     "/root/workspace/zx-demo/license.jpeg",
+  }
+  result, err := zxlSDK.RegisterUser(user, 5*time.Second)
+  
+  if err != nil {
+    fmt.Println("注册用户错误: " + err.Error())
+    return
+  }
+  
+  // 自然人用户注册
+  zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
+  if err != nil {
+    fmt.Println("初始化 SDK 错误")
+  }
+  
+  user := zxl_go_sdk.AgentUser{
+    PersonName:      "XXX",
+    Pwd:             "123456aaa",
+    RepresentEmail:  "zxin_person3@admin.com",
+    Contact:         "XXX",
+    Idcard:          "320681199209029XXX",
+    Mobile:          "18600213476",
+    UserType:        constants.USER_NATURAL_PERSON,
+    CardFrontFile:   "/root/workspace/zx-demo/idcard_front.jpeg",
+    CardBackendFile: "/root/workspace/zx-demo/idcard_front.jpeg",
+  }
+  result, err := zxlSDK.RegisterUser(user, 5*time.Second)
+  
+  if err != nil {
+    fmt.Println("注册用户错误: " + err.Error())
+    return
+  }
+  
+  ```
+
+
+
+## 查询代理用户审核结果
 
 * 方法原型
 
@@ -414,7 +482,10 @@ func main() {
   | Reason    | string | 认证不通过的原因，若通过则为空串                             |
   | AgentCode | string | 代理商代码，仅在用户是代理商时才有意义                       |
   
-### 4.11 上传代理用户的证书
+
+
+
+## 上传代理用户的证书
 
 * 方法原型
 
@@ -438,7 +509,10 @@ func main() {
   | ---------- | ------------------------------------------------------------ |
   | bool   | 上传结果，成功true，失败false|
   
-### 4.12 更新代理用户证书
+
+
+
+## 更新代理用户证书
 
 * 方法原型
 
@@ -462,7 +536,10 @@ func main() {
   | ---------- | ------------------------------------------------------------ |
   | bool   | 更新结果，成功true，失败false|
   
-### 4.13 代理商模式下的用户存证
+
+
+
+## 代理商模式下的用户存证
 
 * 方法原型
 
@@ -492,3 +569,133 @@ func main() {
   | BlockHeight | string | 区块高度 |
   | CreateTime  | string | 创建时间 |
   | Ext         | string | 扩展信息 |
+
+
+
+## 用户提交确权请求
+
+* 方法原型
+
+  ```java
+  SubmitDciClaim(dci DciClaim, sk string, timeout time.Duration) (DciClaimResp, error)
+  ```
+
+* 参数说明
+
+  | *参数名* | *参数类型*    | *默认值* | *是否必填* | *参数描述* |
+  | -------- | ------------- | -------- | ---------- | ---------- |
+  | dciClaim | DciClaim      | 无       | 是         | 确权信息   |
+  | sk       | string        | 无       | 是         | 申请人私钥 |
+  | timeOut  | time.Duration | 无       | 是         | 超时时间   |
+
+> DciClaim 的结构比较复杂，除了填充作品信息之外，还需要填充**权利项**（DciRight）和**作者**信息（DciAuthor），权利项中又包含**权利人**（DciRighter） 信息，具体用法看示例代码。
+>
+> 另外需要注意
+>
+> 1. 目前 DciRight 的 type 只能使用 RIGHT_TYPE_ALL 值
+> 2. sk 是 dciClaim 中 proposerEmail 所属账户的私钥
+> 3. 如果是代理用户确权，需要填充 representAppId 字段
+
+
+
+* 返回数据 （DciClaimResp）
+
+  | 字段   | 类型   | 描述        |
+  | ------ | ------ | ----------- |
+  | TaskId | String | 确权任务 Id |
+
+* 示例
+
+  ```go
+  zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
+  	if err != nil {
+  		fmt.Println("初始化 SDK 错误")
+  	}
+  
+  	righter := zxl_go_sdk.DciRighter{
+  		RighterName: "XXX",
+  		RighterIdCard: "420582198412130XXX",
+  		RighterEmail: "1298334XXX@qq.com",
+  		RighterGainedWay: constants.GAINED_WAY_ORIGINAL,
+  		Sk: sk,
+  		RighterType: constants.RIGHTER_TYPE_LEGAL,
+  	}
+  
+  	right := zxl_go_sdk.DciRight{
+  		Type: constants.RIGHT_TYPE_ALL,
+  		RighterInfoList: []zxl_go_sdk.DciRighter{righter},
+  	}
+  
+  	author := zxl_go_sdk.DciAuthor{
+  		AuthorName: "XXX",
+  		AuthorIdCard: "420582198412XXXX",
+  		AuthorType: constants.AUTHOR_TYPE_LEGAL,
+  	}
+  
+  	dciClaim := zxl_go_sdk.DciClaim{
+  		DciName: "图片作品1",
+  		DciUrl: "https://www.sina.com.cn/",
+  		ProposerEmail: "1298334XXX1@qq.com",
+  		DciType: constants.DCI_TYPE_FILMING,
+  		DciCreateProperty: constants.DCI_CREATE_PROPERTY_ADAPT,
+  		DciCreateTime: "2021-02-10 12:59:59",
+  		RightInfoList: []zxl_go_sdk.DciRight{right},
+  		AuthorList: []zxl_go_sdk.DciAuthor{author},
+  	}
+  	resp, err := zxlSDK.SubmitDciClaim(dciClaim, sk, 10 * time.Second)
+  
+  	if err != nil {
+  		fmt.Printf("提交确权请求出错 %+v", err)
+  		return
+  	}
+  ```
+
+
+
+## 用户查询确权结果
+
+* 方法原型
+
+  ```java
+  QueryDciClaimResult(dciQuery DciClaimQuery, timeout time.Duration) (DciClaimQueryResp, error)
+  ```
+
+* 参数说明（DciClaimQuery）
+
+  | *参数名* | *参数类型* | *默认值* | *是否必填* | *参数描述* |
+  | -------- | ---------- | -------- | ---------- | ---------- |
+  | TaskId   | String     | 无       | 是         | 确权任务ID |
+
+
+
+* 返回数据（DciClaimQueryResp）
+
+  | 字段            | 类型        | 描述                                       |
+  | --------------- | ----------- | ------------------------------------------ |
+  | Status          | int         | 确权任务状态值（）                         |
+  | DciId           | string      | 确权 id                                    |
+  | Url             | String      | 证书地址                                   |
+  | TortSearchList  | interface{} | 如果作品发生侵权，就会返回被侵权的作品地址 |
+  | RecordTimestamp | int         | 确权时间戳                                 |
+
+​     
+
+* 示例
+
+  ```java
+  zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
+  if err != nil {
+    fmt.Println("初始化 SDK 错误")
+  }
+  
+  dciQuery := zxl_go_sdk.DciClaimQuery{
+    TaskId: "2e845212-65b0-4b37-9770-d68394b5b8ee_5",
+  }
+  
+  resp, err := zxlSDK.QueryDciClaimResult(dciQuery, 10 * time.Second)
+  if err != nil {
+    fmt.Printf("确权查询出错 %+v", err)
+    return
+  }
+  ```
+
