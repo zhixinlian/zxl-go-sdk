@@ -298,12 +298,12 @@ func main() {
 
   * ```
     //视频取证接口
-    EvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
+    EvidenceObtainVideo(webUrls, title, remark, timeout time.Duration) (string, error)
     ```
 
   * ```
     //图片取证
-    EvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
+    EvidenceObtainPic(webUrls, title, remark, timeout time.Duration) (string, error)
     ```
 
 * 参数说明
@@ -313,7 +313,6 @@ func main() {
   | webUrls | string       |        | 取证的url |
   | title   | string       |        | 标题      |
   | remark  | string       |        | 描述      |
-  | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
   | timeout | time.Duration |        | 超时时间  |
 
 * 返回值
@@ -325,7 +324,7 @@ func main() {
 * 方法原型
 
   * ```
-    GetEvidenceStatus(orderNo, appId string, timeout time.Duration) (*EvIdData, error)
+    GetEvidenceStatus(orderNo, timeout time.Duration) (*EvIdData, error)
     ```
 
 * 参数说明
@@ -333,7 +332,6 @@ func main() {
   | 参数名  | 参数类型      | 默认值 | 参数描述           |
   | ------- | ------------- | ------ | ------------------ |
   | orderNo | string        |        | 取证返回的任务单号 |
-  | appId | string        |        | 可为代理商id或代理用户id |
   | timeout | time.Duration |        | 超时时间           |
 
 * 返回值
@@ -346,7 +344,6 @@ func main() {
 
 
 # 代理商服务
-
 
 
 ## 代理用户注册
@@ -570,6 +567,58 @@ func main() {
   | CreateTime  | string | 创建时间 |
   | Ext         | string | 扩展信息 |
 
+# 代理商模式下视频/图片取证
+
+## 代理商取证服务
+
+* 方法原型
+
+  * ```
+    //视频取证接口
+    RepresentEvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
+    ```
+
+  * ```
+    //图片取证
+    RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
+    ```
+
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+  | ------- | ------------ | ------ | --------- |
+  | webUrls | string       |        | 取证的url |
+  | title   | string       |        | 标题      |
+  | remark  | string       |        | 描述      |
+  | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
+  | timeout | time.Duration |        | 超时时间  |
+
+* 返回值
+
+  具体的orderNo（任务单号）
+
+## 代理商查询取证结果
+
+* 方法原型
+
+  * ```
+    RepresentGetEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdData, error)
+    ```
+
+* 参数说明
+
+  | 参数名  | 参数类型      | 默认值 | 参数描述           |
+  | ------- | ------------- | ------ | ------------------ |
+  | orderNo | string        |        | 取证返回的任务单号 |
+  | representAppId | string        |        | 可为代理商id或代理用户id |
+  | timeout | time.Duration |        | 超时时间           |
+
+* 返回值
+
+  | 返回值类型 | 返回值描述                                                   |
+  | ---------- | ------------------------------------------------------------ |
+  | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br />"voucherUrl":"成功状态下,取证证书下载地址"<br />} |
+  
 
 
 ## 用户提交确权请求
