@@ -522,7 +522,7 @@ func (zxl *zxlImpl) RegisterUser(info AgentUser, timeout time.Duration) (bool, e
 	}
 	//上传公函
 	if len(info.LetterFile) != 0 {
-		letterId, err := uploadFile(info, zxl.appId, info.LicenseFile, UploadLetterAddr, UploadLetter)
+		letterId, err := uploadFile(info, zxl.appId, info.LetterFile, UploadLetterAddr, UploadLetter)
 		if err != nil {
 			return false, errors.New("upload letter fail : " + err.Error())
 		}
@@ -535,14 +535,14 @@ func (zxl *zxlImpl) RegisterUser(info AgentUser, timeout time.Duration) (bool, e
 	}
 	info.IdcardFrontId = frontId
 	//上传身份证反面
-	backId, err := uploadFile(info, zxl.appId, info.CardFrontFile, UploadCardBackAddr, UploadCardFront)
+	backId, err := uploadFile(info, zxl.appId, info.CardBackendFile, UploadCardBackAddr, UploadCardFront)
 	if err != nil {
 		return false, errors.New("upload card back fail : " + err.Error())
 	}
 	info.IdcardBackId = backId
 	//上传商务执照
 	if len(info.LicenseFile) != 0 {
-		busiId, err := uploadFile(info, zxl.appId, info.CardFrontFile, UploadBusAddr, UploadBus)
+		busiId, err := uploadFile(info, zxl.appId, info.LicenseFile, UploadBusAddr, UploadBus)
 		if err != nil {
 			return false, errors.New("upload busi fail : " + err.Error())
 		}
