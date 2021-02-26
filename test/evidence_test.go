@@ -16,13 +16,13 @@ func TestCetc(t *testing.T) {
 		fmt.Println("错误")
 	}
 	//图片取证
-	result, err := zxl.EvidenceObtainPic("https://www.baidu.com", "图片", "go_sdk_test","1231231", time.Second*2)
+	result, err := zxl.EvidenceObtainPic("https://www.baidu.com", "图片", "go_sdk_test", time.Second*2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
 	fmt.Println(result)
 	//根据orderNo查询取证任务状态及结果
-	result1, err := zxl.GetEvidenceStatus("", "",time.Second*2)
+	result1, err := zxl.GetEvidenceStatus("",time.Second*2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}

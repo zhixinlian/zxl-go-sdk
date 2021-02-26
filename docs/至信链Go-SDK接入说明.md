@@ -80,7 +80,7 @@ func main() {
 	fmt.Println("私钥:", sk)
 	
 	// 绑定证书
-	err = zxl.BindUserCert(pk, sk)
+	err = zxl.BindUserCert(pk, sk, 5 * time.Second)
 	if err != nil {
 		t.Error(err)
 	}
