@@ -129,7 +129,7 @@ func main() {
 * 方法原型
 
   ```
-  GenerateKeyPair() (pk string, sk string, err error)
+  BindUserCert(pk, sk string, timeout time.Duration) error
   ```
 
 * 参数说明
