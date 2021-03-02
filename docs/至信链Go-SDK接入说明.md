@@ -379,10 +379,11 @@ func main() {
   | Idcard          | String     | 无       | 是         | 联系人身份证号码         |
   | CardFrontFile   | String       | 无       | 是         | 联系人身份证正面图片路径     |
   | CardBackendFile | String       | 无       | 是         | 联系人身份证反面图片路径     |
-  | userType | Integer | 1 | 否 | 用户类型 |
+  | userType | Integer | 1 | 否 | 用户类型（1: 法人 2: 自然人），默认是法人 |
   | platformName | String | 无 | 否 | 接入平台名称 |
   | platformUrl | String | 无 | 否 | 接入平台地址 |
-  | businessType | Integer | 4 | 否 | 平台业务类型 |
+  | businessType | Integer | 4 | 否 | 平台业务类型 (1:金融类 2:版权类 3:其他类 4--未填写)，默认是未填写 |
+  
   ​     
 * 返回值
 
