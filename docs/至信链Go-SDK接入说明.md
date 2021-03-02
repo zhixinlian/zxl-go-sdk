@@ -37,7 +37,7 @@
 
 1. 进入到 go 根目录或者当前项目的 vendor 目录中的 github.com/zhixinlian目录下  
 2. 运行命令 git clone https://github.com/zhixinlian/zxl-go-sdk.git  
-3. 选择版本，tag：v2.0.1 
+3. 选择版本，tag：v2.1.3.1
 
 ### 使用步骤
 1. 通过至信链线上首页注册账户并完成认证，获取生成的 APPID 与 APPKEY;
