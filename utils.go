@@ -185,7 +185,27 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 }
 
 
-func IsInnerIp(ipStr string) bool {
+func isInnerIpFromUrl(originUrl string) bool {
+	u, err := url.Parse(originUrl)
+
+	if err != nil {
+		return true
+	}
+
+	h := strings.Split(u.Host, ":")
+	addr, err := net.ResolveIPAddr("ip", h[0])
+	if err != nil {
+		return true
+	}
+
+	if isInnerIp(addr.IP.String()) {
+		return true
+	}
+
+	return false
+}
+
+func isInnerIp(ipStr string) bool {
 	if !checkIp(ipStr) {
 		return false
 	}

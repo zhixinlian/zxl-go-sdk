@@ -9,7 +9,6 @@ import (
 	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"io"
 	"io/ioutil"
-	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -99,13 +98,8 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, sk string, timeout time.Duratio
 		return resp, errors.New("作者数量超限额错误")
 	}
 
-	u, err := net.ResolveIPAddr("ip",dci.DciUrl)
-	if err == nil {
-		if IsInnerIp(u.IP.String()) {
-			return resp, errors.New("url不合规，请检查")
-		}
-	} else {
-		return resp, errors.New("url不合规，请检查")
+	if isInnerIpFromUrl(dci.DciUrl) {
+		return resp, errors.New("url 不合规，请检查")
 	}
 
 	content, err := zxl.getContent(dci.DciUrl)
