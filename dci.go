@@ -9,6 +9,7 @@ import (
 	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"strconv"
 	"strings"
@@ -65,6 +66,7 @@ type DciClaimQueryResp struct {
 	RecordTimestamp int `json:"recordTimestamp"`
 	DciId         string `json:"dciId"`
 	Url           string `json:"url"`
+	Msg           string `json:"msg"`
 }
 
 type DciAuthor struct {
@@ -93,6 +95,19 @@ type DciRighter struct {
  */
 func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, sk string, timeout time.Duration) (DciClaimResp, error) {
 	var resp DciClaimResp
+	if len(dci.AuthorList) > 5 {
+		return resp, errors.New("作者数量超限额错误")
+	}
+
+	u, err := net.ResolveIPAddr("ip",dci.DciUrl)
+	if err == nil {
+		if IsInnerIp(u.IP.String()) {
+			return resp, errors.New("url不合规，请检查")
+		}
+	} else {
+		return resp, errors.New("url不合规，请检查")
+	}
+
 	content, err := zxl.getContent(dci.DciUrl)
 	if err != nil {
 		return resp, err
@@ -146,6 +161,11 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, sk string, timeout time.Duratio
 			signMap[righter.RighterEmail] = sign
 		}
 		rightSignatureDic[string(right.Type)] = signMap
+	}
+
+	// 如果是代理用户确权，就需要填充 AgentAppId 字段
+	if dci.RepresentAppId != "" {
+		dci.AgentAppId = zxl.appId
 	}
 
 	dci.RightSignatureDic = rightSignatureDic
