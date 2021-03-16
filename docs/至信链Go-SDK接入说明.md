@@ -466,7 +466,7 @@ func main() {
   | *参数名* | *参数类型* | *默认值* | *是否必填* | *参数描述*                 |
   | -------- | ---------- | -------- | ---------- | -------------------------- |
   | email    | string     | 无       | 是         | 代理用户注册账户的邮箱账号 |
-  | timeout | time.Duration |        | 超时时间           |
+  | timeout | time.Duration |        | 超时时间           ||
   ​     
 * 返回值
 
@@ -622,12 +622,12 @@ func main() {
   
 
 
-## 用户提交确权请求
+## 发起数字版权确权请求
 
 * 方法原型
 
   ```java
-  SubmitDciClaim(dci DciClaim, sk string, timeout time.Duration) (DciClaimResp, error)
+  SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClaimResp, error)
   ```
 
 * 参数说明
@@ -635,8 +635,123 @@ func main() {
   | *参数名* | *参数类型*    | *默认值* | *是否必填* | *参数描述* |
   | -------- | ------------- | -------- | ---------- | ---------- |
   | dciClaim | DciClaim      | 无       | 是         | 确权信息   |
-  | sk       | string        | 无       | 是         | 申请人私钥 |
   | timeOut  | time.Duration | 无       | 是         | 超时时间   |
+  
+ DciClaim 的结构如下：
+  
+  | 参数名            | 参数类型          | 默认值 | 是否必填 | 参数描述                                 |
+  | ----------------- | ----------------- | ------ | -------- | ---------------------------------------- |
+  | DciName           | string            | 无     | 是       | 作品名字                                 |
+  | ProposerEmail     | string            | 无     | 是       | 申请人邮箱                               |
+  | Sk                | string            | 无     | 是       | 申请人私钥                               |
+  | DciType           | DciType           | 无     | 是       | 作品类型（见下文 DciType）               |
+  | DciCreateProperty | DciCreateProperty | 无     | 是       | 作品创作属性（见下文 DciCreateProperty） |
+  | DciUrl            | string            | 无     | 是       | 作品url                                  |
+  | AuthorList        | []DciAuthor       | 无     | 是       | 作品作者信息                             |
+  | RightList         | []DciRight        | 无     | 是       | 权利人信息列表                           |
+  
+  AuthorList 结构如下：
+  
+  | 参数名       | 参数类型   | 默认值 | 是否必填 | 备注                         |
+  | ------------ | ---------- | ------ | -------- | ---------------------------- |
+  | AuthorType   | AuthorType | 无     | 是       | 作者类型（见下文AuthorType） |
+  | AuthorName   | string     | 无     | 是       | 作者名字                     |
+  | AuthorIdCard | string     | 无     | 是       | 作者证件号                   |
+  
+  RightList 结构如下：
+  
+  | 字段名          | 类型         | 默认值 | 是否必填 | 备注                        |
+  | --------------- | ------------ | ------ | -------- | --------------------------- |
+  | Type            | RightType    | 无     | 是       | 权利类型（见下文 RihtType） |
+  | RighterInfoList | []DciRighter | 无     | 是       | 权利人列表                  |
+  
+  DciRighter 结构如下：
+  
+  | 字段名           | 类型        | 默认值 | 是否必填 | 备注                             |
+  | ---------------- | ----------- | ------ | -------- | -------------------------------- |
+  | RighterEmail     | string      | 无     | 是       | 权利人邮箱                       |
+  | RighterType      | RighterType | 无     | 是       | 权利人类型（见下文 RighterType） |
+  | RighterName      | string      | 无     | 是       | 权利人名字                       |
+  | RighterIdCard    | string      | 无     | 是       | 权利人证件号                     |
+  | RighterGainedWay | int         | 无     | 是       | 枚举GainedWay                    |
+  | Sk               | string      | 无     | 是       | 权利人的私钥                     |
+  
+  
+  
+* 枚举类型说明
+
+  DciType（作品类型）：
+
+  | 编码 | 常量                 | 备注                         |
+| ---- | -------------------- | ---------------------------- |
+  | 1    | DCI_TYPE_TEXT        | 文字作品                     |
+  | 2    | DCI_TYPE_MUSIC       | 音乐作品                     |
+  | 3    | DCI_TYPE_ART_ARCH    | 美术或建筑作品               |
+  | 4    | DCI_TYPE_FILMING     | 摄影作品                     |
+  | 5    | DCI_TYPE_AUDIOVISUAL | 视听作品                     |
+  | 6    | DCI_TYPE_PIC_MODEL   | 设计图或示意图等图形模型作品 |
+  | 7    | DCI_TYPE_SOFTWARE    | 计算机软件                   |
+  | 8    | DCI_TYPE_OTHER       | 符合作品特征的其他智力成果   |
+  
+  GainedWay（权利获取途径）：
+
+  | 编码 | 常量                | 备注 |
+  | ---- | ------------------- | ---- |
+  | 1    | GAINED_WAY_ORIGINAL | 原始 |
+  | 2    | GAINED_WAY_ACCEPT   | 承受 |
+  | 3    | GAINED_WAY_INHERIT  | 继承 |
+  | 4    | GAINED_WAY_OTHER    | 其他 |
+  
+  DciCreateProperty（作品创作属性）：
+  
+  | 编码 | 常量                           | 备注 |
+  | ---- | ------------------------------ | ---- |
+  | 1    | DCI_CREATE_PROPERTY_ORIGINAL   | 原创 |
+  | 2    | DCI_CREATE_PROPERTY_ADAPT      | 改编 |
+  | 3    | DCI_CREATE_PROPERTY_TRANSLATE  | 翻译 |
+  | 4    | DCI_CREATE_PROPERTY_COLLECTION | 汇编 |
+  | 5    | DCI_CREATE_PROPERTY_COMMENT    | 注释 |
+  | 6    | DCI_CREATE_PROPERTY_TIDY       | 整理 |
+  | 7    | DCI_CREATE_PROPERTY_OTHER      | 其他 |
+  
+  RightType（权利类型）：
+  
+  | 编码 | 常量                    | 备注           |
+  | ---- | ----------------------- | -------------- |
+  | 1    | RIGHT_TYPE_PUBLIC       | 发表权         |
+  | 2    | RIGHT_TYPE_SIGN         | 署名权         |
+  | 3    | RIGHT_TYPE_MODIFY       | 修改权         |
+  | 4    | RIGHT_TYPE_FULL_PROTECT | 保护权         |
+  | 5    | RIGHT_TYPE_COPY         | 复制权         |
+  | 6    | RIGHT_TYPE_DISTRIBUTION | 发行权         |
+  | 7    | RIGHT_TYPE_RENT         | 出租权         |
+  | 8    | RIGHT_TYPE_DISPLAY      | 展览权         |
+  | 9    | RIGHT_TYPE_SHOW         | 表演权         |
+  | 10   | RIGHT_TYPE_PLAY         | 放映权         |
+  | 11   | RIGHT_TYPE_BROADCAST    | 广播权         |
+  | 12   | RIGHT_TYPE_NET_TRANS    | 信息网络传播权 |
+  | 13   | RIGHT_TYPE_FILMING      | 摄制权         |
+  | 14   | RIGHT_TYPE_ADAPT        | 改编权         |
+  | 15   | RIGHT_TYPE_TRANSLATE    | 翻译权         |
+  | 16   | RIGHT_TYPE_COLLECTION   | 汇编权         |
+  | 17   | RIGHT_TYPE_OTHER        | 其他权利       |
+  | 18   | RIGHT_TYPE_ALL          | 所有           |
+  
+  RighterType（权利人类型）：
+  
+  | 编码 | 常量                 | 备注   |
+  | ---- | -------------------- | ------ |
+  | 1    | RIGHTER_TYPE_NATURAL | 自然人 |
+  | 2    | RIGHTER_TYPE_LEGAL   | 法人   |
+  
+  AuthorType（作者类型）：
+  
+  | 编码 | 常量                | 备注   |
+  | ---- | ------------------- | ------ |
+  | 1    | AUTHOR_TYPE_NATURAL | 自然人 |
+  | 2    | AUTHOR_TYPE_LEGAL   | 法人   |
+
+
 
 > DciClaim 的结构比较复杂，除了填充作品信息之外，还需要填充**权利项**（DciRight）和**作者**信息（DciAuthor），权利项中又包含**权利人**（DciRighter） 信息，具体用法看示例代码。
 >
@@ -686,9 +801,9 @@ func main() {
   		DciName: "图片作品1",
   		DciUrl: "https://www.sina.com.cn/",
   		ProposerEmail: "1298334XXX1@qq.com",
+      Sk: sk,
   		DciType: constants.DCI_TYPE_FILMING,
   		DciCreateProperty: constants.DCI_CREATE_PROPERTY_ADAPT,
-  		DciCreateTime: "2021-02-10 12:59:59",
   		RightInfoList: []zxl_go_sdk.DciRight{right},
   		AuthorList: []zxl_go_sdk.DciAuthor{author},
   	}
@@ -720,15 +835,21 @@ func main() {
 
 * 返回数据（DciClaimQueryResp）
 
-  | 字段            | 类型        | 描述                                       |
-  | --------------- | ----------- | ------------------------------------------ |
-  | Status          | int         | 确权任务状态值（）                         |
-  | DciId           | string      | 确权 id                                    |
-  | Url             | String      | 证书地址                                   |
-  | TortSearchList  | interface{} | 如果作品发生侵权，就会返回被侵权的作品地址 |
-  | RecordTimestamp | int         | 确权时间戳                                 |
+  | 字段            | 类型         | 描述                                                         |
+  | --------------- | ------------ | ------------------------------------------------------------ |
+  | Status          | int          | 确权任务状态值（2 处理中，4 搜索出来的图片url，疑似侵权中止流程 7 成功, 10 失败） |
+  | DciId           | string       | 确权 id                                                      |
+  | Url             | string       | 证书地址                                                     |
+  | TortSearchList  | []TortSearch | 如果作品发生侵权，就会返回被侵权的作品地址                   |
+  | RecordTimestamp | int          | 确权时间戳                                                   |
+  
+  TortSearch 结构如下：
+  
+  | 字段 | 类型   | 描述           |
+  | ---- | ------ | -------------- |
+  | Url  | String | 被侵权作品地址 |
 
-​     
+​       
 
 * 示例
 

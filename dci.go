@@ -26,12 +26,11 @@ const(
 */
 
 type DciClaim struct {
-	AgentAppId        string `json:"agentAppId"`
+	AppId             string `json:"appId"`
 	DciName           string `json:"dciName"`
 	ProposerEmail     string                       `json:"proposerEmail"`
 	DciType           constants.DciType            `json:"dciType"`
 	DciCreateProperty constants.DciCreateProperty  `json:"dciCreateProperty"`
-	DciCreateTime     string                       `json:"dciCreateTime"`
 	DciUrl            string                       `json:"dciUrl"`
 	DciHash           string                       `json:"dciHash"`
 	Signature         string                       `json:"signature"`
@@ -40,7 +39,7 @@ type DciClaim struct {
 	RightSignatureDic map[string]map[string]string `json:"rightSignatureDic"`
 	RequestType string `json:"requestType"`
 	RedirectUrl string `json:"redirectUrl"`
-	RepresentAppId string `json:"-"`
+	Sk  string `json:"-"`
 }
 
 type DciClaimResp struct {
@@ -61,11 +60,15 @@ type DciClaimQuery struct {
 
 type DciClaimQueryResp struct {
 	Status   int `json:"status"`
-	TortSearchList interface{} `json:"tortSearchList"`
+	TortSearchList []TortSearch `json:"tortSearchList"`
 	RecordTimestamp int `json:"recordTimestamp"`
 	DciId         string `json:"dciId"`
 	Url           string `json:"url"`
 	Msg           string `json:"msg"`
+}
+
+type TortSearch struct {
+	Url string `json:"url"`
 }
 
 type DciAuthor struct {
@@ -92,7 +95,7 @@ type DciRighter struct {
 /**
 提交确权申请
  */
-func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, sk string, timeout time.Duration) (DciClaimResp, error) {
+func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClaimResp, error) {
 	var resp DciClaimResp
 	if len(dci.AuthorList) > 5 {
 		return resp, errors.New("作者数量超限额错误")
@@ -113,18 +116,17 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, sk string, timeout time.Duratio
 	if err != nil{
 		return resp, err
 	}
+	dci.AppId = zxl.appId
 
 	signStr := strings.Join([]string{dci.ProposerEmail,
 		dci.DciName,
 		string(dci.DciType),
-		dci.DciCreateTime,
 		string(dci.DciCreateProperty),
 		dci.DciUrl,
 		dci.DciHash,
 		string(authorJson)}, "_")
 
-
-	signature, err := zxl.Sign(sk, []byte(signStr))
+	signature, err := zxl.Sign(dci.Sk, []byte(signStr))
 	if err != nil {
 		return resp, nil
 	}
@@ -155,11 +157,6 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, sk string, timeout time.Duratio
 			signMap[righter.RighterEmail] = sign
 		}
 		rightSignatureDic[string(right.Type)] = signMap
-	}
-
-	// 如果是代理用户确权，就需要填充 AgentAppId 字段
-	if dci.RepresentAppId != "" {
-		dci.AgentAppId = zxl.appId
 	}
 
 	dci.RightSignatureDic = rightSignatureDic
