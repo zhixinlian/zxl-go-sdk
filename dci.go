@@ -136,7 +136,7 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 	for i, right := range dci.RightInfoList {
 
 		if right.Type != constants.RIGHT_TYPE_ALL {
-			return resp, errors.New("right type is incorrect")
+			return resp, errors.New("权利项选择不正确")
 		}
 
 		right.DciKey = dci.DciHash

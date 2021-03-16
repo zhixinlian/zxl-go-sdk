@@ -737,6 +737,8 @@ func main() {
   | 17   | RIGHT_TYPE_OTHER        | 其他权利       |
   | 18   | RIGHT_TYPE_ALL          | 所有           |
   
+  > 注意：当前只支持编号 18 的**所有**项，其他权利会在后续支持
+  
   RighterType（权利人类型）：
   
   | 编码 | 常量                 | 备注   |
