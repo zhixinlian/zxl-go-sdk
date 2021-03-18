@@ -37,7 +37,7 @@
 
 1. 进入到 go 根目录或者当前项目的 vendor 目录中的 github.com/zhixinlian目录下  
 2. 运行命令 git clone https://github.com/zhixinlian/zxl-go-sdk.git  
-3. 选择版本，tag：v2.1.3.1
+3. 选择版本，tag：v2.1.3.2
 
 ### 使用步骤
 1. 通过至信链线上首页注册账户并完成认证，获取生成的 APPID 与 APPKEY;
@@ -637,47 +637,48 @@ func main() {
   | dciClaim | DciClaim      | 无       | 是         | 确权信息   |
   | timeOut  | time.Duration | 无       | 是         | 超时时间   |
   
+
  DciClaim 的结构如下：
-  
-  | 参数名            | 参数类型          | 默认值 | 是否必填 | 参数描述                                 |
-  | ----------------- | ----------------- | ------ | -------- | ---------------------------------------- |
-  | DciName           | string            | 无     | 是       | 作品名字                                 |
-  | ProposerEmail     | string            | 无     | 是       | 申请人邮箱                               |
-  | Sk                | string            | 无     | 是       | 申请人私钥                               |
-  | DciType           | DciType           | 无     | 是       | 作品类型（见下文 DciType）               |
-  | DciCreateProperty | DciCreateProperty | 无     | 是       | 作品创作属性（见下文 DciCreateProperty） |
-  | DciUrl            | string            | 无     | 是       | 作品url                                  |
-  | AuthorList        | []DciAuthor       | 无     | 是       | 作品作者信息                             |
-  | RightList         | []DciRight        | 无     | 是       | 权利人信息列表                           |
-  
+
+| 参数名            | 参数类型          | 默认值 | 是否必填 | 参数描述                                 |
+| ----------------- | ----------------- | ------ | -------- | ---------------------------------------- |
+| DciName           | string            | 无     | 是       | 作品名字                                 |
+| ProposerEmail     | string            | 无     | 是       | 申请人邮箱                               |
+| ProposerSk        | string            | 无     | 是       | 申请人私钥                               |
+| DciType           | DciType           | 无     | 是       | 作品类型（见下文 DciType）               |
+| DciCreateProperty | DciCreateProperty | 无     | 是       | 作品创作属性（见下文 DciCreateProperty） |
+| DciUrl            | string            | 无     | 是       | 作品url                                  |
+| AuthorList        | []DciAuthor       | 无     | 是       | 作品作者信息                             |
+| RightList         | []DciRight        | 无     | 是       | 权利人信息列表                           |
+
   AuthorList 结构如下：
-  
-  | 参数名       | 参数类型   | 默认值 | 是否必填 | 备注                         |
-  | ------------ | ---------- | ------ | -------- | ---------------------------- |
-  | AuthorType   | AuthorType | 无     | 是       | 作者类型（见下文AuthorType） |
-  | AuthorName   | string     | 无     | 是       | 作者名字                     |
-  | AuthorIdCard | string     | 无     | 是       | 作者证件号                   |
-  
+
+| 参数名       | 参数类型   | 默认值 | 是否必填 | 备注                         |
+| ------------ | ---------- | ------ | -------- | ---------------------------- |
+| AuthorType   | AuthorType | 无     | 是       | 作者类型（见下文AuthorType） |
+| AuthorName   | string     | 无     | 是       | 作者名字                     |
+| AuthorIdCard | string     | 无     | 是       | 作者证件号                   |
+
   RightList 结构如下：
-  
-  | 字段名          | 类型         | 默认值 | 是否必填 | 备注                        |
-  | --------------- | ------------ | ------ | -------- | --------------------------- |
-  | Type            | RightType    | 无     | 是       | 权利类型（见下文 RihtType） |
-  | RighterInfoList | []DciRighter | 无     | 是       | 权利人列表                  |
-  
+
+| 字段名          | 类型         | 默认值 | 是否必填 | 备注                        |
+| --------------- | ------------ | ------ | -------- | --------------------------- |
+| Type            | RightType    | 无     | 是       | 权利类型（见下文 RihtType） |
+| RighterInfoList | []DciRighter | 无     | 是       | 权利人列表                  |
+
   DciRighter 结构如下：
+
+| 字段名           | 类型        | 默认值 | 是否必填 | 备注                             |
+| ---------------- | ----------- | ------ | -------- | -------------------------------- |
+| RighterEmail     | string      | 无     | 是       | 权利人邮箱                       |
+| RighterType      | RighterType | 无     | 是       | 权利人类型（见下文 RighterType） |
+| RighterName      | string      | 无     | 是       | 权利人名字                       |
+| RighterIdCard    | string      | 无     | 是       | 权利人证件号                     |
+| RighterGainedWay | int         | 无     | 是       | 枚举获取途径                     |
+| RighterSk        | string      | 无     | 是       | 权利人的私钥                     |
+
   
-  | 字段名           | 类型        | 默认值 | 是否必填 | 备注                             |
-  | ---------------- | ----------- | ------ | -------- | -------------------------------- |
-  | RighterEmail     | string      | 无     | 是       | 权利人邮箱                       |
-  | RighterType      | RighterType | 无     | 是       | 权利人类型（见下文 RighterType） |
-  | RighterName      | string      | 无     | 是       | 权利人名字                       |
-  | RighterIdCard    | string      | 无     | 是       | 权利人证件号                     |
-  | RighterGainedWay | int         | 无     | 是       | 枚举GainedWay                    |
-  | Sk               | string      | 无     | 是       | 权利人的私钥                     |
-  
-  
-  
+
 * 枚举类型说明
 
   DciType（作品类型）：
@@ -761,7 +762,6 @@ func main() {
 >
 > 1. 目前 DciRight 的 type 只能使用 RIGHT_TYPE_ALL 值
 > 2. sk 是 dciClaim 中 proposerEmail 所属账户的私钥
-> 3. 如果是代理用户确权，需要填充 representAppId 字段
 
 
 
@@ -784,7 +784,7 @@ func main() {
   		RighterIdCard: "420582198412130XXX",
   		RighterEmail: "1298334XXX@qq.com",
   		RighterGainedWay: constants.GAINED_WAY_ORIGINAL,
-  		Sk: sk,
+  		RighterSk: sk,
   		RighterType: constants.RIGHTER_TYPE_LEGAL,
   	}
   
@@ -803,13 +803,13 @@ func main() {
   		DciName: "图片作品1",
   		DciUrl: "https://www.sina.com.cn/",
   		ProposerEmail: "1298334XXX1@qq.com",
-      Sk: sk,
+        ProposerSk: sk,
   		DciType: constants.DCI_TYPE_FILMING,
   		DciCreateProperty: constants.DCI_CREATE_PROPERTY_ADAPT,
   		RightInfoList: []zxl_go_sdk.DciRight{right},
   		AuthorList: []zxl_go_sdk.DciAuthor{author},
   	}
-  	resp, err := zxlSDK.SubmitDciClaim(dciClaim, sk, 10 * time.Second)
+  	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10 * time.Second)
   
   	if err != nil {
   		fmt.Printf("提交确权请求出错 %+v", err)
@@ -849,7 +849,7 @@ func main() {
   
   | 字段 | 类型   | 描述           |
   | ---- | ------ | -------------- |
-  | Url  | String | 被侵权作品地址 |
+  | Url  | String | 被确权作品 url |
 
 ​       
 

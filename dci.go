@@ -39,7 +39,7 @@ type DciClaim struct {
 	RightSignatureDic map[string]map[string]string `json:"rightSignatureDic"`
 	RequestType string `json:"requestType"`
 	RedirectUrl string `json:"redirectUrl"`
-	Sk  string `json:"-"`
+	ProposerSk  string `json:"-"`
 }
 
 type DciClaimResp struct {
@@ -89,7 +89,7 @@ type DciRighter struct {
 	RighterIdCard string `json:"righterIdCard"`
 	RighterName  string `json:"righterName"`
 	RighterType  constants.RighterType `json:"righterType"`
-	Sk string `json:"-"`
+	RighterSk string `json:"-"`
 }
 
 /**
@@ -126,7 +126,7 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 		dci.DciHash,
 		string(authorJson)}, "_")
 
-	signature, err := zxl.Sign(dci.Sk, []byte(signStr))
+	signature, err := zxl.Sign(dci.ProposerSk, []byte(signStr))
 	if err != nil {
 		return resp, nil
 	}
@@ -150,7 +150,7 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 		rightSignStr := strings.Join([]string{right.DciKey, string(right.Type), string(righterInfoJson)}, "_")
 
 		for _, righter := range right.RighterInfoList {
-			sign, err := zxl.Sign(righter.Sk, []byte(rightSignStr))
+			sign, err := zxl.Sign(righter.RighterSk, []byte(rightSignStr))
 			if err != nil {
 				return resp, err
 			}
