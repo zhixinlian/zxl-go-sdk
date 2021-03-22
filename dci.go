@@ -101,6 +101,10 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 		return resp, errors.New("作者数量超限额错误")
 	}
 
+	if !zxl.checkDciAuthors(dci.AuthorList) {
+		return resp, errors.New("作者参数错误")
+	}
+
 	if isInnerIpFromUrl(dci.DciUrl) {
 		return resp, errors.New("url 不合规，请检查")
 	}
@@ -150,6 +154,11 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 		rightSignStr := strings.Join([]string{right.DciKey, string(right.Type), string(righterInfoJson)}, "_")
 
 		for _, righter := range right.RighterInfoList {
+			if righter.RighterName == "" ||
+				righter.RighterIdCard == "" ||
+				righter.RighterGainedWay == "" {
+				return resp, errors.New("权利人参数错误")
+			}
 			sign, err := zxl.Sign(righter.RighterSk, []byte(rightSignStr))
 			if err != nil {
 				return resp, err
@@ -191,6 +200,15 @@ func (zxl *zxlImpl) QueryDciClaimResult(dciQuery DciClaimQuery, timeout time.Dur
 
 	json.Unmarshal(sendRetBytes, &resp)
 	return resp, nil
+}
+
+func (zxl *zxlImpl) checkDciAuthors(authors []DciAuthor) bool {
+	for _, author := range authors {
+		if author.AuthorType == "" || author.AuthorIdCard == "" || author.AuthorName == "" {
+			return false
+		}
+	}
+	return true
 }
 
 func (zxl *zxlImpl) getContent(url string) (string, error) {
