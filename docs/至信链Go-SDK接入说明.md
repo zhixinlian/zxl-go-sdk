@@ -635,7 +635,7 @@ func main() {
   | userType | Integer | 1 | 否 | 用户类型（1: 法人 2: 自然人），默认是法人 |
   | platformName | String | 无 | 否 | 接入平台名称 |
   | platformUrl | String | 无 | 否 | 接入平台地址 |
-  | businessType | Integer | 4 | 否 | 平台业务类型 (1:金融类 2:版权类 3:其他类 4--未填写)，默认是未填写 |
+  | businessType | Integer | 4 | 否 | 平台业务类型 (1:金融类 2:版权类 3:其他类 4:未填写)，默认是未填写 |
   
   ​     
 * 返回值
