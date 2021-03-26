@@ -698,6 +698,8 @@ func submitBusInfo(user AgentUser, appId, appKey string) (bool, error) {
 		a.BusinessType = constants.BUSINESS_DEFAULT
 	}
 	if user.UserType == constants.USER_NATURAL_PERSON {
+		// 如果是自然人注册，那么 contact 字段使用 PersonName 填充
+		user.Contact = user.PersonName
 		a.RedirectUrl = SubmitPersonAddr
 	} else {
 		a.RedirectUrl = SubmitBusAddr
