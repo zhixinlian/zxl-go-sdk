@@ -342,7 +342,7 @@ func main() {
   
   
  # 确权任务
- 
+
 ## 发起数字版权确权请求
 
 * 方法原型
@@ -599,7 +599,7 @@ func main() {
 # 代理商服务
 
 
-## 代理用户注册
+## 法人代理用户注册
 
 * 方法原型
 
@@ -619,11 +619,10 @@ func main() {
   | --------------- | ---------- | -------- | ---------- | ------------------ |
   | RepresentEmail  | string     | 无       | 是         | 代理企业注册邮箱     |
   | Pwd             | string     | 无       | 是         | 代理企业注册密码  |
-  | EpName          | string     | 无       | 否        | 代理企业名称           |
-  | PersonName | string | 无 | 否 | 自然人姓名 |
-  | CreditCode      | string     | 无       | 否        | 代理企业信用代码       |
-  | LicenseFile     | String       | 无       | 否        | 代理企业营业执照图片路径       |
-  | Representative  | String     | 无       | 否        | 代理企业法人代表姓名           |
+  | EpName          | string     | 无       | 是       | 代理企业名称           |
+  | CreditCode      | string     | 无       | 是       | 代理企业信用代码       |
+  | LicenseFile     | String       | 无       | 是       | 代理企业营业执照图片路径       |
+  | Representative  | String     | 无       | 是       | 代理企业法人代表姓名           |
   | LetterFile      | String       | 无       | 否         | 至信链委托公函图片路径       |
   | Category        | int | 无       | 否         | 代理企业行业信息，枚举     |
   | Contact         | String     | 无       | 是         | 联系人姓名         |
@@ -632,10 +631,10 @@ func main() {
   | Idcard          | String     | 无       | 是         | 联系人身份证号码         |
   | CardFrontFile   | String       | 无       | 是         | 联系人身份证正面图片路径     |
   | CardBackendFile | String       | 无       | 是         | 联系人身份证反面图片路径     |
-  | userType | Integer | 1 | 否 | 用户类型（1: 法人 2: 自然人），默认是法人 |
-  | platformName | String | 无 | 否 | 接入平台名称 |
-  | platformUrl | String | 无 | 否 | 接入平台地址 |
-  | businessType | Integer | 4 | 否 | 平台业务类型 (1:金融类 2:版权类 3:其他类 4:未填写)，默认是未填写 |
+  | UserType | Integer | 无 | 是 | 用户类型（1: 法人 2: 自然人），默认是法人 |
+  | PlatformName | String | 无 | 否 | 接入平台名称 |
+  | PlatformUrl | String | 无 | 否 | 接入平台地址 |
+  | BusinessType | Integer | 4 | 否 | 平台业务类型 (1:金融类 2:版权类 3:其他类 4:未填写)，默认是未填写 |
   
   ​     
 * 返回值
@@ -678,6 +677,50 @@ func main() {
     return
   }
   
+  ```
+
+
+
+## 自然人代理用户注册
+
+* 方法原型
+
+  * ```
+    RegisterUser(agentUser AgentUser, timeout time.Duration) (bool, error)
+    ```
+
+* 参数说明
+
+  | 参数名    | 参数类型      | 默认值 | 参数描述     |
+  | --------- | ------------- | ------ | ------------ |
+  | agentUser | AgentUser     |        | 注册用户信息 |
+  | timeout   | time.Duration |        | 超时时间     |
+
+  接口参数传入`AgentUser`类型对象：
+
+  | *参数名*        | *参数类型* | *默认值* | *是否必填* | *参数描述*                                |
+  | --------------- | ---------- | -------- | ---------- | ----------------------------------------- |
+  | RepresentEmail  | string     | 无       | 是         | 代理企业注册邮箱                          |
+  | Pwd             | string     | 无       | 是         | 代理企业注册密码                          |
+  | PersonName      | string     | 无       | 是         | 代理企业名称                              |
+  | Mobile          | String     | 无       | 是         | 联系人手机号                              |
+  | Idcard          | String     | 无       | 是         | 联系人身份证号码                          |
+  | CardFrontFile   | String     | 无       | 是         | 联系人身份证正面图片路径                  |
+  | CardBackendFile | String     | 无       | 是         | 联系人身份证反面图片路径                  |
+  | UserType        | Integer    | 无       | 是         | 用户类型（1: 法人 2: 自然人），默认是法人 |
+
+  ​     
+
+* 返回值
+
+  | 返回值类型 | 返回值描述                                   |
+  | ---------- | -------------------------------------------- |
+  | bool       | 注册成功与否，成功true，失败抛出对应异常信息 |
+
+* 示例
+
+  ```go
+  
   // 自然人用户注册
   zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
   if err != nil {
@@ -688,7 +731,6 @@ func main() {
     PersonName:      "XXX",
     Pwd:             "123456aaa",
     RepresentEmail:  "zxin_person3@admin.com",
-    Contact:         "XXX",
     Idcard:          "320681199209029XXX",
     Mobile:          "18600213476",
     UserType:        constants.USER_NATURAL_PERSON,
@@ -703,6 +745,8 @@ func main() {
   }
   
   ```
+
+
 
 
 

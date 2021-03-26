@@ -685,6 +685,11 @@ func uploadFile(info AgentUser, appId, filename, urlConst, uploadType string) (i
 
 /**提交商务信息*/
 func submitBusInfo(user AgentUser, appId, appKey string) (bool, error) {
+	if user.UserType == constants.USER_NATURAL_PERSON {
+		// 如果是自然人注册，那么 contact 字段使用 PersonName 填充
+		user.Contact = user.PersonName
+	}
+
 	bytes, _ := json.Marshal(user)
 	var a = &LicenseUser{}
 	json.Unmarshal(bytes, a)
