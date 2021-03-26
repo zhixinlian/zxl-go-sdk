@@ -71,7 +71,6 @@ func TestRegisterPerson(t *testing.T) {
 		PersonName:      "",
 		Pwd:             "123456aaa",
 		RepresentEmail:  "xxx@admin.com",
-		Contact:         "",
 		Idcard:          "",
 		Mobile:          "",
 		UserType:        constants.USER_NATURAL_PERSON,

@@ -611,8 +611,8 @@ func main() {
 
   | 参数名  | 参数类型      | 默认值 | 参数描述           |
   | ------- | ------------- | ------ | ------------------ |
-  | agentUser | AgentUser        |        | 注册用户信息 |
-  | timeout | time.Duration |        | 超时时间           |
+  | agentUser | AgentUser        | 无 | 注册用户信息 |
+  | timeout | time.Duration | 无 | 超时时间           |
   接口参数传入`AgentUser`类型对象：
 
   | *参数名*        | *参数类型* | *默认值* | *是否必填* | *参数描述*         |
@@ -621,20 +621,20 @@ func main() {
   | Pwd             | string     | 无       | 是         | 代理企业注册密码  |
   | EpName          | string     | 无       | 是       | 代理企业名称           |
   | CreditCode      | string     | 无       | 是       | 代理企业信用代码       |
-  | LicenseFile     | String       | 无       | 是       | 代理企业营业执照图片路径       |
-  | Representative  | String     | 无       | 是       | 代理企业法人代表姓名           |
-  | LetterFile      | String       | 无       | 否         | 至信链委托公函图片路径       |
+  | LicenseFile     | string      | 无       | 是       | 代理企业营业执照图片路径       |
+  | Representative  | string    | 无       | 是       | 代理企业法人代表姓名           |
+  | LetterFile      | string      | 无       | 否         | 至信链委托公函图片路径       |
   | Category        | int | 无       | 否         | 代理企业行业信息，枚举     |
-  | Contact         | String     | 无       | 是         | 联系人姓名         |
-  | Title           | String     | 无       | 否         | 联系人职位         |
-  | Mobile          | String     | 无       | 是         | 联系人手机号       |
-  | Idcard          | String     | 无       | 是         | 联系人身份证号码         |
-  | CardFrontFile   | String       | 无       | 是         | 联系人身份证正面图片路径     |
-  | CardBackendFile | String       | 无       | 是         | 联系人身份证反面图片路径     |
-  | UserType | Integer | 无 | 是 | 用户类型（1: 法人 2: 自然人），默认是法人 |
-  | PlatformName | String | 无 | 否 | 接入平台名称 |
-  | PlatformUrl | String | 无 | 否 | 接入平台地址 |
-  | BusinessType | Integer | 4 | 否 | 平台业务类型 (1:金融类 2:版权类 3:其他类 4:未填写)，默认是未填写 |
+  | Contact         | string    | 无       | 是         | 联系人姓名         |
+  | Title           | string    | 无       | 否         | 联系人职位         |
+  | Mobile          | string    | 无       | 是         | 联系人手机号       |
+  | Idcard          | string    | 无       | 是         | 联系人身份证号码         |
+  | CardFrontFile   | string      | 无       | 是         | 联系人身份证正面图片路径     |
+  | CardBackendFile | string      | 无       | 是         | 联系人身份证反面图片路径     |
+  | UserType | int | 无 | 是 | 用户类型，填入：1（法人） |
+  | PlatformName | string | 无 | 否 | 接入平台名称 |
+  | PlatformUrl | string | 无 | 否 | 接入平台地址 |
+  | BusinessType | int | 4 | 否 | 平台业务类型 (1:金融类 2:版权类 3:其他类 4:未填写)，默认是未填写 |
   
   ​     
 * 返回值
@@ -693,21 +693,21 @@ func main() {
 
   | 参数名    | 参数类型      | 默认值 | 参数描述     |
   | --------- | ------------- | ------ | ------------ |
-  | agentUser | AgentUser     |        | 注册用户信息 |
-  | timeout   | time.Duration |        | 超时时间     |
+  | agentUser | AgentUser     | 无     | 注册用户信息 |
+  | timeout   | time.Duration | 无     | 超时时间     |
 
   接口参数传入`AgentUser`类型对象：
 
-  | *参数名*        | *参数类型* | *默认值* | *是否必填* | *参数描述*                                |
-  | --------------- | ---------- | -------- | ---------- | ----------------------------------------- |
-  | RepresentEmail  | string     | 无       | 是         | 代理企业注册邮箱                          |
-  | Pwd             | string     | 无       | 是         | 代理企业注册密码                          |
-  | PersonName      | string     | 无       | 是         | 代理企业名称                              |
-  | Mobile          | String     | 无       | 是         | 联系人手机号                              |
-  | Idcard          | String     | 无       | 是         | 联系人身份证号码                          |
-  | CardFrontFile   | String     | 无       | 是         | 联系人身份证正面图片路径                  |
-  | CardBackendFile | String     | 无       | 是         | 联系人身份证反面图片路径                  |
-  | UserType        | Integer    | 无       | 是         | 用户类型（1: 法人 2: 自然人），默认是法人 |
+  | *参数名*        | *参数类型* | *默认值* | *是否必填* | *参数描述*                  |
+  | --------------- | ---------- | -------- | ---------- | --------------------------- |
+  | RepresentEmail  | string     | 无       | 是         | 代理用户注册邮箱            |
+  | Pwd             | string     | 无       | 是         | 代理用户注册密码            |
+  | PersonName      | string     | 无       | 是         | 代理用户姓名                |
+  | Mobile          | string     | 无       | 是         | 联系人手机号                |
+  | Idcard          | string     | 无       | 是         | 联系人身份证号码            |
+  | CardFrontFile   | string     | 无       | 是         | 联系人身份证正面图片路径    |
+  | CardBackendFile | string     | 无       | 是         | 联系人身份证反面图片路径    |
+  | UserType        | int        | 无       | 是         | 用户类型，填入：2（自然人） |
 
   ​     
 
