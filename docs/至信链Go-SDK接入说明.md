@@ -340,7 +340,151 @@ func main() {
   | ---------- | ------------------------------------------------------------ |
   | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br />"voucherUrl":"成功状态下,取证证书下载地址"<br />} |
   
+
+
+
+# 侵权监控服务
+
+## 创建侵权监控任务
+
+* 方法原型
+
+  ```go
+  SubmitTortTask(tort Tort, timeout time.Duration) (TortResp, error)
+  ```
+
+* 参数说明
+
+  | *参数名* | *参数类型*    | *默认值* | *是否必填* | *参数描述*   |
+  | -------- | ------------- | -------- | ---------- | ------------ |
+  | tort     | Tort          | 无       | 是         | 侵权监控参数 |
+  | timeOut  | time.Duration | 无       | 是         | 超时时间     |
+
+
+
+Tort 结构如下:
+
+| *参数名*  | *参数类型*           | *默认值* | *是否必填* | *参数描述*                                       |
+| --------- | -------------------- | -------- | ---------- | ------------------------------------------------ |
+| Url       | string               | 无       | 是         | 资源 url                                         |
+| Title     | string               | 无       | 是         | 标题                                             |
+| Keyword   | string               | 无       | 否         | 关键字列表，半角分号（;）分割                    |
+| Type      | constants.TortType   | 无       | 是         | 资源类型                                         |
+| Source    | constants.TortSource | 无       | 是         | 数据来源                                         |
+| StartDate | string               | 无       | 否         | 开始时间（2006-01-02），如果不填，从当前时间开始 |
+| EndDate   | string               | 无       | 是         | 结束时间（2006-01-02）                           |
+
+* 枚举类型说明
+
+  TortType（资源类型）：
+
+  | 编码 | 常量           | 备注     |
+  | ---- | -------------- | -------- |
+  | 1    | MATERIAL_PHOTO | 图片类型 |
+  | 3    | MATERIAL_VIDEO | 视频类型 |
+
+  TortSource（数据来源）：
+
+  | 编码 | 常量        | 备注                         |
+  | ---- | ----------- | ---------------------------- |
+  | 1    | PROPERTY    | 房产类监测，type为图片时可用 |
+  | 2    | ANY         | 原创类监测，type为图片时可用 |
+  | 21   | SHORT_VIDEO | 短视频监测，type为视频时可用 |
+  | 22   | LONG_VIDEO  | 长视频监测，type为视频时可用 |
+
+* 返回数据（TortResp）
+
+  | 字段      | 类型   | 描述        |
+  | --------- | ------ | ----------- |
+  | TaskId    | string | 确权任务 Id |
+  | RequestId | string | 请求Id      |
+
+* 示例
+
+  ```go
+  zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
+  if err != nil {
+    fmt.Println("初始化 SDK 错误")
+    return
+  }
   
+  tort := zxl_go_sdk.Tort{
+    Url: "https://inews.gtimg.com/newsapp_bt/0/5001rcns97nr04er/1000?appid=ee22ce76657290e1",
+    Title: "测试图片",
+    Keyword: "月亮;太空",
+    Type: constants.MATERIAL_PHOTO,
+    Source: constants.ANY_PIC,
+    StartDate: "2021-03-31",
+    EndDate: "2021-04-10",
+  }
+  
+  resp, err := zxlSDK.SubmitTortTask(tort, 5 * time.Second)
+  ```
+
+
+
+## 查看监控任务结果
+
+* 方法原型
+
+  ```go
+  QueryTortTaskResult(tortQuery TortQuery, timeout time.Duration) (TortQueryResp, error)
+  ```
+
+* 参数说明
+
+  | *参数名*  | *参数类型*    | *默认值* | *是否必填* | *参数描述* |
+  | --------- | ------------- | -------- | ---------- | ---------- |
+  | tortQuery | TortQuery     | 无       | 是         | 查询参数   |
+  | timeOut   | time.Duration | 无       | 是         | 超时时间   |
+
+TortQuery 结构如下：
+
+| *参数名* | *参数类型* | *默认值* | *是否必填* | *参数描述* |
+| -------- | ---------- | -------- | ---------- | ---------- |
+| TaskId   | string     | 无       | 是         | 任务Id     |
+
+* 返回数据（TortQueryResp）
+
+  | 字段      | 类型       | 描述         |
+  | --------- | ---------- | ------------ |
+  | ClueList  | []ClueData | 侵权线索列表 |
+  | RequestId | string     | 请求Id       |
+
+ClueData 结构如下：
+
+| 字段     | 类型   | 描述             |
+| -------- | ------ | ---------------- |
+| ClueId   | int    | 线索Id           |
+| PlayUrl  | string | 侵权作品链接     |
+| Title    | string | 侵权作品标题     |
+| PubTime  | string | 侵权作品发布时间 |
+| Platform | string | 侵权作品所属平台 |
+| Author   | string | 侵权作品作者     |
+| FindTime | string | 发现侵权时间     |
+
+
+
+* 示例
+
+  ```go
+  zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
+  if err != nil {
+    fmt.Println("初始化 SDK 错误")
+    return
+  }
+  
+  tortQuery := zxl_go_sdk.TortQuery{
+    TaskId: "",
+  }
+  
+  resp, err := zxlSDK.QueryTortTaskResult(tortQuery, 5 * time.Second)
+  ```
+
+  
+
+
+
  # 确权任务
 
 ## 发起数字版权确权请求
