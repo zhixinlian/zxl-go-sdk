@@ -127,6 +127,7 @@ type EvSaveResult struct {
 	EvHash      string `json:"evHash"`
 	CreateTime  string `json:"createTime"`
 	Ext         string `json:"ext"`
+	RequestId   string
 }
 
 //下发截屏/录屏任务
@@ -148,6 +149,7 @@ type TaskEvData struct {
 	StatusMsg string `json:"statusMsg"`
 	Url       string `json:"url"`
 	Hash      string `json:"hash"`
+	RequestId string
 }
 
 //证书状态及结果
@@ -155,6 +157,7 @@ type EvIdData struct {
 	Status     int    `json:"status"`
 	EvidUrl    string `json:"evidUrl"`
 	VoucherUrl string `json:"voucherUrl"`
+	RequestId  string
 }
 
 //定义tx接口返回结构体，最外层

@@ -118,10 +118,10 @@ func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout
 		return nil, errors.New("EvidenceSave (Sign) error:" + err.Error())
 	}
 	applyBodyBytes, _ := json.Marshal(&TencentEvidenceReq{BodyData: string(applyBytes), BodySign: applySign})
-	applyRetBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST",
+	applyRetBytes, cri, err := sendRequest(sdk.AppId, sdk.AppKey, "POST",
 		defConf.ServerAddr+defConf.EvidenceApply, applyBodyBytes, timeout)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (sendRequest) error:" + err.Error())
+		return nil, errors.New("EvidenceSave (sendRequest) error:" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var applyResp EvidenceApplyResp
 	err = json.Unmarshal(applyRetBytes, &applyResp)
@@ -143,10 +143,10 @@ func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout
 		return nil, errors.New("EvidenceSave (Sign3) error:" + err.Error())
 	}
 	submitBodyBytes, _ := json.Marshal(&TencentEvidenceReq{BodyData: string(submitBytes), BodySign: submitSign2})
-	submitRetBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST",
+	submitRetBytes, cri, err := sendRequest(sdk.AppId, sdk.AppKey, "POST",
 		defConf.ServerAddr+defConf.EvidenceSubmit, submitBodyBytes, timeout)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (sendRequest2) error:" + err.Error())
+		return nil, errors.New("EvidenceSave (sendRequest2) error:" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var tencentResp EvSaveResult
 	err = json.Unmarshal(submitRetBytes, &tencentResp)
@@ -155,6 +155,7 @@ func (sdk *trustSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout
 	}
 	tencentResp.EvId = uid
 	tencentResp.EvHash = evHash
+	tencentResp.RequestId = cri.RequestId
 	return &tencentResp, nil
 }
 
@@ -174,10 +175,10 @@ func (sdk *trustSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Durati
 	}
 	param := EvObtainTask{WebUrls: webUrls, Type: 2, AppId: sdk.AppId, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
-	applyRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST",
+	applyRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST",
 		defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New("下发任务异常>>error:" + err.Error())
+		return "", errors.New("下发任务异常>>error:" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(applyRetBytes, &txRetDetail)
@@ -193,9 +194,9 @@ func (sdk *trustSDKImpl) ContentCapturePic(webUrls string, timeout time.Duration
 	}
 	param := EvObtainTask{WebUrls: webUrls, Type: 1, AppId: sdk.AppId, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New("下发任务异常>>error:" + err.Error())
+		return "", errors.New("下发任务异常>>error:" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -209,9 +210,9 @@ func (sdk *trustSDKImpl) getContentStatus(orderNo string, timeout time.Duration)
 	}
 	param := EvObtainTask{AppId: sdk.AppId, OrderNo: orderNo, RequestType: "GET", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/evidinfo"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return nil, errors.New(err.Error())
+		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -226,9 +227,9 @@ func (sdk *trustSDKImpl) evidenceObtainVideo(webUrls, title, remark string, time
 	}
 	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 2, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New(err.Error())
+		return "", errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -243,9 +244,9 @@ func (sdk *trustSDKImpl) evidenceObtainPic(webUrls, title, remark string, timeou
 	}
 	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 1, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New(err.Error())
+		return "", errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -260,12 +261,17 @@ func (sdk *trustSDKImpl) getEvidenceStatus(orderNo string, timeout time.Duration
 	}
 	param := EvObtainTask{AppId: sdk.AppId, OrderNo: orderNo, RequestType: "GET", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/evidinfo"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return nil, errors.New(err.Error())
+		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
-	var evIdData = EvIdData{Status: txRetDetail.Status, EvidUrl: txRetDetail.EvIdUrl, VoucherUrl: txRetDetail.VoucherUrl}
+	var evIdData = EvIdData{
+		Status: txRetDetail.Status,
+		EvidUrl: txRetDetail.EvIdUrl,
+		VoucherUrl: txRetDetail.VoucherUrl,
+		RequestId: cri.RequestId,
+	}
 	return &evIdData, nil
 }

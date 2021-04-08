@@ -498,6 +498,7 @@ type ReviewData struct {
 	State     int    `json:"state"`
 	Reason    string `json:"reason"`
 	AgentCode string `json:"agentCode"`
+	RequestId string
 }
 
 /**
@@ -565,11 +566,12 @@ func (zxl *zxlImpl) SelectEpInfo(email string, timeout time.Duration) (ReviewDat
 	param["agentAppId"] = zxl.appId
 	bytes, _ := json.Marshal(param)
 	url := defConf.ServerAddr + defConf.ContentCapture
-	retBytes, err := sendTxMidRequest(zxl.appId, zxl.appKey, "POST", url, bytes, timeout)
+	retBytes, cri, err := sendTxMidRequest(zxl.appId, zxl.appKey, "POST", url, bytes, timeout)
 	if err != nil {
-		return ret, errors.New(err.Error())
+		return ret, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	json.Unmarshal(retBytes, &ret)
+	ret.RequestId = cri.RequestId
 	return ret, nil
 }
 
@@ -588,9 +590,9 @@ func (zxl *zxlImpl) BindRepresentUserCert(representAppId, representAppKey, repre
 	if err != nil {
 		return false, errors.New("BindUserCertError (Marshal): " + err.Error())
 	}
-	_, err = sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.UserCert, dataBytes, 0)
+	_, cri, err := sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.UserCert, dataBytes, 0)
 	if err != nil {
-		return false, errors.New("BindUserCertError (sendRequest): " + err.Error())
+		return false, errors.New("BindUserCertError (sendRequest): " + err.Error() + ", requestId:"+ cri.RequestId)
 	}
 	return true, nil
 }
@@ -610,7 +612,7 @@ func (zxl *zxlImpl) UpdateRepresentUserCert(representAppId, representAppKey, rep
 	if err != nil {
 		return false, errors.New("UpdateUserCertError (Marshal): " + err.Error())
 	}
-	_, err = sendRequest(zxl.appId, zxl.appKey, "PUT", defConf.ServerAddr+defConf.UserCert, dataBytes, 0)
+	_, _, err = sendRequest(zxl.appId, zxl.appKey, "PUT", defConf.ServerAddr+defConf.UserCert, dataBytes, 0)
 	if err != nil {
 		return false, errors.New("UpdateUserCertError (sendRequest): " + err.Error())
 	}
@@ -631,17 +633,18 @@ func (zxl *zxlImpl) RepresentSave(evHash, extendInfo, representSk, representAppI
 	}
 	ed.Sign = signStr
 	bodyData, _ := json.Marshal(&ed)
-	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.EvidenceSave, bodyData, timeout)
+	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.EvidenceSave, bodyData, timeout)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (cetc sendRequest) error:" + err.Error())
+		return nil, errors.New("EvidenceSave (cetc sendRequest) error:" + err.Error() + ", requestId:"+ cri.RequestId)
 	}
 	var saveResp EvSaveResult
 	err = json.Unmarshal(respBytes, &saveResp)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (cetc Unmarshal) error:" + err.Error())
+		return nil, errors.New("EvidenceSave (cetc Unmarshal) error:" + err.Error() + ", requestId:"+ cri.RequestId)
 	}
 	saveResp.EvHash = evHash
 	saveResp.EvId = uid
+	saveResp.RequestId = cri.RequestId
 	return &saveResp, nil
 }
 
@@ -651,9 +654,9 @@ func submitRegister(appId, appKey string, info AgentUser, timeout time.Duration)
 	var send = AgentUserSubmitInfo{req, info.RepresentEmail, info.Pwd, appId}
 	paramBytes, _ := json.Marshal(send)
 	url := defConf.ServerAddr + defConf.ContentCapture
-	_, err := sendTxMidRequest(appId, appKey, "POST", url, paramBytes, timeout)
+	_, cri, err := sendTxMidRequest(appId, appKey, "POST", url, paramBytes, timeout)
 	if err != nil {
-		return errors.New("register agent user fail: " + err.Error())
+		return errors.New("register agent user fail: " + err.Error() + ", requestId:"+ cri.RequestId)
 	}
 	return nil
 }
@@ -708,9 +711,9 @@ func submitBusInfo(user AgentUser, appId, appKey string) (bool, error) {
 	}
 	bytes, _ = json.Marshal(a)
 	url := defConf.ServerAddr + defConf.ContentCapture
-	_, err := sendTxMidRequest(appId, appKey, "POST", url, bytes, 0)
+	_, cri, err := sendTxMidRequest(appId, appKey, "POST", url, bytes, 0)
 	if err != nil {
-		return false, errors.New("submit busi info fail :" + err.Error())
+		return false, errors.New("submit busi info fail :" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	return true, nil
 }
