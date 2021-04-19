@@ -93,13 +93,23 @@ func (zxl *zxlImpl) KvSave(req KvSaveReq, timeout time.Duration) (*KvSaveResp, e
 	if err != nil {
 		return resp, errors.New("kv saved failed"+err.Error())
 	}
-	err = json.Unmarshal(data, resp)
+	resp.RequestId = cri.RequestId
 
+	var commonData commonResult
+	err = json.Unmarshal(data, &commonData)
+	if err != nil {
+		return nil, errors.New("returned data format error:" + err.Error())
+	}
+	if commonData.RetCode != 0 {
+		return nil, errors.New("http response error info : " + strconv.Itoa(commonData.RetCode) + ","+commonData.RetMsg)
+	}
+
+	jsonData, _ := json.Marshal(commonData.Data)
+
+	err = json.Unmarshal(jsonData, resp)
 	if err != nil {
 		return resp, errors.New("format data error "+ err.Error())
 	}
-
-	resp.RequestId = cri.RequestId
 
 	return resp, nil
 }
@@ -120,13 +130,23 @@ func (zxl *zxlImpl) KvQuery(req KvQueryReq, timeout time.Duration) (*KvQueryResp
 	if err != nil {
 		return resp, errors.New("kv query failed"+ err.Error())
 	}
+	resp.RequestId = cri.RequestId
 
-	err = json.Unmarshal(data, resp)
+	var commonData commonResult
+	err = json.Unmarshal(data, &commonData)
+	if err != nil {
+		return nil, errors.New("returned data format error:" + err.Error())
+	}
+	if commonData.RetCode != 0 {
+		return nil, errors.New("http response error info : " + strconv.Itoa(commonData.RetCode) + ","+commonData.RetMsg)
+	}
+
+	jsonData, _ := json.Marshal(commonData.Data)
+
+	err = json.Unmarshal(jsonData, resp)
 	if err != nil {
 		return resp, errors.New("format data error "+ err.Error())
 	}
-
-	resp.RequestId = cri.RequestId
 
 	return resp, nil
 }
