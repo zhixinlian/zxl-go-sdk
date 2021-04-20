@@ -68,6 +68,16 @@ func (zxl *zxlImpl) KvSave(req KvSaveReq, timeout time.Duration) (*KvSaveResp, e
 	resp := &KvSaveResp{}
 	url := defConf.ServerAddr + KvSaveUrl
 
+	if req.KvKey == ""{
+		return resp, errors.New("KvKey 不能为空")
+	}
+	if req.KvValue == "" {
+		return resp, errors.New("KvValue 不能为空")
+	}
+	if req.Sk == "" {
+		return resp, errors.New("私钥不能为空")
+	}
+
 	req.KvKeyHash = getHash(req.KvKey)
 	req.KvKeyValueHash = getHash(req.KvKey+":"+req.KvValue)
 
