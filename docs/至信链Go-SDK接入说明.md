@@ -736,6 +736,107 @@ ClueData 结构如下：
     return
   }
   ```
+  
+# Kv 服务
+
+## Kv 存储
+
+### 方法原型
+
+````java
+KvSave(req KvSaveReq, timeout time.Duration) (*KvSaveResp, error)
+````
+
+### 参数说明
+
+| *参数名*  | *参数类型* | *默认值* | *是否必填* | *参数描述*                             |
+| --------- | ---------- | -------- | ---------- | -------------------------------------- |
+| req       | KvSaveReq     | 无       | 是         | kv 存储请求                               |
+| timeout   | time.Duration | 无       | 是         |   请求超时时间       |
+
+KvSaveReq 结构如下：
+| *参数名*  | *参数类型* | *默认值* | *是否必填* | *参数描述*                             |
+| --------- | ---------- | -------- | ---------- | -------------------------------------- |
+| KvKey      | String     | 无       | 是         | kv 数据的 key                              |
+| KvValue      | String     | 无       | 是         | kv 数据的 value                              |
+| Sk      | String     | 无       | 是         | 存储人的私钥（如果是代理用户，就是代理用户的私钥）                             |
+| RepresentAppId      | String     | 无       | 否         | 代理用户 appId                          |
+
+
+### 返回数据
+
+| 字段   | 类型   | 描述    |
+| ------ | ------ | ------- |
+| resp | KvSaveResp | Kv 存储结果 |
+
+KvSaveResp 结构如下：
+| 字段   | 类型   | 描述    |
+| ------ | ------ | ------- |
+| KvKey | String | kv 的 key|
+| RequestId | String | 请求的 requestId|
+
+### 示例
+
+```go
+
+key := ""
+
+req := zxl_go_sdk.KvSaveReq{
+    KvKey: key,
+    KvValue: "",
+    Sk: sK,
+}
+
+resp, err := sdk.KvSave(req, 5 * time.Second)
+```
+
+
+## 查询 Kv
+
+### 方法原型
+
+````java
+KvQuery(req KvQueryReq, timeout time.Duration) (*KvQueryResp, error) 
+````
+
+### 参数说明
+
+| *参数名* | *参数类型* | *默认值* | *是否必填* | *参数描述*                   |
+| -------- | ---------- | -------- | ---------- | ---------------------------- |
+| req   | KvQueryReq     | 无       | 是         | Kv 查询请求 |
+| timeout   | time.Duration | 无       | 是         |   请求超时时间       |
+
+KvQueryReq 结构如下：
+| *参数名* | *参数类型* | *默认值* | *是否必填* | *参数描述*                   |
+| -------- | ---------- | -------- | ---------- | ---------------------------- |
+| KvKey   | String     | 无       | 是         | kv 数据的 key |
+
+### 返回数据
+
+| 字段           | 类型 | 描述             |
+| -------------- | ---- | ---------------- |
+| resp| KvQueryResp | kv 数据查询结果 |
+
+KvQueryResp 结构如下：
+| 字段           | 类型 | 描述             |
+| -------------- | ---- | ---------------- |
+| KvKey| String | kv 数据的 key |
+| KvValue| String | kv 数据的 value |
+| CreateTime| String | kv 数据上链时间 |
+| Status| Integer | kv 数据状态（1：未上链，3：上链成功，4：上链失败） |
+| RequestId| String | 请求 requestId |
+
+### 示例
+
+````java
+key := ""
+queryReq := zxl_go_sdk.KvQueryReq{
+               KvKey: key,
+            }
+queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
+
+````
+
 
 
 
