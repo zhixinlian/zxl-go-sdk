@@ -12,6 +12,7 @@ import (
 	"reflect"
 	"strings"
 	"time"
+	"github.com/zhixinlian/zxl-go-sdk/constants"
 )
 
 /**
@@ -381,6 +382,20 @@ type AgentUser struct {
 	Mobile string `json:"mobile"`
 	/**行业id信息**/
 	Category int `json:"category"`
+	/**自然人姓名**/
+	PersonName string `json:"personName"`
+	/**用户类型，默认为1：法人主体， 2：自然人主体**/
+	UserType constants.UserType `json:"userType"`
+	/**接入平台名称：数字+字母，不超过20字**/
+	PlatformName string `json:"platformName"`
+	/**接入平台地址**/
+	PlatformUrl string `json:"platformUrl"`
+	/**平台业务类型：
+	  1--金融类
+	  2--版权类
+	  3--其他类
+	  4--未填写 default*/
+	BusinessType constants.BusinessType `json:"businessType"`
 }
 
 /**通用转发请求结构体*/
@@ -425,6 +440,8 @@ const (
 	UploadBusAddr = "sdk/zhixin-api/v2/ump/ep/upload_busi_license"
 	//提交商务信息
 	SubmitBusAddr = "sdk/zhixin-api/v2/ump/ep/apply"
+	// 提交个人实名
+	SubmitPersonAddr = "sdk/zhixin-api/v2/ump/ep/person_apply"
 	//查询企业信息
 	GetEpInfoAddr = "sdk/zhixin-api/v1/ump/ep/get"
 	/**===========================================相关请求类型================================================*/
@@ -466,6 +483,11 @@ type LicenseUser struct {
 	Mobile           string `json:"mobile"`
 	CategoryCId      int    `json:"categoryCId"`
 	CategoryPId      int    `json:"categoryPId"`
+	PersonName       string `json:"personName"`
+	UserType         constants.UserType    `json:"userType"`
+	PlatformName     string `json:"platformName"`
+	PlatformUrl      string `json:"platformUrl"`
+	BusinessType     constants.BusinessType    `json:"businessType"`
 	CommonReq
 }
 
@@ -500,7 +522,7 @@ func (zxl *zxlImpl) RegisterUser(info AgentUser, timeout time.Duration) (bool, e
 	}
 	//上传公函
 	if len(info.LetterFile) != 0 {
-		letterId, err := uploadFile(info, zxl.appId, info.LicenseFile, UploadLetterAddr, UploadLetter)
+		letterId, err := uploadFile(info, zxl.appId, info.LetterFile, UploadLetterAddr, UploadLetter)
 		if err != nil {
 			return false, errors.New("upload letter fail : " + err.Error())
 		}
@@ -513,17 +535,19 @@ func (zxl *zxlImpl) RegisterUser(info AgentUser, timeout time.Duration) (bool, e
 	}
 	info.IdcardFrontId = frontId
 	//上传身份证反面
-	backId, err := uploadFile(info, zxl.appId, info.CardFrontFile, UploadCardBackAddr, UploadCardFront)
+	backId, err := uploadFile(info, zxl.appId, info.CardBackendFile, UploadCardBackAddr, UploadCardFront)
 	if err != nil {
 		return false, errors.New("upload card back fail : " + err.Error())
 	}
 	info.IdcardBackId = backId
 	//上传商务执照
-	busiId, err := uploadFile(info, zxl.appId, info.CardFrontFile, UploadBusAddr, UploadBus)
-	if err != nil {
-		return false, errors.New("upload busi fail : " + err.Error())
-	}
-	info.BusiLicenseId = busiId
+	if len(info.LicenseFile) != 0 {
+		busiId, err := uploadFile(info, zxl.appId, info.LicenseFile, UploadBusAddr, UploadBus)
+		if err != nil {
+			return false, errors.New("upload busi fail : " + err.Error())
+		}
+		info.BusiLicenseId = busiId
+    }
 	//提交商务信息
 	return submitBusInfo(info, zxl.appId, zxl.appKey)
 }
@@ -621,7 +645,6 @@ func (zxl *zxlImpl) RepresentSave(evHash, extendInfo, representSk, representAppI
 	return &saveResp, nil
 }
 
-
 /**代理用户的注册*/
 func submitRegister(appId, appKey string, info AgentUser, timeout time.Duration) error {
 	var req = CommonReq{ReqTypePost, SubmitRegisterUser}
@@ -662,6 +685,10 @@ func uploadFile(info AgentUser, appId, filename, urlConst, uploadType string) (i
 
 /**提交商务信息*/
 func submitBusInfo(user AgentUser, appId, appKey string) (bool, error) {
+	if user.UserType == constants.USER_NATURAL_PERSON {
+		// 如果是自然人注册，那么 contact 字段使用 PersonName 填充
+		user.Contact = user.PersonName
+	}
 	bytes, _ := json.Marshal(user)
 	var a = &LicenseUser{}
 	json.Unmarshal(bytes, a)
@@ -670,7 +697,15 @@ func submitBusInfo(user AgentUser, appId, appKey string) (bool, error) {
 	a.CategoryCId = c.Cid
 	a.CategoryPId = c.Pid
 	a.RequestType = "POST"
-	a.RedirectUrl = SubmitBusAddr
+	// 商务类型为 0 表示没有设置
+	if a.BusinessType == 0 {
+		a.BusinessType = constants.BUSINESS_DEFAULT
+	}
+	if user.UserType == constants.USER_NATURAL_PERSON {
+		a.RedirectUrl = SubmitPersonAddr
+	} else {
+		a.RedirectUrl = SubmitBusAddr
+	}
 	bytes, _ = json.Marshal(a)
 	url := defConf.ServerAddr + defConf.ContentCapture
 	_, err := sendTxMidRequest(appId, appKey, "POST", url, bytes, 0)

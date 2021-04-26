@@ -143,7 +143,16 @@ func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) 
 }
 
 //视频取证接口
-func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
+func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) {
+	return sdk.evidenceObtainVideo(webUrls, title, remark, "", timeout)
+}
+
+//代理用户视频取证接口
+func (sdk *cetcSDKImpl) RepresentEvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
+	return sdk.evidenceObtainVideo(webUrls, title, remark, representAppId, timeout)
+}
+
+func (sdk *cetcSDKImpl) evidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
@@ -160,7 +169,16 @@ func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark, representApp
 }
 
 //图片取证接口
-func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
+func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error) {
+	return sdk.evidenceObtainPic(webUrls, title, remark, "", timeout)
+}
+
+//代理用户图片取证接口
+func (sdk *cetcSDKImpl) RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
+	return sdk.evidenceObtainPic(webUrls, title, remark, representAppId, timeout)
+}
+
+func (sdk *cetcSDKImpl) evidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 || len(title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
@@ -176,11 +194,25 @@ func (sdk *cetcSDKImpl) EvidenceObtainPic(webUrls, title, remark, representAppId
 	return orderNo, nil
 }
 
+func (sdk *cetcSDKImpl) GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error) {
+	return sdk.getEvidenceStatus(orderNo, "", timeout)
+}
+
 //获取取证证书任务状态及结果
-func (sdk *cetcSDKImpl) GetEvidenceStatus(orderNo, appId string, timeout time.Duration) (*EvIdData, error) {
+func (sdk *cetcSDKImpl) RepresentGetEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdData, error) {
+	return sdk.getEvidenceStatus(orderNo, representAppId, timeout)
+}
+
+func (sdk *cetcSDKImpl) getEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdData, error) {
 	if len(orderNo) == 0 {
 		return nil, errors.New("orderNo 不能为空")
 	}
+
+	appId := sdk.AppId
+	if representAppId != "" {
+		appId = representAppId
+	}
+
 	param := EvObtainTask{AppId: appId, OrderNo: orderNo, RequestType: "GET", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/evidinfo"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)

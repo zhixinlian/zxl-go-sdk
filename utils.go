@@ -10,6 +10,7 @@ import (
 	uuid "github.com/satori/go.uuid"
 	"io"
 	"io/ioutil"
+	"net"
 	"net/http"
 	"net/url"
 	"strconv"
@@ -32,7 +33,7 @@ func addTrust(pool *x509.CertPool, path string) {
 	aCrt := []byte("-----BEGIN CERTIFICATE-----\nMIICTzCCAbgCCQDx5kTlifTTZDANBgkqhkiG9w0BAQsFADBsMQswCQYDVQQGEwJj\nbjELMAkGA1UECAwCY2QxCzAJBgNVBAcMAmNkMQwwCgYDVQQKDAN6eGwxDDAKBgNV\nBAsMA3p4bDETMBEGA1UEAwwKYWNjZXNzLmNvbTESMBAGCSqGSIb3DQEJARYDYWFh\nMB4XDTE5MDcyNTAyMTM1OVoXDTI5MDcyMjAyMTM1OVowbDELMAkGA1UEBhMCY24x\nCzAJBgNVBAgMAmNkMQswCQYDVQQHDAJjZDEMMAoGA1UECgwDenhsMQwwCgYDVQQL\nDAN6eGwxEzARBgNVBAMMCmFjY2Vzcy5jb20xEjAQBgkqhkiG9w0BCQEWA2FhYTCB\nnzANBgkqhkiG9w0BAQEFAAOBjQAwgYkCgYEAwwcACPiwpUsDewlQhElDYLNWPz5B\nZ9DDPW5lUiNJey1oTLf2JP+B4O+BF0H+cg9JXtLuiGfiC6OdJG2e3SjbE/+wSAp0\nSBaeeG6hgKfxJClIzXPNxdayCvxwWf5Z3R3b+XRXceHR/hvHgmlCGTZ+E7Bu5mi4\n2UMPNItP694jcQcCAwEAATANBgkqhkiG9w0BAQsFAAOBgQBWNvgT7ut+lMEBm/Vw\nGCOVdyr7lSCxiS/lg31/zwWWuWtqhdAqljPmaWEtihkNjDVJpHS8ur6yuTwdCNcy\nbPo53O5/bIIIVKf7TMr/neEK7TbuTAf7CA9noMqC7K3vDSC8xdlCSAMO9N96QOk/\nJjCnk7d8N539fQPt80FMKkqhVw==\n-----END CERTIFICATE-----")
 	pool.AppendCertsFromPEM(aCrt)
 }
-func buildHtppClient(isProxy bool, timeout time.Duration) *http.Client {
+func buildHttpClient(isProxy bool, timeout time.Duration) *http.Client {
 	pool := x509.NewCertPool()
 
 	//cliCrt, err := tls.LoadX509KeyPair("D:\\certificate\\go\\server.crt", "D:\\certificate\\go\\server.key")
@@ -75,7 +76,7 @@ func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Du
 	//tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	//
 	//cli := http.Client{Transport: tr, Timeout: timeout}
-	cli := buildHtppClient(defConf.IsProxy, timeout)
+	cli := buildHttpClient(defConf.IsProxy, timeout)
 
 	req, err := http.NewRequest(method, url, byteReader)
 	if err != nil {
@@ -181,4 +182,68 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 	}
 	retBytes, _ := json.Marshal(&commonData.Detail)
 	return retBytes, nil
+}
+
+
+func isInnerIpFromUrl(originUrl string) bool {
+	u, err := url.Parse(originUrl)
+
+	if err != nil {
+		return true
+	}
+
+	h := strings.Split(u.Host, ":")
+	addr, err := net.ResolveIPAddr("ip", h[0])
+	if err != nil {
+		return true
+	}
+
+	if isInnerIp(addr.IP.String()) {
+		return true
+	}
+
+	return false
+}
+
+func isInnerIp(ipStr string) bool {
+	if !checkIp(ipStr) {
+		return false
+	}
+	inputIpNum := inetAton(ipStr)
+	innerIpA := inetAton("10.255.255.255")
+	innerIpB := inetAton("172.16.255.255")
+	innerIpC := inetAton("192.168.255.255")
+	innerIpD := inetAton("100.64.255.255")
+	innerIpF := inetAton("127.255.255.255")
+
+	return inputIpNum>>24 == innerIpA>>24 || inputIpNum>>20 == innerIpB>>20 ||
+		inputIpNum>>16 == innerIpC>>16 || inputIpNum>>22 == innerIpD>>22 ||
+		inputIpNum>>24 == innerIpF>>24
+}
+
+func checkIp(ipStr string) bool {
+	address := net.ParseIP(ipStr)
+	if address == nil {
+		return false
+	} else {
+		return true
+	}
+}
+
+func inetAton(ipStr string) int64 {
+	bits := strings.Split(ipStr, ".")
+
+	b0, _ := strconv.Atoi(bits[0])
+	b1, _ := strconv.Atoi(bits[1])
+	b2, _ := strconv.Atoi(bits[2])
+	b3, _ := strconv.Atoi(bits[3])
+
+	var sum int64
+
+	sum += int64(b0) << 24
+	sum += int64(b1) << 16
+	sum += int64(b2) << 8
+	sum += int64(b3)
+
+	return sum
 }
