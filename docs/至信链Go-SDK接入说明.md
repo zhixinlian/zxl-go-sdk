@@ -762,6 +762,8 @@ KvSaveReq 结构如下：
 | Sk      | String     | 无       | 是         | 存储人的私钥（如果是代理用户，就是代理用户的私钥）                             |
 | RepresentAppId      | String     | 无       | 否         | 代理用户 appId                          |
 
+> 注：KvKey 要使用 appId: 开始，如果是代理用户，就使用 representAppId: 开头，
+> 例如 201107000400001:xxxxx
 
 ### 返回数据
 
@@ -779,7 +781,7 @@ KvSaveResp 结构如下：
 
 ```go
 
-key := ""
+key := appId + ":" + ""
 
 req := zxl_go_sdk.KvSaveReq{
     KvKey: key,
