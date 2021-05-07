@@ -74,7 +74,7 @@ type commonResult struct {
 func (zxl *zxlImpl) SubmitTortTask(tort Tort, timeout time.Duration) (TortResp, error) {
 	var resp TortResp
 
-	if tort.Url == "" || tort.EndDate == "" || tort.Type == 0 || tort.Source == 0 {
+	if tort.Url == "" || tort.Title == "" || tort.EndDate == "" || tort.Type == 0 || tort.Source == 0 {
 		return resp, errors.New("参数错误")
 	}
 
