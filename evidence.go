@@ -78,6 +78,31 @@ func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
 	//}
 }
 
+type ZxlConfig struct {
+	AppId      string
+	AppKey     string
+	ServerAddr string
+}
+
+func NewZxlImplWithConfig(config ZxlConfig)(*zxlImpl, error)  {
+
+	if len(config.AppId) < 15 {
+		return nil, errors.New(InvalidAppId)
+	}
+	if len(config.AppKey) == 0 {
+		return nil, errors.New(InvalidAppKey)
+	}
+	typeInt, err := strconv.Atoi(config.AppId[10:11])
+	if err != nil {
+		return nil, errors.New(InvalidAppId)
+	}
+	defConf.ServerAddr = config.ServerAddr
+	return &zxlImpl{appId: config.AppId,
+		appKey: config.AppKey,
+		appType: typeInt,
+		zxlCipher: &cetcSDKImpl{AppId: config.AppId, AppKey: config.AppKey}}, nil
+}
+
 type zxlImpl struct {
 	zxlCipher
 	appKey  string
