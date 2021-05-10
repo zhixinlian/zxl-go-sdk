@@ -163,11 +163,12 @@ type EvIdData struct {
 //中版链证书状态及结果
 type EvIdDataZbl struct {
 	Status      int    `json:"status"`
+	FileSize    int    `json:"fileSize"`
 	EvidUrl     string `json:"evidUrl"`
 	Evid        string `json:"evid"`
 	EvHash      string `json:"evHash"`
 	TxHash      string `json:"txHash"`
-	BlockHeight string `json:"blockHeight"`
+	BlockHeight int    `json:"blockHeight"`
 	StorageTime string `json:"storageTime"`
 	VoucherUrl  string `json:"voucherUrl"`
 	WebTitle    string `json:"webTitle"`
