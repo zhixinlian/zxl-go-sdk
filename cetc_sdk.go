@@ -261,7 +261,7 @@ func (sdk *cetcSDKImpl) getZblEvidenceStatus(orderNo, representAppId string, tim
 		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var evIdData EvIdDataZbl
-	err := json.Unmarshal(sendRetBytes, &evIdData)
+	err = json.Unmarshal(sendRetBytes, &evIdData)
 	if err != nil {
 		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
