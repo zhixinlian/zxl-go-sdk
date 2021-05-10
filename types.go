@@ -168,7 +168,7 @@ type EvIdDataZbl struct {
 	Evid        string `json:"evid"`
 	EvHash      string `json:"evHash"`
 	TxHash      string `json:"txHash"`
-	BlockHeight int    `json:"blockHeight"`
+	BlockHeight string    `json:"blockHeight"`
 	StorageTime string `json:"storageTime"`
 	VoucherUrl  string `json:"voucherUrl"`
 	WebTitle    string `json:"webTitle"`
