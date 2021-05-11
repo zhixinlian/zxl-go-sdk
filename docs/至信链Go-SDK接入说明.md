@@ -390,7 +390,8 @@ Tort 结构如下:
   | 1    | PROPERTY    | 房产类监测，type为图片时可用 |
   | 2    | ANY         | 原创类监测，type为图片时可用 |
   | 21   | SHORT_VIDEO | 短视频监测，type为视频时可用 |
-  | 22   | LONG_VIDEO  | 长视频监测，type为视频时可用 |
+  | 22   | LONG_VIDEO  | 长对短监测:监测范围和短视频一样，type 为长视频时可用 |
+  | 23   | LONG_TO_LONG_VIDEO  | 长对长监测:全网视频小网站，type为视频时可用 |
 
 * 返回数据（TortResp）
 
