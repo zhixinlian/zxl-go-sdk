@@ -55,6 +55,8 @@ type zxlCipher interface {
 	RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
 	//代理商模式获取取证证书任务状态及结果
 	RepresentGetEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdData, error)
+	//中版链代理商模式获取取证证书任务状态及结果
+	RepresentZblGetEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdDataZbl, error)
 }
 
 func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {

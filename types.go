@@ -132,14 +132,14 @@ type EvSaveResult struct {
 
 //下发截屏/录屏任务
 type EvObtainTask struct {
-	WebUrls     string `json:"webUrls"`
-	Type        int    `json:"type"`
-	AppId       string `json:"appId"`
-	RequestType string `json:"requestType"`
-	RedirectUrl string `json:"redirectUrl"`
-	OrderNo     string `json:"orderNo"`
-	Title       string `json:"title"`
-	Remark      string `json:"remark"`
+	WebUrls        string `json:"webUrls"`
+	Type           int    `json:"type"`
+	AppId          string `json:"appId"`
+	RequestType    string `json:"requestType"`
+	RedirectUrl    string `json:"redirectUrl"`
+	OrderNo        string `json:"orderNo"`
+	Title          string `json:"title"`
+	Remark         string `json:"remark"`
 	RepresentAppId string `json:"representAppId"`
 }
 
@@ -158,6 +158,23 @@ type EvIdData struct {
 	EvidUrl    string `json:"evidUrl"`
 	VoucherUrl string `json:"voucherUrl"`
 	RequestId  string
+}
+
+//中版链证书状态及结果
+type EvIdDataZbl struct {
+	Status      int    `json:"status"`
+	FileSize    int    `json:"fileSize"`
+	EvidUrl     string `json:"evidUrl"`
+	Evid        string `json:"evid"`
+	EvHash      string `json:"evHash"`
+	TxHash      string `json:"txHash"`
+	BlockHeight string    `json:"blockHeight"`
+	StorageTime string `json:"storageTime"`
+	VoucherUrl  string `json:"voucherUrl"`
+	WebTitle    string `json:"webTitle"`
+	WebUrl      string `json:"webUrl"`
+	CreateTime  string `json:"createTime"`
+	RequestId   string
 }
 
 //定义tx接口返回结构体，最外层

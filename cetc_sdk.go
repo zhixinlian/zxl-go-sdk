@@ -210,6 +210,12 @@ func (sdk *cetcSDKImpl) RepresentGetEvidenceStatus(orderNo, representAppId strin
 	return sdk.getEvidenceStatus(orderNo, representAppId, timeout)
 }
 
+//获取取证证书任务状态及结果
+func (sdk *cetcSDKImpl) RepresentZblGetEvidenceStatus(orderNo, representAppId string,
+	timeout time.Duration) (*EvIdDataZbl, error) {
+	return sdk.getZblEvidenceStatus(orderNo, representAppId, timeout)
+}
+
 func (sdk *cetcSDKImpl) getEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdData, error) {
 	if len(orderNo) == 0 {
 		return nil, errors.New("orderNo 不能为空")
@@ -233,6 +239,31 @@ func (sdk *cetcSDKImpl) getEvidenceStatus(orderNo, representAppId string, timeou
 		EvidUrl: txRetDetail.EvIdUrl,
 		VoucherUrl: txRetDetail.VoucherUrl,
 		RequestId: cri.RequestId,
+	}
+	return &evIdData, nil
+}
+
+func (sdk *cetcSDKImpl) getZblEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdDataZbl,
+	error) {
+	if len(orderNo) == 0 {
+		return nil, errors.New("orderNo 不能为空")
+	}
+
+	appId := sdk.AppId
+	if representAppId != "" {
+		appId = representAppId
+	}
+
+	param := EvObtainTask{AppId: appId, OrderNo: orderNo, RequestType: "GET", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/evidinfo"}
+	paramBytes, _ := json.Marshal(&param)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	if err != nil {
+		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
+	}
+	var evIdData EvIdDataZbl
+	err = json.Unmarshal(sendRetBytes, &evIdData)
+	if err != nil {
+		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	return &evIdData, nil
 }
