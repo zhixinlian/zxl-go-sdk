@@ -11,6 +11,7 @@
 | 2020.08.11 | 新增接口 | v2.0.1   |
 | 2021.01.28 | 新增代理商相关接口 | v2.0.4   |
 | 2021.02.09 | 增加个人用户及确权接口 | v2.1.3 |
+| 2021.05.12 | 接口优化            | v2.1.4 |
 
 ### 阅读对象
 
@@ -444,12 +445,15 @@ TortQuery 结构如下：
 | *参数名* | *参数类型* | *默认值* | *是否必填* | *参数描述* |
 | -------- | ---------- | -------- | ---------- | ---------- |
 | TaskId   | string     | 无       | 是         | 任务Id     |
+| Offset   | int        | 0       | 否         | 侵权线索列表起始位置，默认为 0 |
+| Limit    | int        | 无       | 否        | 每次返回侵权线索列表数量，不填则表示返回全部 |
 
 * 返回数据（TortQueryResp）
 
   | 字段      | 类型       | 描述         |
   | --------- | ---------- | ------------ |
-  | ClueList  | []ClueData | 侵权线索列表 |
+  | ClueList  | []ClueData | 侵权线索列表   |
+  | Count     | int        | 监测线索总数量 |
   | RequestId | string     | 请求Id       |
 
 ClueData 结构如下：
@@ -1044,7 +1048,7 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
   | representAppKey | string     | 无       | 是         | 代理用户appKey     |
   | representPk     | string     | 无       | 是         | 代理用户生成的公钥 |
   | representSk     | string     | 无       | 是         | 代理用户生成的私钥 |
-  | timeout | time.Duration |        | 超时时间           |
+  
   ​     
 * 返回值
 
@@ -1060,7 +1064,7 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
 * 方法原型
 
   * ```
-    BindRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error)
+    UpdateRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error)
     ```
 
 * 参数说明
@@ -1071,7 +1075,7 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
   | representAppKey | string     | 无       | 是         | 代理用户appKey     |
   | representPk     | string     | 无       | 是         | 代理用户生成的公钥 |
   | representSk     | string     | 无       | 是         | 代理用户生成的私钥 |
-  | timeout | time.Duration |        | 超时时间           |
+  
   ​     
 * 返回值
 

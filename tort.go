@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"fmt"
 	"github.com/zhixinlian/zxl-go-sdk/constants"
 	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"io"
@@ -43,10 +44,13 @@ type TortResp struct {
  */
 type TortQuery struct {
 	TaskId      string `json:"taskId"`
+	Offset      int    `json:"offset"`
+	Limit       int    `json:"int"`
 }
 
 type TortQueryResp struct {
 	ClueList  []ClueData `json:"clueList"`
+	Count     int        `json:"count"`
 	RequestId string
 }
 
@@ -109,7 +113,7 @@ func (zxl *zxlImpl) SubmitTortTask(tort Tort, timeout time.Duration) (TortResp, 
 func (zxl *zxlImpl) QueryTortTaskResult(tortQuery TortQuery, timeout time.Duration) (TortQueryResp, error) {
 	var resp TortQueryResp
 
-	url := QUERY_TORT_RESULT_URL + tortQuery.TaskId
+	url := QUERY_TORT_RESULT_URL + tortQuery.TaskId + fmt.Sprintf("?offset=%v&limit=%v", tortQuery.Offset, tortQuery.Limit)
 
 	retBytes, cri, err := sendTortRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+url, []byte(""), timeout)
 
