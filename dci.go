@@ -43,7 +43,8 @@ type DciClaim struct {
 }
 
 type DciClaimResp struct {
-	TaskId string `json:"taskId"`
+	TaskId    string `json:"taskId"`
+	RequestId string
 }
 
 type dciClaimResult struct {
@@ -65,6 +66,7 @@ type DciClaimQueryResp struct {
 	DciId         string `json:"dciId"`
 	Url           string `json:"url"`
 	Msg           string `json:"msg"`
+	RequestId     string
 }
 
 type TortSearch struct {
@@ -174,12 +176,13 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 
 	paramBytes, _ := json.Marshal(dci)
 
-	sendRetBytes, err := sendDciRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendDciRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return resp, errors.New("提交确权结果错误：" + err.Error())
+		return resp, errors.New("提交确权结果错误：" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	json.Unmarshal(sendRetBytes, &resp)
 
+	resp.RequestId = cri.RequestId
 	return resp, nil
 }
 
@@ -193,12 +196,13 @@ func (zxl *zxlImpl) QueryDciClaimResult(dciQuery DciClaimQuery, timeout time.Dur
 	dciQuery.RedirectUrl = QUERY_DCI_RESULT
 	paramBytes, _ := json.Marshal(dciQuery)
 
-	sendRetBytes, err := sendDciRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri,  err := sendDciRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return resp, errors.New("查询确权结果错误：" + err.Error())
+		return resp, errors.New("查询确权结果错误：" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 
 	json.Unmarshal(sendRetBytes, &resp)
+	resp.RequestId = cri.RequestId
 	return resp, nil
 }
 
@@ -226,17 +230,19 @@ func (zxl *zxlImpl) getContent(url string) (string, error) {
 	return string(body), nil
 }
 
-func sendDciRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) ([]byte, error) {
+func sendDciRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) ([]byte, *commReqInfo, error) {
 	var byteReader io.Reader = nil
 	if body != nil {
 		byteReader = bytes.NewReader(body)
 	}
 
+	cri := commReqInfo{}
+
 	cli := buildHttpClient(defConf.IsProxy, timeout)
 	
 	req, err := http.NewRequest(method, url, byteReader)
 	if err != nil {
-		return nil, errors.New("NewRequest error:" + err.Error())
+		return nil, &cri, errors.New("NewRequest error:" + err.Error())
 	}
 	req.Header.Add("appId", appId)
 
@@ -248,8 +254,11 @@ func sendDciRequest(appId, appKey, method, url string, body []byte, timeout time
 	req.Header.Add("signature", signature)
 	req.Header.Add("content-type", "application/json")
 	resp, err := cli.Do(req)
+	if resp != nil {
+		cri.RequestId = resp.Header.Get(REQUEST_ID)
+	}
 	if err != nil {
-		return nil, errors.New("cli.Do error:" + err.Error())
+		return nil, &cri, errors.New("cli.Do error:" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
@@ -257,20 +266,20 @@ func sendDciRequest(appId, appKey, method, url string, body []byte, timeout time
 			data, _ := ioutil.ReadAll(resp.Body)
 			var commonData CommonRet
 			_ = json.Unmarshal(data, &commonData)
-			return nil, errors.New("http response error info : " + commonData.Message)
+			return nil, &cri, errors.New("http response error info : " + commonData.Message)
 		}
-		return nil, errors.New("cli.Do error bad status : " + resp.Status)
+		return nil, &cri, errors.New("cli.Do error bad status : " + resp.Status)
 	}
 	data, err := ioutil.ReadAll(resp.Body)
 
 	var commonData dciClaimResult
 	err = json.Unmarshal(data, &commonData)
 	if err != nil {
-		return nil, errors.New("returned data format error:" + string(data))
+		return nil, &cri, errors.New("returned data format error:" + string(data))
 	}
 	if commonData.RetCode != 0 {
-		return nil, errors.New("http response error info : " + retErrMsg(strconv.Itoa(commonData.RetCode)))
+		return nil, &cri, errors.New("http response error info : " + retErrMsg(strconv.Itoa(commonData.RetCode)))
 	}
 	retBytes, _ := json.Marshal(&commonData.Data)
-	return retBytes, nil
+	return retBytes, &cri, nil
 }

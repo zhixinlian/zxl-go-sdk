@@ -11,6 +11,7 @@
 | 2020.08.11 | 新增接口 | v2.0.1   |
 | 2021.01.28 | 新增代理商相关接口 | v2.0.4   |
 | 2021.02.09 | 增加个人用户及确权接口 | v2.1.3 |
+| 2021.05.12 | 接口优化            | v2.1.4 |
 
 ### 阅读对象
 
@@ -390,7 +391,8 @@ Tort 结构如下:
   | 1    | PROPERTY    | 房产类监测，type为图片时可用 |
   | 2    | ANY         | 原创类监测，type为图片时可用 |
   | 21   | SHORT_VIDEO | 短视频监测，type为视频时可用 |
-  | 22   | LONG_VIDEO  | 长视频监测，type为视频时可用 |
+  | 22   | LONG_VIDEO  | 长对短监测:监测范围和短视频一样，type 为长视频时可用 |
+  | 23   | LONG_TO_LONG_VIDEO  | 长对长监测:全网视频小网站，type为视频时可用 |
 
 * 返回数据（TortResp）
 
@@ -443,12 +445,15 @@ TortQuery 结构如下：
 | *参数名* | *参数类型* | *默认值* | *是否必填* | *参数描述* |
 | -------- | ---------- | -------- | ---------- | ---------- |
 | TaskId   | string     | 无       | 是         | 任务Id     |
+| Offset   | int        | 0       | 否         | 侵权线索列表起始位置，默认为 0 |
+| Limit    | int        | 无       | 否        | 每次返回侵权线索列表数量，不填则表示返回全部 |
 
 * 返回数据（TortQueryResp）
 
   | 字段      | 类型       | 描述         |
   | --------- | ---------- | ------------ |
-  | ClueList  | []ClueData | 侵权线索列表 |
+  | ClueList  | []ClueData | 侵权线索列表   |
+  | Count     | int        | 监测线索总数量 |
   | RequestId | string     | 请求Id       |
 
 ClueData 结构如下：
@@ -736,6 +741,109 @@ ClueData 结构如下：
     return
   }
   ```
+  
+# Kv 服务
+
+## Kv 存储
+
+### 方法原型
+
+````java
+KvSave(req KvSaveReq, timeout time.Duration) (*KvSaveResp, error)
+````
+
+### 参数说明
+
+| *参数名*  | *参数类型* | *默认值* | *是否必填* | *参数描述*                             |
+| --------- | ---------- | -------- | ---------- | -------------------------------------- |
+| req       | KvSaveReq     | 无       | 是         | kv 存储请求                               |
+| timeout   | time.Duration | 无       | 是         |   请求超时时间       |
+
+KvSaveReq 结构如下：
+| *参数名*  | *参数类型* | *默认值* | *是否必填* | *参数描述*                             |
+| --------- | ---------- | -------- | ---------- | -------------------------------------- |
+| KvKey      | String     | 无       | 是         | kv 数据的 key                              |
+| KvValue      | String     | 无       | 是         | kv 数据的 value                              |
+| Sk      | String     | 无       | 是         | 存储人的私钥（如果是代理用户，就是代理用户的私钥）                             |
+| RepresentAppId      | String     | 无       | 否         | 代理用户 appId                          |
+
+> 注：KvKey 要使用 appId: 开始，如果是代理用户，就使用 representAppId: 开头，
+> 例如 201107000400001:xxxxx
+
+### 返回数据
+
+| 字段   | 类型   | 描述    |
+| ------ | ------ | ------- |
+| resp | KvSaveResp | Kv 存储结果 |
+
+KvSaveResp 结构如下：
+| 字段   | 类型   | 描述    |
+| ------ | ------ | ------- |
+| KvKey | String | kv 的 key|
+| RequestId | String | 请求的 requestId|
+
+### 示例
+
+```go
+
+key := appId + ":" + ""
+
+req := zxl_go_sdk.KvSaveReq{
+    KvKey: key,
+    KvValue: "",
+    Sk: sK,
+}
+
+resp, err := sdk.KvSave(req, 5 * time.Second)
+```
+
+
+## 查询 Kv
+
+### 方法原型
+
+````java
+KvQuery(req KvQueryReq, timeout time.Duration) (*KvQueryResp, error) 
+````
+
+### 参数说明
+
+| *参数名* | *参数类型* | *默认值* | *是否必填* | *参数描述*                   |
+| -------- | ---------- | -------- | ---------- | ---------------------------- |
+| req   | KvQueryReq     | 无       | 是         | Kv 查询请求 |
+| timeout   | time.Duration | 无       | 是         |   请求超时时间       |
+
+KvQueryReq 结构如下：
+| *参数名* | *参数类型* | *默认值* | *是否必填* | *参数描述*                   |
+| -------- | ---------- | -------- | ---------- | ---------------------------- |
+| KvKey   | String     | 无       | 是         | kv 数据的 key |
+
+### 返回数据
+
+| 字段           | 类型 | 描述             |
+| -------------- | ---- | ---------------- |
+| resp| KvQueryResp | kv 数据查询结果 |
+
+KvQueryResp 结构如下：
+| 字段           | 类型 | 描述             |
+| -------------- | ---- | ---------------- |
+| KvKey| String | kv 数据的 key |
+| KvValue| String | kv 数据的 value |
+| CreateTime| String | kv 数据上链时间 |
+| Status| Integer | kv 数据状态（1：未上链，3：上链成功，4：上链失败） |
+| RequestId| String | 请求 requestId |
+
+### 示例
+
+````java
+key := ""
+queryReq := zxl_go_sdk.KvQueryReq{
+               KvKey: key,
+            }
+queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
+
+````
+
 
 
 
@@ -940,7 +1048,7 @@ ClueData 结构如下：
   | representAppKey | string     | 无       | 是         | 代理用户appKey     |
   | representPk     | string     | 无       | 是         | 代理用户生成的公钥 |
   | representSk     | string     | 无       | 是         | 代理用户生成的私钥 |
-  | timeout | time.Duration |        | 超时时间           |
+  
   ​     
 * 返回值
 
@@ -956,7 +1064,7 @@ ClueData 结构如下：
 * 方法原型
 
   * ```
-    BindRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error)
+    UpdateRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error)
     ```
 
 * 参数说明
@@ -967,7 +1075,7 @@ ClueData 结构如下：
   | representAppKey | string     | 无       | 是         | 代理用户appKey     |
   | representPk     | string     | 无       | 是         | 代理用户生成的公钥 |
   | representSk     | string     | 无       | 是         | 代理用户生成的私钥 |
-  | timeout | time.Duration |        | 超时时间           |
+  
   ​     
 * 返回值
 

@@ -5,9 +5,11 @@ import (
 	"container/list"
 	"crypto/tls"
 	"crypto/x509"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	uuid "github.com/satori/go.uuid"
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"io"
 	"io/ioutil"
 	"net"
@@ -17,6 +19,15 @@ import (
 	"strings"
 	"time"
 )
+
+/**
+ * 请求中携带的公共信息
+ */
+type commReqInfo struct {
+	RequestId string
+}
+
+const REQUEST_ID = "traceId"
 
 func generateUid() (string, error) {
 	tmpUid := uuid.NewV1()
@@ -67,12 +78,12 @@ func buildHttpClient(isProxy bool, timeout time.Duration) *http.Client {
 	}
 
 }
-func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) ([]byte, error) {
+func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) ([]byte, *commReqInfo, error) {
 	var byteReader io.Reader = nil
 	if body != nil {
 		byteReader = bytes.NewReader(body)
 	}
-
+	cri :=  commReqInfo{}
 	//tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	//
 	//cli := http.Client{Transport: tr, Timeout: timeout}
@@ -80,14 +91,21 @@ func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Du
 
 	req, err := http.NewRequest(method, url, byteReader)
 	if err != nil {
-		return nil, errors.New("NewRequest error:" + err.Error())
+		return nil, &cri, errors.New("NewRequest error:" + err.Error())
 	}
 	req.Header.Add("appId", appId)
-	req.Header.Add("appKey", appKey)
+	signatureTime := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
+	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId+","+appKey+","+signatureTime)))
+
+	req.Header.Add("signatureTime", signatureTime)
+	req.Header.Add("signature", signature)
 	req.Header.Add("content-type", "application/json")
 	resp, err := cli.Do(req)
+	if resp != nil {
+		cri.RequestId = resp.Header.Get(REQUEST_ID)
+	}
 	if err != nil {
-		return nil, errors.New("cli.Do error:" + err.Error())
+		return nil, &cri, errors.New("cli.Do error:" + err.Error())
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
@@ -95,22 +113,22 @@ func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Du
 			data, _ := ioutil.ReadAll(resp.Body)
 			var commonData CommonRet
 			_ = json.Unmarshal(data, &commonData)
-			return nil, errors.New("http response error info : " + commonData.Message)
+			return nil, &cri, errors.New("http response error info : " + commonData.Message)
 		}
-		return nil, errors.New("cli.Do error bad status : " + resp.Status)
+		return nil, &cri, errors.New("cli.Do error bad status : " + resp.Status)
 	}
 	data, err := ioutil.ReadAll(resp.Body)
 	var commonData CommonRet
 	err = json.Unmarshal(data, &commonData)
 	if err != nil {
-		return nil, errors.New("returned data format error:" + string(data))
+		return nil, &cri, errors.New("returned data format error:" + string(data))
 	}
 	if commonData.Code != 200 {
-		return nil, errors.New("http response error info : " + commonData.Message)
+		return nil, &cri, errors.New("http response error info : " + commonData.Message)
 	}
 
 	retBytes, _ := json.Marshal(&commonData.Data)
-	return retBytes, nil
+	return retBytes, &cri, nil
 }
 
 /**tx Error Type**/
@@ -139,11 +157,13 @@ func retErrMsg(msg string) (errMsg string) {
 }
 
 //新增腾讯中间件请求操作发送
-func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) ([]byte, error) {
+func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout time.Duration) ([]byte, *commReqInfo, error) {
 	var byteReader io.Reader = nil
 	if body != nil {
 		byteReader = bytes.NewReader(body)
 	}
+
+	cri := commReqInfo{}
 
 	tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}, DisableKeepAlives: true}
 
@@ -151,14 +171,22 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 
 	req, err := http.NewRequest(method, url, byteReader)
 	if err != nil {
-		return nil, errors.New("NewRequest error:" + err.Error())
+		return nil, &cri, errors.New("NewRequest error:" + err.Error())
 	}
 	req.Header.Add("appId", appId)
-	req.Header.Add("appKey", appKey)
+	signatureTime := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
+	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId+","+appKey+","+signatureTime)))
+
+	req.Header.Add("signatureTime", signatureTime)
+	req.Header.Add("signature", signature)
 	req.Header.Add("content-type", "application/json")
 	resp, err := cli.Do(req)
+	if resp != nil {
+		cri.RequestId = resp.Header.Get(REQUEST_ID)
+	}
+
 	if err != nil {
-		return nil, errors.New("cli.Do error:" + err.Error())
+		return nil, &cri, errors.New("cli.Do error:" + err.Error())
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
@@ -166,22 +194,22 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 			data, _ := ioutil.ReadAll(resp.Body)
 			var commonData CommonRet
 			_ = json.Unmarshal(data, &commonData)
-			return nil, errors.New("http response error info : " + commonData.Message)
+			return nil, &cri, errors.New("http response error info : " + commonData.Message)
 		}
-		return nil, errors.New("cli.Do error bad status : " + resp.Status)
+		return nil, &cri, errors.New("cli.Do error bad status : " + resp.Status)
 	}
 	data, err := ioutil.ReadAll(resp.Body)
 
 	var commonData TxRetCommonData
 	err = json.Unmarshal(data, &commonData)
 	if err != nil {
-		return nil, errors.New("returned data format error:" + string(data))
+		return nil, &cri, errors.New("returned data format error:" + string(data))
 	}
 	if commonData.RetCode != 0 {
-		return nil, errors.New("http response error info : " + retErrMsg(strconv.Itoa(commonData.RetCode)))
+		return nil, &cri, errors.New("http response error info : " + retErrMsg(strconv.Itoa(commonData.RetCode)))
 	}
 	retBytes, _ := json.Marshal(&commonData.Detail)
-	return retBytes, nil
+	return retBytes, &cri, nil
 }
 
 

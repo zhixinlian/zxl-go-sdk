@@ -64,9 +64,9 @@ func (sdk *cetcSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout 
 	ed.Sign = signStr
 
 	bodyData, _ := json.Marshal(&ed)
-	respBytes, err := sendRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.EvidenceSave, bodyData, timeout)
+	respBytes, cri, err := sendRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.EvidenceSave, bodyData, timeout)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (cetc sendRequest) error:" + err.Error())
+		return nil, errors.New("EvidenceSave (cetc sendRequest) error:" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var saveResp EvSaveResult
 	err = json.Unmarshal(respBytes, &saveResp)
@@ -75,6 +75,7 @@ func (sdk *cetcSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout 
 	}
 	saveResp.EvHash = evHash
 	saveResp.EvId = uid
+	saveResp.RequestId = cri.RequestId
 	return &saveResp, nil
 }
 
@@ -99,10 +100,10 @@ func (sdk *cetcSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Duratio
 	}
 	param := EvObtainTask{WebUrls: webUrls, Type: 2, AppId: sdk.AppId, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
-	applyRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST",
+	applyRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST",
 		defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New("下发任务异常>>error:" + err.Error())
+		return "", errors.New("下发任务异常>>error:" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(applyRetBytes, &txRetDetail)
@@ -117,9 +118,9 @@ func (sdk *cetcSDKImpl) ContentCapturePic(webUrls string, timeout time.Duration)
 	}
 	param := EvObtainTask{WebUrls: webUrls, Type: 1, AppId: sdk.AppId, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New("下发任务异常>>error:" + err.Error())
+		return "", errors.New("下发任务异常>>error:" + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -132,13 +133,19 @@ func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) 
 	}
 	param := EvObtainTask{AppId: sdk.AppId, OrderNo: orderNo, RequestType: "GET", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/evidinfo"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return nil, errors.New(err.Error())
+		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
-	var taskEvData = TaskEvData{Hash: txRetDetail.Hash, StatusMsg: txRetDetail.StatusMsg, Status: txRetDetail.Status, Url: txRetDetail.Url}
+	var taskEvData = TaskEvData{
+		Hash: txRetDetail.Hash,
+		StatusMsg: txRetDetail.StatusMsg,
+		Status: txRetDetail.Status,
+		Url: txRetDetail.Url,
+		RequestId: cri.RequestId,
+	}
 	return &taskEvData, nil
 }
 
@@ -158,9 +165,9 @@ func (sdk *cetcSDKImpl) evidenceObtainVideo(webUrls, title, remark, representApp
 	}
 	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 2, RepresentAppId: representAppId, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New(err.Error())
+		return "", errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -184,9 +191,9 @@ func (sdk *cetcSDKImpl) evidenceObtainPic(webUrls, title, remark, representAppId
 	}
 	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 1, RepresentAppId: representAppId, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New(err.Error())
+		return "", errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -203,6 +210,12 @@ func (sdk *cetcSDKImpl) RepresentGetEvidenceStatus(orderNo, representAppId strin
 	return sdk.getEvidenceStatus(orderNo, representAppId, timeout)
 }
 
+//获取取证证书任务状态及结果
+func (sdk *cetcSDKImpl) RepresentZblGetEvidenceStatus(orderNo, representAppId string,
+	timeout time.Duration) (*EvIdDataZbl, error) {
+	return sdk.getZblEvidenceStatus(orderNo, representAppId, timeout)
+}
+
 func (sdk *cetcSDKImpl) getEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdData, error) {
 	if len(orderNo) == 0 {
 		return nil, errors.New("orderNo 不能为空")
@@ -215,12 +228,42 @@ func (sdk *cetcSDKImpl) getEvidenceStatus(orderNo, representAppId string, timeou
 
 	param := EvObtainTask{AppId: appId, OrderNo: orderNo, RequestType: "GET", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/evidinfo"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return nil, errors.New(err.Error())
+		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
-	var evIdData = EvIdData{Status: txRetDetail.Status, EvidUrl: txRetDetail.EvIdUrl, VoucherUrl: txRetDetail.VoucherUrl}
+	var evIdData = EvIdData{
+		Status: txRetDetail.Status,
+		EvidUrl: txRetDetail.EvIdUrl,
+		VoucherUrl: txRetDetail.VoucherUrl,
+		RequestId: cri.RequestId,
+	}
+	return &evIdData, nil
+}
+
+func (sdk *cetcSDKImpl) getZblEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdDataZbl,
+	error) {
+	if len(orderNo) == 0 {
+		return nil, errors.New("orderNo 不能为空")
+	}
+
+	appId := sdk.AppId
+	if representAppId != "" {
+		appId = representAppId
+	}
+
+	param := EvObtainTask{AppId: appId, OrderNo: orderNo, RequestType: "GET", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/evidinfo"}
+	paramBytes, _ := json.Marshal(&param)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	if err != nil {
+		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
+	}
+	var evIdData EvIdDataZbl
+	err = json.Unmarshal(sendRetBytes, &evIdData)
+	if err != nil {
+		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
+	}
 	return &evIdData, nil
 }

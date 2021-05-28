@@ -55,6 +55,8 @@ type zxlCipher interface {
 	RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
 	//代理商模式获取取证证书任务状态及结果
 	RepresentGetEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdData, error)
+	//中版链代理商模式获取取证证书任务状态及结果
+	RepresentZblGetEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdDataZbl, error)
 }
 
 func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
@@ -78,6 +80,31 @@ func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
 	//}
 }
 
+type ZxlConfig struct {
+	AppId      string
+	AppKey     string
+	ServerAddr string
+}
+
+func NewZxlImplWithConfig(config ZxlConfig)(*zxlImpl, error)  {
+
+	if len(config.AppId) < 15 {
+		return nil, errors.New(InvalidAppId)
+	}
+	if len(config.AppKey) == 0 {
+		return nil, errors.New(InvalidAppKey)
+	}
+	typeInt, err := strconv.Atoi(config.AppId[10:11])
+	if err != nil {
+		return nil, errors.New(InvalidAppId)
+	}
+	defConf.ServerAddr = config.ServerAddr
+	return &zxlImpl{appId: config.AppId,
+		appKey: config.AppKey,
+		appType: typeInt,
+		zxlCipher: &cetcSDKImpl{AppId: config.AppId, AppKey: config.AppKey}}, nil
+}
+
 type zxlImpl struct {
 	zxlCipher
 	appKey  string
@@ -97,9 +124,9 @@ func (zxl *zxlImpl) BindUserCert(pk, sk string, timeout time.Duration) error {
 	if err != nil {
 		return errors.New("BindUserCertError (Marshal): " + err.Error())
 	}
-	_, err = sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.UserCert, dataBytes, timeout)
+	_, cri, err := sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.UserCert, dataBytes, timeout)
 	if err != nil {
-		return errors.New("BindUserCertError (sendRequest): " + err.Error())
+		return errors.New("BindUserCertError (sendRequest): " + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 
 	//var bindResp UserCertResp
@@ -122,9 +149,9 @@ func (zxl *zxlImpl) UpdateUserCert(pk, sk string, timeout time.Duration) error {
 	if err != nil {
 		return errors.New("UpdateUserCert (Marshal): " + err.Error())
 	}
-	_, err = sendRequest(zxl.appId, zxl.appKey, "PUT", defConf.ServerAddr+defConf.UserCert, dataBytes, timeout)
+	_, cri, err := sendRequest(zxl.appId, zxl.appKey, "PUT", defConf.ServerAddr+defConf.UserCert, dataBytes, timeout)
 	if err != nil {
-		return errors.New("UpdateUserCert (sendRequest): " + err.Error())
+		return errors.New("UpdateUserCert (sendRequest): " + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 
 	return nil
@@ -178,9 +205,9 @@ func (zxl *zxlImpl) QueryWithEvId(evId string, timeout time.Duration) ([]QueryRe
 	if len(evId) == 0 {
 		return nil, errors.New("evId 不能为空")
 	}
-	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithEvId+evId, nil, timeout)
+	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithEvId+evId, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithEvId (sendRequest) error: " + err.Error())
+		return nil, errors.New("QueryWithEvId (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
@@ -195,9 +222,9 @@ func (zxl *zxlImpl) QueryWithTxHash(txHash string, timeout time.Duration) ([]Que
 	if len(txHash) == 0 {
 		return nil, errors.New("txHash 不能为空")
 	}
-	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithTxHash+txHash, nil, timeout)
+	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithTxHash+txHash, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithTxHash (sendRequest) error: " + err.Error())
+		return nil, errors.New("QueryWithTxHash (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
@@ -213,9 +240,9 @@ func (zxl *zxlImpl) QueryWithEvHash(evHash string, timeout time.Duration) ([]Que
 	if len(evHash) == 0 {
 		return nil, errors.New("evHash 不能为空")
 	}
-	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithEvHash+evHash, nil, timeout)
+	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithEvHash+evHash, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithEvHash (sendRequest) error: " + err.Error())
+		return nil, errors.New("QueryWithEvHash (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
@@ -231,9 +258,9 @@ func (zxl *zxlImpl) QueryWithHash(hash string, timeout time.Duration) ([]QueryRe
 	if len(hash) == 0 {
 		return nil, errors.New("hash 不能为空")
 	}
-	respBytes, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithHash+hash, nil, timeout)
+	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithHash+hash, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithHash (sendRequest) error: " + err.Error())
+		return nil, errors.New("QueryWithHash (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
