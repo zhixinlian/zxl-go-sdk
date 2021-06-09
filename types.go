@@ -141,6 +141,7 @@ type EvObtainTask struct {
 	Title          string `json:"title"`
 	Remark         string `json:"remark"`
 	RepresentAppId string `json:"representAppId"`
+	Duration       int    `json:"duration"`
 }
 
 //任务Data
@@ -168,7 +169,7 @@ type EvIdDataZbl struct {
 	Evid        string `json:"evid"`
 	EvHash      string `json:"evHash"`
 	TxHash      string `json:"txHash"`
-	BlockHeight string    `json:"blockHeight"`
+	BlockHeight string `json:"blockHeight"`
 	StorageTime string `json:"storageTime"`
 	VoucherUrl  string `json:"voucherUrl"`
 	WebTitle    string `json:"webTitle"`

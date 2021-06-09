@@ -5,17 +5,20 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm2"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"io/ioutil"
 	"strings"
 	"time"
+
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm2"
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 )
 
 type cetcSDKImpl struct {
 	AppId  string
 	AppKey string
 }
+
+const DEFAULT_VIDEO_DURATION = 300 // 默认录屏时长5分钟
 
 // 生成公司钥对
 // 返回值  pk公钥（string），sk私钥（string），err错误信息（error）
@@ -66,7 +69,7 @@ func (sdk *cetcSDKImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout 
 	bodyData, _ := json.Marshal(&ed)
 	respBytes, cri, err := sendRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.EvidenceSave, bodyData, timeout)
 	if err != nil {
-		return nil, errors.New("EvidenceSave (cetc sendRequest) error:" + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New("EvidenceSave (cetc sendRequest) error:" + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var saveResp EvSaveResult
 	err = json.Unmarshal(respBytes, &saveResp)
@@ -93,17 +96,38 @@ func (sdk *cetcSDKImpl) CalculateStrHash(str string) (string, error) {
 	return hex.EncodeToString(dataHash), nil
 }
 
-//下发截屏任务到取证工具服务
+//下发录屏任务到取证工具服务
 func (sdk *cetcSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error) {
-	if len(webUrls) == 0 {
+	op := captureVideoOptions{webUrls: webUrls, timeout: timeout, duration: DEFAULT_VIDEO_DURATION}
+	return sdk.contentCaptureVideo(&op)
+}
+
+//下发录屏任务到取证工具服务增加录屏时长
+func (sdk *cetcSDKImpl) ContentCaptureVideoWithDuration(webUrls string, timeout time.Duration, duration int) (string, error) {
+	op := captureVideoOptions{webUrls: webUrls, timeout: timeout, duration: duration}
+	return sdk.contentCaptureVideo(&op)
+}
+
+type captureVideoOptions struct {
+	webUrls  string
+	timeout  time.Duration
+	duration int
+}
+
+//下发录屏任务到取证工具服务增加录屏时长
+func (sdk *cetcSDKImpl) contentCaptureVideo(op *captureVideoOptions) (string, error) {
+	if len(op.webUrls) == 0 {
 		return "", errors.New("webUrls 不能为空")
 	}
-	param := EvObtainTask{WebUrls: webUrls, Type: 2, AppId: sdk.AppId, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
+	if op.duration > 60*60 {
+		return "", errors.New("duration 录屏任务不能超过1小时")
+	}
+	param := EvObtainTask{WebUrls: op.webUrls, Type: 2, AppId: sdk.AppId, Duration: op.duration, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	applyRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST",
-		defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+		defConf.ServerAddr+defConf.ContentCapture, paramBytes, op.timeout)
 	if err != nil {
-		return "", errors.New("下发任务异常>>error:" + err.Error()+ ", requestId:"+ cri.RequestId)
+		return "", errors.New("下发任务异常>>error:" + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(applyRetBytes, &txRetDetail)
@@ -111,7 +135,7 @@ func (sdk *cetcSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Duratio
 	return applyResp, nil
 }
 
-//下发录屏任务到取证工具服务
+//下发截屏任务到取证工具服务
 func (sdk *cetcSDKImpl) ContentCapturePic(webUrls string, timeout time.Duration) (string, error) {
 	if len(webUrls) == 0 {
 		return "", errors.New("webUrls 不能为空")
@@ -120,7 +144,7 @@ func (sdk *cetcSDKImpl) ContentCapturePic(webUrls string, timeout time.Duration)
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New("下发任务异常>>error:" + err.Error()+ ", requestId:"+ cri.RequestId)
+		return "", errors.New("下发任务异常>>error:" + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -135,39 +159,61 @@ func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) 
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New(err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
 	var taskEvData = TaskEvData{
-		Hash: txRetDetail.Hash,
+		Hash:      txRetDetail.Hash,
 		StatusMsg: txRetDetail.StatusMsg,
-		Status: txRetDetail.Status,
-		Url: txRetDetail.Url,
+		Status:    txRetDetail.Status,
+		Url:       txRetDetail.Url,
 		RequestId: cri.RequestId,
 	}
 	return &taskEvData, nil
 }
 
+type obtainVideoOption struct {
+	webUrls        string
+	title          string
+	remark         string
+	representAppId string
+	timeout        time.Duration
+	duration       int
+}
+
 //视频取证接口
 func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) {
-	return sdk.evidenceObtainVideo(webUrls, title, remark, "", timeout)
+	return sdk.evidenceObtainVideo(&obtainVideoOption{webUrls: webUrls, title: title, remark: remark, timeout: timeout, duration: DEFAULT_VIDEO_DURATION})
+}
+
+//视频取证增加录屏时长
+func (sdk *cetcSDKImpl) EvidenceObtainVideoWithDuration(webUrls, title, remark string, timeout time.Duration, duration int) (string, error) {
+	return sdk.evidenceObtainVideo(&obtainVideoOption{webUrls: webUrls, title: title, remark: remark, timeout: timeout, duration: duration})
 }
 
 //代理用户视频取证接口
 func (sdk *cetcSDKImpl) RepresentEvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
-	return sdk.evidenceObtainVideo(webUrls, title, remark, representAppId, timeout)
+	return sdk.evidenceObtainVideo(&obtainVideoOption{webUrls: webUrls, title: title, remark: remark, timeout: timeout, duration: DEFAULT_VIDEO_DURATION})
 }
 
-func (sdk *cetcSDKImpl) evidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
-	if len(webUrls) == 0 || len(title) == 0 {
+//代理用户视频取证接口增加录屏时长
+func (sdk *cetcSDKImpl) RepresentEvidenceObtainVideoWithDuration(webUrls, title, remark, representAppId string, timeout time.Duration, duration int) (string, error) {
+	return sdk.evidenceObtainVideo(&obtainVideoOption{webUrls: webUrls, title: title, remark: remark, timeout: timeout, duration: duration})
+}
+
+func (sdk *cetcSDKImpl) evidenceObtainVideo(op *obtainVideoOption) (string, error) {
+	if len(op.webUrls) == 0 || len(op.title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: webUrls, Title: title, Type: 2, RepresentAppId: representAppId, Remark: remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	if op.duration > 60*60 {
+		return "", errors.New("duration 录屏任务不能超过1小时")
+	}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: op.webUrls, Title: op.title, Type: 2, Duration: op.duration, RepresentAppId: op.representAppId, Remark: op.remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
-	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, op.timeout)
 	if err != nil {
-		return "", errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
+		return "", errors.New(err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -193,7 +239,7 @@ func (sdk *cetcSDKImpl) evidenceObtainPic(webUrls, title, remark, representAppId
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return "", errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
+		return "", errors.New(err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
@@ -230,15 +276,15 @@ func (sdk *cetcSDKImpl) getEvidenceStatus(orderNo, representAppId string, timeou
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New(err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
 	var evIdData = EvIdData{
-		Status: txRetDetail.Status,
-		EvidUrl: txRetDetail.EvIdUrl,
+		Status:     txRetDetail.Status,
+		EvidUrl:    txRetDetail.EvIdUrl,
 		VoucherUrl: txRetDetail.VoucherUrl,
-		RequestId: cri.RequestId,
+		RequestId:  cri.RequestId,
 	}
 	return &evIdData, nil
 }
@@ -258,12 +304,12 @@ func (sdk *cetcSDKImpl) getZblEvidenceStatus(orderNo, representAppId string, tim
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New(err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var evIdData EvIdDataZbl
 	err = json.Unmarshal(sendRetBytes, &evIdData)
 	if err != nil {
-		return nil, errors.New(err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New(err.Error() + ", requestId:" + cri.RequestId)
 	}
 	return &evIdData, nil
 }

@@ -248,6 +248,11 @@ func main() {
   * ```
     ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error)
     ```
+    
+  * ```
+    // 长视频录屏任务
+    ContentCaptureVideoWithDuration(webUrls string, timeout time.Duration, duration int)
+    ```
 
   * ```
     ContentCapturePic(webUrls string, timeout time.Duration) (string, error)
@@ -300,6 +305,11 @@ func main() {
   * ```
     //视频取证接口
     EvidenceObtainVideo(webUrls, title, remark, timeout time.Duration) (string, error)
+    ```
+
+  * ```
+    //长视频取证接口
+    EvidenceObtainVideoWithDuration(webUrls, title, remark, timeout time.Duration, duration int) (string, error)
     ```
 
   * ```
