@@ -248,11 +248,6 @@ func main() {
   * ```
     ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error)
     ```
-    
-  * ```
-    // 长视频录屏任务
-    ContentCaptureVideoWithDuration(webUrls string, timeout time.Duration, duration int)
-    ```
 
   * ```
     ContentCapturePic(webUrls string, timeout time.Duration) (string, error)
@@ -264,6 +259,25 @@ func main() {
   | ------- | ------------- | ------ | ------------- |
   | webUrls | string        |        | 需要截屏的url |
   | timeout | time.Duration |        | 超时时间      |
+
+* 返回值
+
+  具体的orderNo（任务单号）
+
+
+* 方法原型
+  * ```
+    // 长视频录屏任务
+    ContentCaptureVideoWithDuration(webUrls string, timeout time.Duration, duration int)
+    ```
+
+* 参数说明
+
+  | 参数名  | 参数类型      | 默认值 | 参数描述      |
+    | ------- | ------------- | ------ | ------------- |
+  | webUrls | string        |        | 需要截屏的url |
+  | timeout | time.Duration |        | 超时时间      |
+  | duration | int |        | 录屏时间，单位:秒，不超过1小时|
 
 * 返回值
 
@@ -308,11 +322,6 @@ func main() {
     ```
 
   * ```
-    //长视频取证接口
-    EvidenceObtainVideoWithDuration(webUrls, title, remark, timeout time.Duration, duration int) (string, error)
-    ```
-
-  * ```
     //图片取证
     EvidenceObtainPic(webUrls, title, remark, timeout time.Duration) (string, error)
     ```
@@ -329,6 +338,29 @@ func main() {
 * 返回值
 
   具体的orderNo（任务单号）
+
+
+* 方法原型
+  * ```
+    //长视频取证接口
+    EvidenceObtainVideoWithDuration(webUrls, title, remark, timeout time.Duration, duration int) (string, error)
+    ```
+
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+    | ------- | ------------ | ------ | --------- |
+  | webUrls | string       |        | 取证的url |
+  | title   | string       |        | 标题      |
+  | remark  | string       |        | 描述      |
+  | timeout | time.Duration |        | 超时时间  |
+  | duration | int |        | 录屏时间，单位:秒，不超过1小时|
+
+
+* 返回值
+
+  具体的orderNo（任务单号）
+
 
 ## 查询取证结果
 
@@ -350,8 +382,6 @@ func main() {
   | 返回值类型 | 返回值描述                                                   |
   | ---------- | ------------------------------------------------------------ |
   | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br />"voucherUrl":"成功状态下,取证证书下载地址"<br />} |
-  
-
 
 
 # 侵权监控服务
@@ -1139,11 +1169,6 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
     ```
 
   * ```
-    //长视频取证接口
-    RepresentEvidenceObtainVideoWithDuration(webUrls, title, remark, representAppId string, timeout time.Duration, duration int) (string, error)
-    ```
-
-  * ```
     //图片取证
     RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
     ```
@@ -1157,6 +1182,28 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
   | remark  | string       |        | 描述      |
   | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
   | timeout | time.Duration |        | 超时时间  |
+  
+* 返回值 
+
+  具体的orderNo（任务单号）
+
+
+* 方法原型
+  * ```
+    //长视频取证接口
+    RepresentEvidenceObtainVideoWithDuration(webUrls, title, remark, representAppId string, timeout time.Duration, duration int) (string, error)
+    ```
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+    | ------- | ------------ | ------ | --------- |
+  | webUrls | string       |        | 取证的url |
+  | title   | string       |        | 标题      |
+  | remark  | string       |        | 描述      |
+  | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
+  | timeout | time.Duration |        | 超时时间  |
+  | duration | int |        | 录屏时间，单位:秒，不超过1小时|
+
 
 * 返回值
 

@@ -123,6 +123,9 @@ func (sdk *cetcSDKImpl) contentCaptureVideo(op *captureVideoOptions) (string, er
 	if op.duration > 60*60 {
 		return "", errors.New("duration 录屏任务不能超过1小时")
 	}
+	if op.duration < 0 {
+		return "", errors.New("duration 录屏任务时间错误")
+	}
 	if op.duration == 0 {
 		duration = DEFAULT_VIDEO_DURATION
 	}
@@ -213,6 +216,9 @@ func (sdk *cetcSDKImpl) evidenceObtainVideo(op *obtainVideoOption) (string, erro
 	duration := op.duration
 	if op.duration > 60*60 {
 		return "", errors.New("duration 录屏任务不能超过1小时")
+	}
+	if op.duration < 0 {
+		return "", errors.New("duration 录屏任务时间错误")
 	}
 	if op.duration == 0 {
 		duration = DEFAULT_VIDEO_DURATION
