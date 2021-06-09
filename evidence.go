@@ -7,10 +7,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 )
 
 const (
@@ -51,6 +52,8 @@ type zxlCipher interface {
 	GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error)
 	//代理商模式视频取证接口
 	RepresentEvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
+	//代理商模式长视频取证接口
+	RepresentEvidenceObtainVideoWithDuration(webUrls, title, remark, representAppId string, timeout time.Duration, duration int) (string, error)
 	//代理商模式图片取证接口
 	RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
 	//代理商模式获取取证证书任务状态及结果
@@ -86,7 +89,7 @@ type ZxlConfig struct {
 	ServerAddr string
 }
 
-func NewZxlImplWithConfig(config ZxlConfig)(*zxlImpl, error)  {
+func NewZxlImplWithConfig(config ZxlConfig) (*zxlImpl, error) {
 
 	if len(config.AppId) < 15 {
 		return nil, errors.New(InvalidAppId)
@@ -100,8 +103,8 @@ func NewZxlImplWithConfig(config ZxlConfig)(*zxlImpl, error)  {
 	}
 	defConf.ServerAddr = config.ServerAddr
 	return &zxlImpl{appId: config.AppId,
-		appKey: config.AppKey,
-		appType: typeInt,
+		appKey:    config.AppKey,
+		appType:   typeInt,
 		zxlCipher: &cetcSDKImpl{AppId: config.AppId, AppKey: config.AppKey}}, nil
 }
 
@@ -126,7 +129,7 @@ func (zxl *zxlImpl) BindUserCert(pk, sk string, timeout time.Duration) error {
 	}
 	_, cri, err := sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.UserCert, dataBytes, timeout)
 	if err != nil {
-		return errors.New("BindUserCertError (sendRequest): " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return errors.New("BindUserCertError (sendRequest): " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 
 	//var bindResp UserCertResp
@@ -151,7 +154,7 @@ func (zxl *zxlImpl) UpdateUserCert(pk, sk string, timeout time.Duration) error {
 	}
 	_, cri, err := sendRequest(zxl.appId, zxl.appKey, "PUT", defConf.ServerAddr+defConf.UserCert, dataBytes, timeout)
 	if err != nil {
-		return errors.New("UpdateUserCert (sendRequest): " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return errors.New("UpdateUserCert (sendRequest): " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 
 	return nil
@@ -207,7 +210,7 @@ func (zxl *zxlImpl) QueryWithEvId(evId string, timeout time.Duration) ([]QueryRe
 	}
 	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithEvId+evId, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithEvId (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New("QueryWithEvId (sendRequest) error: " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
@@ -224,7 +227,7 @@ func (zxl *zxlImpl) QueryWithTxHash(txHash string, timeout time.Duration) ([]Que
 	}
 	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithTxHash+txHash, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithTxHash (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New("QueryWithTxHash (sendRequest) error: " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
@@ -242,7 +245,7 @@ func (zxl *zxlImpl) QueryWithEvHash(evHash string, timeout time.Duration) ([]Que
 	}
 	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithEvHash+evHash, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithEvHash (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New("QueryWithEvHash (sendRequest) error: " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
@@ -260,7 +263,7 @@ func (zxl *zxlImpl) QueryWithHash(hash string, timeout time.Duration) ([]QueryRe
 	}
 	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithHash+hash, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithHash (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New("QueryWithHash (sendRequest) error: " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)

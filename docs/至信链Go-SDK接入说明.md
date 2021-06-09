@@ -1139,6 +1139,11 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
     ```
 
   * ```
+    //长视频取证接口
+    RepresentEvidenceObtainVideoWithDuration(webUrls, title, remark, representAppId string, timeout time.Duration, duration int) (string, error)
+    ```
+
+  * ```
     //图片取证
     RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
     ```
