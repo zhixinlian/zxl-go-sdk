@@ -41,7 +41,7 @@ type zxlCipher interface {
 	//录屏任务
 	ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error)
 	//录屏任务增加取证时长
-	NewContentCaptureVideo(captureVideoOption *CaptureVideoOption, timeout time.Duration)
+	NewContentCaptureVideo(captureVideoOption *CaptureVideoOption, timeout time.Duration) (string, error)
 	//截屏任务
 	ContentCapturePic(webUrls string, timeout time.Duration) (string, error)
 	//获取录屏、截屏任务状态及结果
