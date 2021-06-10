@@ -55,7 +55,7 @@ type zxlCipher interface {
 	//代理商模式视频取证接口
 	RepresentEvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
 	//代理商模式长视频取证接口
-	NewEvidenceObtainVideo(captureVideoOption *CaptureVideoOption, timeout time.Duration) (string, error)
+	NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration) (string, error)
 	//代理商模式图片取证接口
 	RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
 	//代理商模式获取取证证书任务状态及结果
