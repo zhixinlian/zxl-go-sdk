@@ -176,19 +176,19 @@ func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) 
 type ObtainVideoOption struct {
 	WebUrls        string
 	Title          string
-	remark         string
+	Remark         string
 	RepresentAppId string
 	Duration       int
 }
 
 //视频取证接口
 func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) {
-	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{WebUrls: webUrls, Title: title, remark: remark, Duration: DEFAULT_VIDEO_DURATION}, timeout)
+	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{WebUrls: webUrls, Title: title, Remark: remark, Duration: DEFAULT_VIDEO_DURATION}, timeout)
 }
 
 //代理用户视频取证接口
 func (sdk *cetcSDKImpl) RepresentEvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
-	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{WebUrls: webUrls, Title: title, remark: remark, RepresentAppId: representAppId, Duration: DEFAULT_VIDEO_DURATION}, timeout)
+	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{WebUrls: webUrls, Title: title, Remark: remark, RepresentAppId: representAppId, Duration: DEFAULT_VIDEO_DURATION}, timeout)
 }
 
 func (sdk *cetcSDKImpl) NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration) (string, error) {
@@ -205,7 +205,7 @@ func (sdk *cetcSDKImpl) NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOpt
 	if obtainVideoOption.Duration == 0 {
 		duration = DEFAULT_VIDEO_DURATION
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: obtainVideoOption.WebUrls, Title: obtainVideoOption.Title, Type: 2, Duration: duration, RepresentAppId: obtainVideoOption.RepresentAppId, Remark: obtainVideoOption.remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: obtainVideoOption.WebUrls, Title: obtainVideoOption.Title, Type: 2, Duration: duration, RepresentAppId: obtainVideoOption.RepresentAppId, Remark: obtainVideoOption.Remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
