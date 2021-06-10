@@ -183,7 +183,7 @@ type ObtainVideoOption struct {
 
 //视频取证接口
 func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) {
-	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{WebUrls: webUrls, Title: title, Remark: remark, Duration: DEFAULT_VIDEO_DURATION}, timeout)
+	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{WebUrls: webUrls, Title: title, Remark: remark, RepresentAppId: "", Duration: DEFAULT_VIDEO_DURATION}, timeout)
 }
 
 //代理用户视频取证接口
