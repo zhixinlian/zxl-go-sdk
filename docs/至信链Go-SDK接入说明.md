@@ -12,6 +12,8 @@
 | 2021.01.28 | 新增代理商相关接口 | v2.0.4   |
 | 2021.02.09 | 增加个人用户及确权接口 | v2.1.3 |
 | 2021.05.12 | 接口优化            | v2.1.4 |
+| 2021.06.10 | 新增长视频录屏支持            | v2.1.4.4 |
+
 
 ### 阅读对象
 
@@ -267,8 +269,8 @@ func main() {
 
 * 方法原型
   * ```
-    // 长视频录屏任务
-    ContentCaptureVideoWithDuration(webUrls string, timeout time.Duration, duration int)
+    // 下发长视频录屏取证工具服务
+    NewEvidenceObtainVideo(op ObtainVideoOption, timeout time.Duration)
     ```
 
 * 参数说明
