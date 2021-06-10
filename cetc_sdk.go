@@ -97,32 +97,32 @@ func (sdk *cetcSDKImpl) CalculateStrHash(str string) (string, error) {
 }
 
 type CaptureVideoOption struct {
-	webUrls  string
-	duration int
+	WebUrls  string
+	Duration int
 }
 
 //下发录屏任务到取证工具服务
 func (sdk *cetcSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error) {
-	op := CaptureVideoOption{webUrls: webUrls, duration: DEFAULT_VIDEO_DURATION}
+	op := CaptureVideoOption{WebUrls: webUrls, Duration: DEFAULT_VIDEO_DURATION}
 	return sdk.NewContentCaptureVideo(&op, timeout)
 }
 
 //下发录屏任务到取证工具服务增加录屏时长
 func (sdk *cetcSDKImpl) NewContentCaptureVideo(captureVideoOption *CaptureVideoOption, timeout time.Duration) (string, error) {
-	if len(captureVideoOption.webUrls) == 0 {
+	if len(captureVideoOption.WebUrls) == 0 {
 		return "", errors.New("webUrls 不能为空")
 	}
-	duration := captureVideoOption.duration
-	if captureVideoOption.duration > 60*60 {
+	duration := captureVideoOption.Duration
+	if captureVideoOption.Duration > 60*60 {
 		return "", errors.New("duration 录屏任务不能超过1小时")
 	}
-	if captureVideoOption.duration < 0 {
+	if captureVideoOption.Duration < 0 {
 		return "", errors.New("duration 录屏任务时间错误")
 	}
-	if captureVideoOption.duration == 0 {
+	if captureVideoOption.Duration == 0 {
 		duration = DEFAULT_VIDEO_DURATION
 	}
-	param := EvObtainTask{WebUrls: captureVideoOption.webUrls, Type: 2, AppId: sdk.AppId, Duration: duration, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
+	param := EvObtainTask{WebUrls: captureVideoOption.WebUrls, Type: 2, AppId: sdk.AppId, Duration: duration, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	applyRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST",
 		defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
@@ -174,38 +174,38 @@ func (sdk *cetcSDKImpl) GetContentStatus(orderNo string, timeout time.Duration) 
 }
 
 type ObtainVideoOption struct {
-	webUrls        string
-	title          string
+	WebUrls        string
+	Title          string
 	remark         string
-	representAppId string
-	duration       int
+	RepresentAppId string
+	Duration       int
 }
 
 //视频取证接口
 func (sdk *cetcSDKImpl) EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error) {
-	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{webUrls: webUrls, title: title, remark: remark, duration: DEFAULT_VIDEO_DURATION}, timeout)
+	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{WebUrls: webUrls, Title: title, remark: remark, Duration: DEFAULT_VIDEO_DURATION}, timeout)
 }
 
 //代理用户视频取证接口
 func (sdk *cetcSDKImpl) RepresentEvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error) {
-	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{webUrls: webUrls, title: title, remark: remark, representAppId: representAppId, duration: DEFAULT_VIDEO_DURATION}, timeout)
+	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{WebUrls: webUrls, Title: title, remark: remark, RepresentAppId: representAppId, Duration: DEFAULT_VIDEO_DURATION}, timeout)
 }
 
 func (sdk *cetcSDKImpl) NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration) (string, error) {
-	if len(obtainVideoOption.webUrls) == 0 || len(obtainVideoOption.title) == 0 {
+	if len(obtainVideoOption.WebUrls) == 0 || len(obtainVideoOption.Title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
-	duration := obtainVideoOption.duration
-	if obtainVideoOption.duration > 60*60 {
+	duration := obtainVideoOption.Duration
+	if obtainVideoOption.Duration > 60*60 {
 		return "", errors.New("duration 录屏任务不能超过1小时")
 	}
-	if obtainVideoOption.duration < 0 {
+	if obtainVideoOption.Duration < 0 {
 		return "", errors.New("duration 录屏任务时间错误")
 	}
-	if obtainVideoOption.duration == 0 {
+	if obtainVideoOption.Duration == 0 {
 		duration = DEFAULT_VIDEO_DURATION
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: obtainVideoOption.webUrls, Title: obtainVideoOption.title, Type: 2, Duration: duration, RepresentAppId: obtainVideoOption.representAppId, Remark: obtainVideoOption.remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: obtainVideoOption.WebUrls, Title: obtainVideoOption.Title, Type: 2, Duration: duration, RepresentAppId: obtainVideoOption.RepresentAppId, Remark: obtainVideoOption.remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
