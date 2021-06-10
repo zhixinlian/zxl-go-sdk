@@ -41,7 +41,7 @@ type zxlCipher interface {
 	//录屏任务
 	ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error)
 	//录屏任务增加取证时长
-	NewContentCaptureVideo(op *CaptureVideoOption, timeout time.Duration)
+	NewContentCaptureVideo(captureVideoOption *CaptureVideoOption, timeout time.Duration)
 	//截屏任务
 	ContentCapturePic(webUrls string, timeout time.Duration) (string, error)
 	//获取录屏、截屏任务状态及结果
@@ -55,7 +55,7 @@ type zxlCipher interface {
 	//代理商模式视频取证接口
 	RepresentEvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
 	//代理商模式长视频取证接口
-	NewEvidenceObtainVideo(op *CaptureVideoOption, timeout time.Duration) (string, error)
+	NewEvidenceObtainVideo(captureVideoOption *CaptureVideoOption, timeout time.Duration) (string, error)
 	//代理商模式图片取证接口
 	RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
 	//代理商模式获取取证证书任务状态及结果

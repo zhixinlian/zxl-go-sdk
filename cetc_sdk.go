@@ -108,21 +108,21 @@ func (sdk *cetcSDKImpl) ContentCaptureVideo(webUrls string, timeout time.Duratio
 }
 
 //下发录屏任务到取证工具服务增加录屏时长
-func (sdk *cetcSDKImpl) NewContentCaptureVideo(op *CaptureVideoOption, timeout time.Duration) (string, error) {
-	if len(op.webUrls) == 0 {
+func (sdk *cetcSDKImpl) NewContentCaptureVideo(captureVideoOption *CaptureVideoOption, timeout time.Duration) (string, error) {
+	if len(captureVideoOption.webUrls) == 0 {
 		return "", errors.New("webUrls 不能为空")
 	}
-	duration := op.duration
-	if op.duration > 60*60 {
+	duration := captureVideoOption.duration
+	if captureVideoOption.duration > 60*60 {
 		return "", errors.New("duration 录屏任务不能超过1小时")
 	}
-	if op.duration < 0 {
+	if captureVideoOption.duration < 0 {
 		return "", errors.New("duration 录屏任务时间错误")
 	}
-	if op.duration == 0 {
+	if captureVideoOption.duration == 0 {
 		duration = DEFAULT_VIDEO_DURATION
 	}
-	param := EvObtainTask{WebUrls: op.webUrls, Type: 2, AppId: sdk.AppId, Duration: duration, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
+	param := EvObtainTask{WebUrls: captureVideoOption.webUrls, Type: 2, AppId: sdk.AppId, Duration: duration, RequestType: "POST", RedirectUrl: "zhixin-api/v2/screenshot/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	applyRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST",
 		defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
@@ -191,21 +191,21 @@ func (sdk *cetcSDKImpl) RepresentEvidenceObtainVideo(webUrls, title, remark, rep
 	return sdk.NewEvidenceObtainVideo(&ObtainVideoOption{webUrls: webUrls, title: title, remark: remark, representAppId: representAppId, duration: DEFAULT_VIDEO_DURATION}, timeout)
 }
 
-func (sdk *cetcSDKImpl) NewEvidenceObtainVideo(op *ObtainVideoOption, timeout time.Duration) (string, error) {
-	if len(op.webUrls) == 0 || len(op.title) == 0 {
+func (sdk *cetcSDKImpl) NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration) (string, error) {
+	if len(obtainVideoOption.webUrls) == 0 || len(obtainVideoOption.title) == 0 {
 		return "", errors.New("webUrls or title 不能为空")
 	}
-	duration := op.duration
-	if op.duration > 60*60 {
+	duration := obtainVideoOption.duration
+	if obtainVideoOption.duration > 60*60 {
 		return "", errors.New("duration 录屏任务不能超过1小时")
 	}
-	if op.duration < 0 {
+	if obtainVideoOption.duration < 0 {
 		return "", errors.New("duration 录屏任务时间错误")
 	}
-	if op.duration == 0 {
+	if obtainVideoOption.duration == 0 {
 		duration = DEFAULT_VIDEO_DURATION
 	}
-	param := EvObtainTask{AppId: sdk.AppId, WebUrls: op.webUrls, Title: op.title, Type: 2, Duration: duration, RepresentAppId: op.representAppId, Remark: op.remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
+	param := EvObtainTask{AppId: sdk.AppId, WebUrls: obtainVideoOption.webUrls, Title: obtainVideoOption.title, Type: 2, Duration: duration, RepresentAppId: obtainVideoOption.representAppId, Remark: obtainVideoOption.remark, RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/obtain"}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, cri, err := sendTxMidRequest(sdk.AppId, sdk.AppKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {

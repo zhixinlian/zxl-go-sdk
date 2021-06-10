@@ -270,15 +270,20 @@ func main() {
 * 方法原型
   * ```
     // 下发长视频录屏取证工具服务
-    NewEvidenceObtainVideo(op ObtainVideoOption, timeout time.Duration)
+    NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration)
     ```
 
 * 参数说明
 
   | 参数名  | 参数类型      | 默认值 | 参数描述      |
     | ------- | ------------- | ------ | ------------- |
-  | webUrls | string        |        | 需要截屏的url |
+  | obtainVideoOption | *obtainVideoOption        |        | 录屏视频的参数 |
   | timeout | time.Duration |        | 超时时间      |
+  obtainVideoOption的结构如下
+
+  | 参数名  | 参数类型      | 默认值 | 参数描述      |
+  | ------- | ------------- | ------ | ------------- |
+  | webUrls | string        |        | 需要截屏的url |
   | duration | int |        | 录屏时间，单位:秒，不超过1小时|
 
 * 返回值
@@ -345,17 +350,22 @@ func main() {
 * 方法原型
   * ```
     //长视频取证接口
-    EvidenceObtainVideoWithDuration(webUrls, title, remark, timeout time.Duration, duration int) (string, error)
+    NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration)
     ```
-
+  
 * 参数说明
 
   | 参数名  | 参数类型     | 默认值 | 参数描述  |
     | ------- | ------------ | ------ | --------- |
+  | obtainVideoOption | *ObtainVideoOption       |        | 视频取证的参数 |
+  | timeout | time.Duration |        | 超时时间  |
+  obtainVideoOption的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+      | ------- | ------------ | ------ | --------- |
   | webUrls | string       |        | 取证的url |
   | title   | string       |        | 标题      |
   | remark  | string       |        | 描述      |
-  | timeout | time.Duration |        | 超时时间  |
   | duration | int |        | 录屏时间，单位:秒，不超过1小时|
 
 
@@ -1193,17 +1203,23 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
 * 方法原型
   * ```
     //长视频取证接口
-    RepresentEvidenceObtainVideoWithDuration(webUrls, title, remark, representAppId string, timeout time.Duration, duration int) (string, error)
+    NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration)
     ```
+
 * 参数说明
 
   | 参数名  | 参数类型     | 默认值 | 参数描述  |
-    | ------- | ------------ | ------ | --------- |
+      | ------- | ------------ | ------ | --------- |
+  | obtainVideoOption | *ObtainVideoOption       |        | 视频取证的参数 |
+  | timeout | time.Duration |        | 超时时间  |
+  obtainVideoOption的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+        | ------- | ------------ | ------ | --------- |
   | webUrls | string       |        | 取证的url |
   | title   | string       |        | 标题      |
-  | remark  | string       |        | 描述      |
   | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
-  | timeout | time.Duration |        | 超时时间  |
+  | remark  | string       |        | 描述      |
   | duration | int |        | 录屏时间，单位:秒，不超过1小时|
 
 
