@@ -40,7 +40,7 @@
 
 1. 进入到 go 根目录或者当前项目的 vendor 目录中的 github.com/zhixinlian目录下  
 2. 运行命令 git clone https://github.com/zhixinlian/zxl-go-sdk.git  
-3. 选择版本，tag：v2.1.3
+3. 选择版本，tag：v2.1.4
 
 ### 使用步骤
 1. 通过至信链线上首页注册账户并完成认证，获取生成的 APPID 与 APPKEY;
@@ -395,6 +395,46 @@ func main() {
   | ---------- | ------------------------------------------------------------ |
   | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br />"voucherUrl":"成功状态下,取证证书下载地址"<br />} |
 
+* 示例
+  ```go
+      zxlsdk, err := zxl.NewZxlImpl(appId, appKey)
+      if err != nil {
+          panic(err)
+      }
+  
+      obtainVideoOption := zxl.ObtainVideoOption{
+          Duration:       3600,
+          RepresentAppId: "",
+          Remark:         "测试视频",
+          Title:          "测试视频",
+          WebUrls:        "https://zhixinliantest-1302317679.cos.ap-guangzhou.myqcloud.com/20210611/video/2021-06-11_15-15-18_655459332949.mp4",
+      }
+      //长视频取证
+      orderNo, err := zxlsdk.NewEvidenceObtainVideo(&obtainVideoOption, 5*time.Second)
+  
+      if err != nil {
+          fmt.Println(err)
+          return
+      }
+      fmt.Printf("取证请求提交，订单号：%s\n", orderNo)
+  
+      evIdData := &zxl.EvIdData{}
+  
+      // 查询取证结果
+      for {
+          evIdData, err = zxlsdk.GetEvidenceStatus(orderNo, 0)
+          if err != nil {
+              panic(err)
+          }
+          fmt.Printf("evIdData is %v\n", evIdData)
+          if evIdData.Status != 0 {
+              break
+          }
+  
+          time.Sleep(1 * time.Second)
+  
+      }
+  ```
 
 # 侵权监控服务
 
@@ -454,26 +494,25 @@ Tort 结构如下:
   | RequestId | string | 请求Id      |
 
 * 示例
-
-  ```go
-  zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
-  if err != nil {
-    fmt.Println("初始化 SDK 错误")
-    return
-  }
-  
-  tort := zxl_go_sdk.Tort{
-    Url: "https://inews.gtimg.com/newsapp_bt/0/5001rcns97nr04er/1000?appid=ee22ce76657290e1",
-    Title: "测试图片",
-    Keyword: "月亮;太空",
-    Type: constants.MATERIAL_PHOTO,
-    Source: constants.ANY_PIC,
-    StartDate: "2021-03-31",
-    EndDate: "2021-04-10",
-  }
-  
-  resp, err := zxlSDK.SubmitTortTask(tort, 5 * time.Second)
-  ```
+    ```go
+    zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
+    if err != nil {
+      fmt.Println("初始化 SDK 错误")
+      return
+    }
+    
+    tort := zxl_go_sdk.Tort{
+      Url: "https://inews.gtimg.com/newsapp_bt/0/5001rcns97nr04er/1000?appid=ee22ce76657290e1",
+      Title: "测试图片",
+      Keyword: "月亮;太空",
+      Type: constants.MATERIAL_PHOTO,
+      Source: constants.ANY_PIC,
+      StartDate: "2021-03-31",
+      EndDate: "2021-04-10",
+    }
+    
+    resp, err := zxlSDK.SubmitTortTask(tort, 5 * time.Second)
+    ```
 
 
 
