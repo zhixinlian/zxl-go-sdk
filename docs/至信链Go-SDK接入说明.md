@@ -241,82 +241,6 @@ func main() {
 
 
 
-# 下发录屏/截屏任务
-
-## 下发录屏/截屏任务到取证工具服务
-
-* 方法原型
-
-  * ```
-    ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error)
-    ```
-
-  * ```
-    ContentCapturePic(webUrls string, timeout time.Duration) (string, error)
-    ```
-
-* 参数说明
-
-  | 参数名  | 参数类型      | 默认值 | 参数描述      |
-  | ------- | ------------- | ------ | ------------- |
-  | webUrls | string        |        | 需要截屏的url |
-  | timeout | time.Duration |        | 超时时间      |
-
-* 返回值
-
-  具体的orderNo（任务单号）
-
-
-* 方法原型
-  * ```
-    // 下发长视频录屏取证工具服务
-    NewContentCaptureVideo(captureVideoOption *CaptureVideoOption, timeout time.Duration)
-    ```
-
-* 参数说明
-
-  | 参数名  | 参数类型      | 默认值 | 参数描述      |
-    | ------- | ------------- | ------ | ------------- |
-  | captureVideoOption | *CaptureVideoOption        |        | 录屏视频的参数 |
-  | timeout | time.Duration |        | 超时时间      |
-  CaptureVideoOption的结构如下
-
-  | 参数名  | 参数类型      | 默认值 | 参数描述      |
-  | ------- | ------------- | ------ | ------------- |
-  | webUrls | string        |        | 需要截屏的url |
-  | duration | int |        | 录屏时间，单位:秒，不超过1小时|
-
-* 返回值
-
-  具体的orderNo（任务单号）
-
-
-
-## 查询录屏/截屏任务状态及结果
-
-* 方法原型
-
-  * ```
-    GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error)
-    ```
-
-* 参数说明
-
-  | 参数名  | 参数类型      | 默认值 | 参数描述                          |
-  | ------- | ------------- | ------ | --------------------------------- |
-  | orderNo | string        |        | 截屏/录屏任务下发后返回的任务单号 |
-  | timeout | time.Duration |        | 超时时间                          |
-
-* 返回值
-
-  | 返回值类型 | 返回值描述                                                   |
-  | ---------- | ------------------------------------------------------------ |
-  | TaskEvData | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"statusMsg":"任务状态解读:[运行中]>>[运行成功]>>[运行失败]",<br />"url":"状态成功时,对应的cosurl",<br />"hash":"截图成功时,对应的存证hash"<br />} |
-
-
-
-
-
 # 视频/图片取证
 
 ## 取证服务
@@ -698,7 +622,7 @@ ClueData 结构如下：
   | 16   | RIGHT_TYPE_COLLECTION   | 汇编权         |
   | 17   | RIGHT_TYPE_OTHER        | 其他权利       |
   | 18   | RIGHT_TYPE_ALL          | 所有           |
-  
+
   > 注意：当前只支持编号 18 的**所有**项，其他权利会在后续支持
   
   RighterType（权利人类型）：
