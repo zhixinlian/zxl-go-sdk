@@ -270,16 +270,16 @@ func main() {
 * 方法原型
   * ```
     // 下发长视频录屏取证工具服务
-    NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration)
+    NewContentCaptureVideo(captureVideoOption *CaptureVideoOption, timeout time.Duration)
     ```
 
 * 参数说明
 
   | 参数名  | 参数类型      | 默认值 | 参数描述      |
     | ------- | ------------- | ------ | ------------- |
-  | obtainVideoOption | *obtainVideoOption        |        | 录屏视频的参数 |
+  | captureVideoOption | *CaptureVideoOption        |        | 录屏视频的参数 |
   | timeout | time.Duration |        | 超时时间      |
-  obtainVideoOption的结构如下
+  CaptureVideoOption的结构如下
 
   | 参数名  | 参数类型      | 默认值 | 参数描述      |
   | ------- | ------------- | ------ | ------------- |
