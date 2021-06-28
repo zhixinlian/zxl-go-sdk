@@ -8,8 +8,6 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	uuid "github.com/satori/go.uuid"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"io"
 	"io/ioutil"
 	"net"
@@ -18,6 +16,9 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 )
 
 /**
@@ -30,7 +31,7 @@ type commReqInfo struct {
 const REQUEST_ID = "traceId"
 
 func generateUid() (string, error) {
-	tmpUid := uuid.NewV1()
+	tmpUid := uuid.New()
 	idStr := strings.ReplaceAll(tmpUid.String(), "-", "")
 	//idStr := ""
 	return idStr, nil
@@ -83,7 +84,7 @@ func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Du
 	if body != nil {
 		byteReader = bytes.NewReader(body)
 	}
-	cri :=  commReqInfo{}
+	cri := commReqInfo{}
 	//tr := &http.Transport{TLSClientConfig: &tls.Config{InsecureSkipVerify: true}}
 	//
 	//cli := http.Client{Transport: tr, Timeout: timeout}
@@ -94,8 +95,8 @@ func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Du
 		return nil, &cri, errors.New("NewRequest error:" + err.Error())
 	}
 	req.Header.Add("appId", appId)
-	signatureTime := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
-	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId+","+appKey+","+signatureTime)))
+	signatureTime := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
+	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId + "," + appKey + "," + signatureTime)))
 
 	req.Header.Add("signatureTime", signatureTime)
 	req.Header.Add("signature", signature)
@@ -174,8 +175,8 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 		return nil, &cri, errors.New("NewRequest error:" + err.Error())
 	}
 	req.Header.Add("appId", appId)
-	signatureTime := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
-	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId+","+appKey+","+signatureTime)))
+	signatureTime := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
+	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId + "," + appKey + "," + signatureTime)))
 
 	req.Header.Add("signatureTime", signatureTime)
 	req.Header.Add("signature", signature)
@@ -211,7 +212,6 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 	retBytes, _ := json.Marshal(&commonData.Detail)
 	return retBytes, &cri, nil
 }
-
 
 func isInnerIpFromUrl(originUrl string) bool {
 	u, err := url.Parse(originUrl)
