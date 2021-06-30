@@ -2,22 +2,22 @@ package main
 
 import (
 	"fmt"
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"strings"
 )
 
 func main() {
-	tmpUid := uuid.NewV1()
+	tmpUid, _ := uuid.NewUUID()
 	fmt.Println(tmpUid.String())
-	tmpUid = uuid.NewV1()
+	tmpUid, _ = uuid.NewUUID()
 	fmt.Println(tmpUid.String())
-	tmpUid = uuid.NewV1()
+	tmpUid, _ = uuid.NewUUID()
 	fmt.Println(tmpUid.String())
-	tmpUid = uuid.NewV1()
+	tmpUid, _ = uuid.NewUUID()
 	fmt.Println(tmpUid.String())
-	tmpUid = uuid.NewV1()
+	tmpUid, _ = uuid.NewUUID()
 	fmt.Println(tmpUid.String())
-	tmpUid = uuid.NewV1()
+	tmpUid, _ = uuid.NewUUID()
 	fmt.Println(tmpUid.String())
 
 	idStr := strings.ReplaceAll(tmpUid.String(), "-", "")

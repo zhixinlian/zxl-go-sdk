@@ -8,7 +8,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	uuid "github.com/satori/go.uuid"
+	"github.com/google/uuid"
 	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"io"
 	"io/ioutil"
@@ -30,7 +30,7 @@ type commReqInfo struct {
 const REQUEST_ID = "traceId"
 
 func generateUid() (string, error) {
-	tmpUid := uuid.NewV1()
+	tmpUid, _ := uuid.NewUUID()
 	idStr := strings.ReplaceAll(tmpUid.String(), "-", "")
 	//idStr := ""
 	return idStr, nil
