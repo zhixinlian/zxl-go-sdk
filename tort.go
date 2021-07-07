@@ -51,6 +51,7 @@ type TortQuery struct {
 type TortQueryResp struct {
 	ClueList  []ClueData `json:"clueList"`
 	Count     int        `json:"count"`
+	Status    int        `json:"status"`
 	RequestId string
 }
 
