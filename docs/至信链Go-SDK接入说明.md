@@ -398,6 +398,7 @@ Tort 结构如下:
   | 编码 | 常量           | 备注     |
   | ---- | -------------- | -------- |
   | 1    | MATERIAL_PHOTO | 图片类型 |
+  | 2    | MATERIAL_TEXT  | 文字类型 |
   | 3    | MATERIAL_VIDEO | 视频类型 |
 
   TortSource（数据来源）：
@@ -409,6 +410,7 @@ Tort 结构如下:
   | 21   | SHORT_VIDEO | 短视频监测，type为视频时可用 |
   | 22   | LONG_VIDEO  | 长对短监测:监测范围和短视频一样，type 为长视频时可用 |
   | 23   | LONG_TO_LONG_VIDEO  | 长对长监测:全网视频小网站，type为视频时可用 |
+  | 41   | NEWS_TEXT   | 新闻咨询类，监测范围全网   |
 
 * 返回数据（TortResp）
 
@@ -469,6 +471,7 @@ TortQuery 结构如下：
   | --------- | ---------- | ------------ |
   | ClueList  | []ClueData | 侵权线索列表   |
   | Count     | int        | 监测线索总数量 |
+  | Status    | int        | 1：未开始，2：监测中 10: 已停止 |
   | RequestId | string     | 请求Id       |
 
 ClueData 结构如下：
