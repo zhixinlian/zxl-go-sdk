@@ -13,3 +13,5 @@
 
 # goland configuration file
 .idea/*
+
+vendor

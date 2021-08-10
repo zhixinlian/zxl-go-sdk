@@ -215,12 +215,16 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 
 func isInnerIpFromUrl(originUrl string) bool {
 	u, err := url.Parse(originUrl)
-
 	if err != nil {
 		return true
 	}
 
 	h := strings.Split(u.Host, ":")
+
+	// 先检查是否是 ip，只对内网的 ip 进行拦截，如果是域名， 直接放行
+	if !checkIp(h[0]) {
+		return false
+	}
 	addr, err := net.ResolveIPAddr("ip", h[0])
 	if err != nil {
 		return true
@@ -234,9 +238,6 @@ func isInnerIpFromUrl(originUrl string) bool {
 }
 
 func isInnerIp(ipStr string) bool {
-	if !checkIp(ipStr) {
-		return false
-	}
 	inputIpNum := inetAton(ipStr)
 	innerIpA := inetAton("10.255.255.255")
 	innerIpB := inetAton("172.16.255.255")
