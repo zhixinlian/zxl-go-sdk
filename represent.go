@@ -4,15 +4,14 @@ import (
 	"bytes"
 	"encoding/json"
 	"errors"
+	"github.com/zhixinlian/zxl-go-sdk/constants"
 	"io"
 	"io/ioutil"
 	"mime/multipart"
-	"net/http"
 	"os"
 	"reflect"
 	"strings"
 	"time"
-	"github.com/zhixinlian/zxl-go-sdk/constants"
 )
 
 /**
@@ -510,7 +509,7 @@ type ReviewData struct {
 5、上传执照
 6、提交整个注册信息
 */
-func (zxl *zxlImpl) RegisterUser(info AgentUser, timeout time.Duration) (bool, error) {
+func (zxl *ZxlImpl) RegisterUser(info AgentUser, timeout time.Duration) (bool, error) {
 	//提交注册信息
 	pwd, err := zxl.CalculateStrHash(info.Pwd)
 	if err != nil {
@@ -554,7 +553,7 @@ func (zxl *zxlImpl) RegisterUser(info AgentUser, timeout time.Duration) (bool, e
 }
 
 /**查询代理用户的审核状态信息*/
-func (zxl *zxlImpl) SelectEpInfo(email string, timeout time.Duration) (ReviewData, error) {
+func (zxl *ZxlImpl) SelectEpInfo(email string, timeout time.Duration) (ReviewData, error) {
 	var ret ReviewData
 	if len(email) <= 0 {
 		return ret, errors.New("please enter the correct email address")
@@ -576,7 +575,7 @@ func (zxl *zxlImpl) SelectEpInfo(email string, timeout time.Duration) (ReviewDat
 }
 
 /**绑定代理用户的公私钥*/
-func (zxl *zxlImpl) BindRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error) {
+func (zxl *ZxlImpl) BindRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error) {
 	if len(representSk) <= 0 {
 		panic("")
 	}
@@ -598,7 +597,7 @@ func (zxl *zxlImpl) BindRepresentUserCert(representAppId, representAppKey, repre
 }
 
 /**更新代理用户公私钥*/
-func (zxl *zxlImpl) UpdateRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error) {
+func (zxl *ZxlImpl) UpdateRepresentUserCert(representAppId, representAppKey, representPk, representSk string) (bool, error) {
 	if len(representSk) <= 0 {
 		panic("")
 	}
@@ -620,7 +619,7 @@ func (zxl *zxlImpl) UpdateRepresentUserCert(representAppId, representAppKey, rep
 }
 
 /**代理用户上链**/
-func (zxl *zxlImpl) RepresentSave(evHash, extendInfo, representSk, representAppId string, timeout time.Duration) (*EvSaveResult, error) {
+func (zxl *ZxlImpl) RepresentSave(evHash, extendInfo, representSk, representAppId string, timeout time.Duration) (*EvSaveResult, error) {
 	uid, err := generateUid()
 	if err != nil {
 		return nil, errors.New("EvidenceSave (cetc generateUid) error:" + err.Error())
@@ -746,7 +745,8 @@ func postFile(filename string, targetUrl string, param map[string]string) (map[s
 	}
 	contentType := bodyWriter.FormDataContentType()
 	bodyWriter.Close()
-	resp, err := http.Post(targetUrl, contentType, bodyBuf)
+	cli := buildHttpClient(defConf.IsProxy, time.Duration(defConf.DefaultHttpTimeout) * time.Second)
+	resp, err := cli.Post(targetUrl, contentType, bodyBuf)
 	if err != nil {
 		return nil, errors.New("send http fail: " + err.Error())
 	}

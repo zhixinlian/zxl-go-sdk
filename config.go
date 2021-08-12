@@ -19,4 +19,5 @@ var defConf = Config{
 	UserCert:       "/api/v1/spider/sdk/certificate?sdkVersion=go-v2.0.4",
 	ContentCapture: "/api/v1/spider/sdk/req/forward?sdkVersion=go-v2.0.4",
 	ReqFilePath:    "/api/v1/spider/sdk/req/file/forward?sdkVersion=go-v2.0.4",
+	DefaultHttpTimeout: 10,
 }

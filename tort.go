@@ -76,7 +76,7 @@ type commonResult struct {
 }
 
 
-func (zxl *zxlImpl) SubmitTortTask(tort Tort, timeout time.Duration) (TortResp, error) {
+func (zxl *ZxlImpl) SubmitTortTask(tort Tort, timeout time.Duration) (TortResp, error) {
 	var resp TortResp
 
 	if tort.Url == "" || tort.Title == "" || tort.EndDate == "" || tort.Type == 0 || tort.Source == 0 {
@@ -111,7 +111,7 @@ func (zxl *zxlImpl) SubmitTortTask(tort Tort, timeout time.Duration) (TortResp, 
 	return resp, nil
 }
 
-func (zxl *zxlImpl) QueryTortTaskResult(tortQuery TortQuery, timeout time.Duration) (TortQueryResp, error) {
+func (zxl *ZxlImpl) QueryTortTaskResult(tortQuery TortQuery, timeout time.Duration) (TortQueryResp, error) {
 	var resp TortQueryResp
 
 	url := QUERY_TORT_RESULT_URL + tortQuery.TaskId + fmt.Sprintf("?offset=%v&limit=%v", tortQuery.Offset, tortQuery.Limit)
