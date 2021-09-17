@@ -189,6 +189,7 @@ type TxRetCommonData struct {
 //定义tx接口返回结构体,最内层
 type TxRetDetail struct {
 	OrderNo    string `json:"orderNo"`
+	Msg    string `json:"msg"`
 	Status     int    `json:"status"`
 	StatusMsg  string `json:"statusMsg"`
 	Url        string `json:"url"`
