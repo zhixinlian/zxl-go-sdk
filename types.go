@@ -159,6 +159,7 @@ type EvIdData struct {
 	Status     int    `json:"status"`
 	EvidUrl    string `json:"evidUrl"`
 	VoucherUrl string `json:"voucherUrl"`
+	Duration       int    `json:"duration"`
 	RequestId  string
 }
 
@@ -196,6 +197,7 @@ type TxRetDetail struct {
 	Hash       string `json:"hash"`
 	EvIdUrl    string `json:"evidUrl"`
 	VoucherUrl string `json:"voucherUrl"`
+	Duration       int    `json:"duration"`
 }
 
 func (evData *EvSaveResult) GetEvId() string {
