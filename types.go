@@ -177,6 +177,7 @@ type EvIdDataZbl struct {
 	WebTitle    string `json:"webTitle"`
 	WebUrl      string `json:"webUrl"`
 	CreateTime  string `json:"createTime"`
+	Duration       int    `json:"duration"`
 	RequestId   string
 }
 
