@@ -64,7 +64,7 @@ type KvQueryResp struct {
 	RequestId  string `json:"requestId"`
 }
 
-func (zxl *zxlImpl) KvSave(req KvSaveReq, timeout time.Duration) (*KvSaveResp, error) {
+func (zxl *ZxlImpl) KvSave(req KvSaveReq, timeout time.Duration) (*KvSaveResp, error) {
 	resp := &KvSaveResp{}
 	url := defConf.ServerAddr + KvSaveUrl
 
@@ -125,7 +125,7 @@ func (zxl *zxlImpl) KvSave(req KvSaveReq, timeout time.Duration) (*KvSaveResp, e
 }
 
 
-func (zxl *zxlImpl) KvQuery(req KvQueryReq, timeout time.Duration) (*KvQueryResp, error) {
+func (zxl *ZxlImpl) KvQuery(req KvQueryReq, timeout time.Duration) (*KvQueryResp, error) {
 	resp := &KvQueryResp{}
 	url := defConf.ServerAddr + KvQueryUrl
 

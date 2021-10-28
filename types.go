@@ -20,21 +20,22 @@ type EvidenceData struct {
 }
 
 type Config struct {
-	ServerAddr      string `json:"serverAddr"`
-	EvidenceApply   string `json:"evidenceApply"`
-	EvidenceSubmit  string `json:"evidenceSubmit"`
-	EvidenceSave    string
-	QueryWithEvId   string `json:"queryWithEvId"`
-	QueryWithEvHash string `json:"queryWithEvHash"`
-	QueryWithTxHash string `json:"queryWithTxHash"`
-	UserCert        string `json:"userCert"`
-	QueryWithHash   string `json:"queryWithHash"`
-	ProxyHost       string
-	ProxyPort       string
-	IsProxy         bool
-	ServerCrtPath   string
-	ContentCapture  string `json:"contentCapture"`
-	ReqFilePath     string `json:"reqFilePath"`
+	ServerAddr         string `json:"serverAddr"`
+	EvidenceApply      string `json:"evidenceApply"`
+	EvidenceSubmit     string `json:"evidenceSubmit"`
+	EvidenceSave       string
+	QueryWithEvId      string `json:"queryWithEvId"`
+	QueryWithEvHash    string `json:"queryWithEvHash"`
+	QueryWithTxHash    string `json:"queryWithTxHash"`
+	UserCert           string `json:"userCert"`
+	QueryWithHash      string `json:"queryWithHash"`
+	ProxyHost          string
+	ProxyPort          string
+	IsProxy            bool
+	ServerCrtPath      string
+	ContentCapture     string `json:"contentCapture"`
+	ReqFilePath        string `json:"reqFilePath"`
+	DefaultHttpTimeout int
 }
 
 type CommonRet struct {
@@ -141,6 +142,7 @@ type EvObtainTask struct {
 	Title          string `json:"title"`
 	Remark         string `json:"remark"`
 	RepresentAppId string `json:"representAppId"`
+	Duration       int    `json:"duration"`
 }
 
 //任务Data
@@ -168,7 +170,7 @@ type EvIdDataZbl struct {
 	Evid        string `json:"evid"`
 	EvHash      string `json:"evHash"`
 	TxHash      string `json:"txHash"`
-	BlockHeight string    `json:"blockHeight"`
+	BlockHeight string `json:"blockHeight"`
 	StorageTime string `json:"storageTime"`
 	VoucherUrl  string `json:"voucherUrl"`
 	WebTitle    string `json:"webTitle"`

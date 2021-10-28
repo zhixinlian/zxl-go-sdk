@@ -7,59 +7,33 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 )
 
 const (
 	InvalidAppId   = "无效的appId"
 	InvalidAppKey  = "无效的appKey"
-	InvalidAppType = "无效的appType"
 	BadCipherKey   = "加密密码不能为空"
 	BadCipherData  = "加密内容不能为空"
 
-	TypeTengXun = 0
-	TypeWangAn  = 1
 )
 
-type zxlCipher interface {
-	//生成公私钥对
-	GenerateKeyPair() (pk string, sk string, err error)
-	//签名
-	Sign(sk string, rawData []byte) (string, error)
-	//验证签名
-	Verify(pk, signedStr string, rawData []byte) (bool, error)
-	//保存证据
-	EvidenceSave(evHash, extendInfo, sk, pk string, timeout time.Duration) (*EvSaveResult, error)
-	//计算文件hash
-	CalculateHash(path string) (string, error)
-	//计算字符串hash
-	CalculateStrHash(str string) (string, error)
-	//录屏任务
-	ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error)
-	//截屏任务
-	ContentCapturePic(webUrls string, timeout time.Duration) (string, error)
-	//获取录屏、截屏任务状态及结果
-	GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error)
-	//视频取证接口
-	EvidenceObtainVideo(webUrls, title, remark string, timeout time.Duration) (string, error)
-	//图片取证接口
-	EvidenceObtainPic(webUrls, title, remark string, timeout time.Duration) (string, error)
-	//获取取证证书任务状态及结果
-	GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error)
-	//代理商模式视频取证接口
-	RepresentEvidenceObtainVideo(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
-	//代理商模式图片取证接口
-	RepresentEvidenceObtainPic(webUrls, title, remark, representAppId string, timeout time.Duration) (string, error)
-	//代理商模式获取取证证书任务状态及结果
-	RepresentGetEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdData, error)
-	//中版链代理商模式获取取证证书任务状态及结果
-	RepresentZblGetEvidenceStatus(orderNo, representAppId string, timeout time.Duration) (*EvIdDataZbl, error)
+
+type ZxlConfig struct {
+	AppId      string
+	AppKey     string
+	ServerAddr string
+	IsProxy    bool
+	ProxyHost  string
+	ProxyPort  string
 }
 
-func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
+// Deprecated
+func NewZxlImpl(appId, appKey string) (*ZxlImpl, error) {
 	if len(appId) < 15 {
 		return nil, errors.New(InvalidAppId)
 	}
@@ -70,24 +44,43 @@ func NewZxlImpl(appId, appKey string) (*zxlImpl, error) {
 	if err != nil {
 		return nil, errors.New(InvalidAppId)
 	}
-	return &zxlImpl{appId: appId, appKey: appKey, appType: typeInt, zxlCipher: &cetcSDKImpl{AppId: appId, AppKey: appKey}}, nil
-	//if typeInt == TypeTengXun {
-	//	return &zxlImpl{appId: appId, appKey: appKey, appType:typeInt, zxlCipher: &trustSDKImpl{AppId:appId, AppKey:appKey}}, nil
-	//} else if typeInt == TypeWangAn {
-	//	return &zxlImpl{appId: appId, appKey: appKey, appType:typeInt, zxlCipher: &cetcSDKImpl{AppId:appId, AppKey:appKey}}, nil
-	//} else {
-	//	return nil, errors.New(InvalidAppType)
-	//}
+	return &ZxlImpl{
+		appId: appId,
+		appKey: appKey,
+		appType: typeInt}, nil
 }
 
-type ZxlConfig struct {
-	AppId      string
-	AppKey     string
-	ServerAddr string
+
+func CreateZxlClientWithConfig(config ZxlConfig)(*ZxlImpl, error) {
+	if len(config.AppId) < 15 {
+		return nil, errors.New(InvalidAppId)
+	}
+	if len(config.AppKey) == 0 {
+		return nil, errors.New(InvalidAppKey)
+	}
+	typeInt, err := strconv.Atoi(config.AppId[10:11])
+	if err != nil {
+		return nil, errors.New(InvalidAppId)
+	}
+	if config.ServerAddr != "" {
+		defConf.ServerAddr = config.ServerAddr
+	}
+	// 配置代理
+	if config.IsProxy == true {
+		defConf.IsProxy = config.IsProxy
+		defConf.ProxyHost = config.ProxyHost
+		defConf.ProxyPort = config.ProxyPort
+	}
+	return &ZxlImpl{
+		appId: config.AppId,
+		appKey: config.AppKey,
+		appType: typeInt,
+		}, nil
 }
 
-func NewZxlImplWithConfig(config ZxlConfig)(*zxlImpl, error)  {
 
+// Deprecated
+func NewZxlImplWithConfig(config ZxlConfig) (*ZxlImpl, error) {
 	if len(config.AppId) < 15 {
 		return nil, errors.New(InvalidAppId)
 	}
@@ -99,21 +92,21 @@ func NewZxlImplWithConfig(config ZxlConfig)(*zxlImpl, error)  {
 		return nil, errors.New(InvalidAppId)
 	}
 	defConf.ServerAddr = config.ServerAddr
-	return &zxlImpl{appId: config.AppId,
-		appKey: config.AppKey,
-		appType: typeInt,
-		zxlCipher: &cetcSDKImpl{AppId: config.AppId, AppKey: config.AppKey}}, nil
+	return &ZxlImpl{
+		appId: config.AppId,
+		appKey:    config.AppKey,
+		appType:   typeInt,
+		}, nil
 }
 
-type zxlImpl struct {
-	zxlCipher
+type ZxlImpl struct {
 	appKey  string
 	appId   string
 	appType int
 }
 
 //绑定用户证书
-func (zxl *zxlImpl) BindUserCert(pk, sk string, timeout time.Duration) error {
+func (zxl *ZxlImpl) BindUserCert(pk, sk string, timeout time.Duration) error {
 	rawData := strings.Join([]string{zxl.appId, pk}, ",")
 	signedStr, err := zxl.Sign(sk, []byte(rawData))
 	if err != nil {
@@ -126,19 +119,13 @@ func (zxl *zxlImpl) BindUserCert(pk, sk string, timeout time.Duration) error {
 	}
 	_, cri, err := sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.UserCert, dataBytes, timeout)
 	if err != nil {
-		return errors.New("BindUserCertError (sendRequest): " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return errors.New("BindUserCertError (sendRequest): " + err.Error() + ", requestId:" + cri.RequestId)
 	}
-
-	//var bindResp UserCertResp
-	//err = json.Unmarshal(respBytes, &bindResp)
-	//if err != nil {
-	//	return errors.New("BindUserCertError (Unmarshal): " + err.Error())
-	//}
 	return nil
 }
 
 //更新用户证书
-func (zxl *zxlImpl) UpdateUserCert(pk, sk string, timeout time.Duration) error {
+func (zxl *ZxlImpl) UpdateUserCert(pk, sk string, timeout time.Duration) error {
 	rawData := strings.Join([]string{zxl.appId, pk}, ",")
 	signedStr, err := zxl.Sign(sk, []byte(rawData))
 	if err != nil {
@@ -151,14 +138,14 @@ func (zxl *zxlImpl) UpdateUserCert(pk, sk string, timeout time.Duration) error {
 	}
 	_, cri, err := sendRequest(zxl.appId, zxl.appKey, "PUT", defConf.ServerAddr+defConf.UserCert, dataBytes, timeout)
 	if err != nil {
-		return errors.New("UpdateUserCert (sendRequest): " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return errors.New("UpdateUserCert (sendRequest): " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 
 	return nil
 }
 
 //加密信息
-func (zxl *zxlImpl) EncryptData(pwd string, rawData []byte) (string, error) {
+func (zxl *ZxlImpl) EncryptData(pwd string, rawData []byte) (string, error) {
 	if len(pwd) == 0 {
 		return "", errors.New(BadCipherKey)
 	}
@@ -179,7 +166,7 @@ func (zxl *zxlImpl) EncryptData(pwd string, rawData []byte) (string, error) {
 }
 
 //解密信息
-func (zxl *zxlImpl) DecryptData(pwd string, encryptedData string) ([]byte, error) {
+func (zxl *ZxlImpl) DecryptData(pwd string, encryptedData string) ([]byte, error) {
 	if len(pwd) == 0 {
 		return nil, errors.New(BadCipherKey)
 	}
@@ -201,13 +188,13 @@ func (zxl *zxlImpl) DecryptData(pwd string, encryptedData string) ([]byte, error
 }
 
 //通过证据id查找证据
-func (zxl *zxlImpl) QueryWithEvId(evId string, timeout time.Duration) ([]QueryResp, error) {
+func (zxl *ZxlImpl) QueryWithEvId(evId string, timeout time.Duration) ([]QueryResp, error) {
 	if len(evId) == 0 {
 		return nil, errors.New("evId 不能为空")
 	}
 	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithEvId+evId, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithEvId (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New("QueryWithEvId (sendRequest) error: " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
@@ -218,13 +205,13 @@ func (zxl *zxlImpl) QueryWithEvId(evId string, timeout time.Duration) ([]QueryRe
 }
 
 //通过交易id查找证据
-func (zxl *zxlImpl) QueryWithTxHash(txHash string, timeout time.Duration) ([]QueryResp, error) {
+func (zxl *ZxlImpl) QueryWithTxHash(txHash string, timeout time.Duration) ([]QueryResp, error) {
 	if len(txHash) == 0 {
 		return nil, errors.New("txHash 不能为空")
 	}
 	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithTxHash+txHash, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithTxHash (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New("QueryWithTxHash (sendRequest) error: " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
@@ -235,14 +222,14 @@ func (zxl *zxlImpl) QueryWithTxHash(txHash string, timeout time.Duration) ([]Que
 }
 
 //通过证据hash查找证据
-func (zxl *zxlImpl) QueryWithEvHash(evHash string, timeout time.Duration) ([]QueryResp, error) {
+func (zxl *ZxlImpl) QueryWithEvHash(evHash string, timeout time.Duration) ([]QueryResp, error) {
 
 	if len(evHash) == 0 {
 		return nil, errors.New("evHash 不能为空")
 	}
 	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithEvHash+evHash, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithEvHash (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New("QueryWithEvHash (sendRequest) error: " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)
@@ -253,14 +240,14 @@ func (zxl *zxlImpl) QueryWithEvHash(evHash string, timeout time.Duration) ([]Que
 }
 
 //任意输入查找证据
-func (zxl *zxlImpl) QueryWithHash(hash string, timeout time.Duration) ([]QueryResp, error) {
+func (zxl *ZxlImpl) QueryWithHash(hash string, timeout time.Duration) ([]QueryResp, error) {
 
 	if len(hash) == 0 {
 		return nil, errors.New("hash 不能为空")
 	}
 	respBytes, cri, err := sendRequest(zxl.appId, zxl.appKey, "GET", defConf.ServerAddr+defConf.QueryWithHash+hash, nil, timeout)
 	if err != nil {
-		return nil, errors.New("QueryWithHash (sendRequest) error: " + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, errors.New("QueryWithHash (sendRequest) error: " + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	var result []QueryResp
 	err = json.Unmarshal(respBytes, &result)

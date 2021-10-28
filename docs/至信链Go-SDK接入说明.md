@@ -12,6 +12,10 @@
 | 2021.01.28 | 新增代理商相关接口 | v2.0.4   |
 | 2021.02.09 | 增加个人用户及确权接口 | v2.1.3 |
 | 2021.05.12 | 接口优化            | v2.1.4 |
+| 2021.06.10 | 新增长视频录屏支持            | v2.1.4.4 |
+| 2021.10.25 | SDK 重构            | v2.3.0 |
+
+
 
 ### 阅读对象
 
@@ -38,7 +42,7 @@
 
 1. 进入到 go 根目录或者当前项目的 vendor 目录中的 github.com/zhixinlian目录下  
 2. 运行命令 git clone https://github.com/zhixinlian/zxl-go-sdk.git  
-3. 选择版本，tag：v2.1.3
+3. 选择版本，tag：v2.1.4
 
 ### 使用步骤
 1. 通过至信链线上首页注册账户并完成认证，获取生成的 APPID 与 APPKEY;
@@ -239,58 +243,6 @@ func main() {
 
 
 
-# 下发录屏/截屏任务
-
-## 下发录屏/截屏任务到取证工具服务
-
-* 方法原型
-
-  * ```
-    ContentCaptureVideo(webUrls string, timeout time.Duration) (string, error)
-    ```
-
-  * ```
-    ContentCapturePic(webUrls string, timeout time.Duration) (string, error)
-    ```
-
-* 参数说明
-
-  | 参数名  | 参数类型      | 默认值 | 参数描述      |
-  | ------- | ------------- | ------ | ------------- |
-  | webUrls | string        |        | 需要截屏的url |
-  | timeout | time.Duration |        | 超时时间      |
-
-* 返回值
-
-  具体的orderNo（任务单号）
-
-
-
-## 查询录屏/截屏任务状态及结果
-
-* 方法原型
-
-  * ```
-    GetContentStatus(orderNo string, timeout time.Duration) (*TaskEvData, error)
-    ```
-
-* 参数说明
-
-  | 参数名  | 参数类型      | 默认值 | 参数描述                          |
-  | ------- | ------------- | ------ | --------------------------------- |
-  | orderNo | string        |        | 截屏/录屏任务下发后返回的任务单号 |
-  | timeout | time.Duration |        | 超时时间                          |
-
-* 返回值
-
-  | 返回值类型 | 返回值描述                                                   |
-  | ---------- | ------------------------------------------------------------ |
-  | TaskEvData | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"statusMsg":"任务状态解读:[运行中]>>[运行成功]>>[运行失败]",<br />"url":"状态成功时,对应的cosurl",<br />"hash":"截图成功时,对应的存证hash"<br />} |
-
-
-
-
-
 # 视频/图片取证
 
 ## 取证服务
@@ -320,6 +272,34 @@ func main() {
 
   具体的orderNo（任务单号）
 
+
+* 方法原型
+  * ```
+    //长视频取证接口
+    NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration)
+    ```
+  
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+    | ------- | ------------ | ------ | --------- |
+  | obtainVideoOption | *ObtainVideoOption       |        | 视频取证的参数 |
+  | timeout | time.Duration |        | 超时时间  |
+  obtainVideoOption的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+      | ------- | ------------ | ------ | --------- |
+  | webUrls | string       |        | 取证的url |
+  | title   | string       |        | 标题      |
+  | remark  | string       |        | 描述      |
+  | duration | int |        | 录屏时间，单位:秒，不超过1小时|
+
+
+* 返回值
+
+  具体的orderNo（任务单号）
+
+
 ## 查询取证结果
 
 * 方法原型
@@ -340,9 +320,47 @@ func main() {
   | 返回值类型 | 返回值描述                                                   |
   | ---------- | ------------------------------------------------------------ |
   | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br />"voucherUrl":"成功状态下,取证证书下载地址"<br />} |
+
+* 示例
+  ```go
+      zxlsdk, err := zxl.NewZxlImpl(appId, appKey)
+      if err != nil {
+          panic(err)
+      }
   
-
-
+      obtainVideoOption := zxl.ObtainVideoOption{
+          Duration:       3600,
+          RepresentAppId: "",
+          Remark:         "测试视频",
+          Title:          "测试视频",
+          WebUrls:        "https://zhixinliantest-1302317679.cos.ap-guangzhou.myqcloud.com/20210611/video/2021-06-11_15-15-18_655459332949.mp4",
+      }
+      //长视频取证
+      orderNo, err := zxlsdk.NewEvidenceObtainVideo(&obtainVideoOption, 5*time.Second)
+  
+      if err != nil {
+          fmt.Println(err)
+          return
+      }
+      fmt.Printf("取证请求提交，订单号：%s\n", orderNo)
+  
+      evIdData := &zxl.EvIdData{}
+  
+      // 查询取证结果
+      for {
+          evIdData, err = zxlsdk.GetEvidenceStatus(orderNo, 0)
+          if err != nil {
+              panic(err)
+          }
+          fmt.Printf("evIdData is %v\n", evIdData)
+          if evIdData.Status != 0 {
+              break
+          }
+  
+          time.Sleep(1 * time.Second)
+  
+      }
+  ```
 
 # 侵权监控服务
 
@@ -382,6 +400,7 @@ Tort 结构如下:
   | 编码 | 常量           | 备注     |
   | ---- | -------------- | -------- |
   | 1    | MATERIAL_PHOTO | 图片类型 |
+  | 2    | MATERIAL_TEXT  | 文字类型 |
   | 3    | MATERIAL_VIDEO | 视频类型 |
 
   TortSource（数据来源）：
@@ -393,6 +412,7 @@ Tort 结构如下:
   | 21   | SHORT_VIDEO | 短视频监测，type为视频时可用 |
   | 22   | LONG_VIDEO  | 长对短监测:监测范围和短视频一样，type 为长视频时可用 |
   | 23   | LONG_TO_LONG_VIDEO  | 长对长监测:全网视频小网站，type为视频时可用 |
+  | 41   | NEWS_TEXT   | 新闻咨询类，监测范围全网   |
 
 * 返回数据（TortResp）
 
@@ -402,26 +422,25 @@ Tort 结构如下:
   | RequestId | string | 请求Id      |
 
 * 示例
-
-  ```go
-  zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
-  if err != nil {
-    fmt.Println("初始化 SDK 错误")
-    return
-  }
-  
-  tort := zxl_go_sdk.Tort{
-    Url: "https://inews.gtimg.com/newsapp_bt/0/5001rcns97nr04er/1000?appid=ee22ce76657290e1",
-    Title: "测试图片",
-    Keyword: "月亮;太空",
-    Type: constants.MATERIAL_PHOTO,
-    Source: constants.ANY_PIC,
-    StartDate: "2021-03-31",
-    EndDate: "2021-04-10",
-  }
-  
-  resp, err := zxlSDK.SubmitTortTask(tort, 5 * time.Second)
-  ```
+    ```go
+    zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
+    if err != nil {
+      fmt.Println("初始化 SDK 错误")
+      return
+    }
+    
+    tort := zxl_go_sdk.Tort{
+      Url: "https://inews.gtimg.com/newsapp_bt/0/5001rcns97nr04er/1000?appid=ee22ce76657290e1",
+      Title: "测试图片",
+      Keyword: "月亮;太空",
+      Type: constants.MATERIAL_PHOTO,
+      Source: constants.ANY_PIC,
+      StartDate: "2021-03-31",
+      EndDate: "2021-04-10",
+    }
+    
+    resp, err := zxlSDK.SubmitTortTask(tort, 5 * time.Second)
+    ```
 
 
 
@@ -454,6 +473,7 @@ TortQuery 结构如下：
   | --------- | ---------- | ------------ |
   | ClueList  | []ClueData | 侵权线索列表   |
   | Count     | int        | 监测线索总数量 |
+  | Status    | int        | 1：未开始，2：监测中 10: 已停止 |
   | RequestId | string     | 请求Id       |
 
 ClueData 结构如下：
@@ -607,7 +627,7 @@ ClueData 结构如下：
   | 16   | RIGHT_TYPE_COLLECTION   | 汇编权         |
   | 17   | RIGHT_TYPE_OTHER        | 其他权利       |
   | 18   | RIGHT_TYPE_ALL          | 所有           |
-  
+
   > 注意：当前只支持编号 18 的**所有**项，其他权利会在后续支持
   
   RighterType（权利人类型）：
@@ -1142,6 +1162,34 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
   | remark  | string       |        | 描述      |
   | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
   | timeout | time.Duration |        | 超时时间  |
+  
+* 返回值 
+
+  具体的orderNo（任务单号）
+
+
+* 方法原型
+  * ```
+    //长视频取证接口
+    NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption, timeout time.Duration)
+    ```
+
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+      | ------- | ------------ | ------ | --------- |
+  | obtainVideoOption | *ObtainVideoOption       |        | 视频取证的参数 |
+  | timeout | time.Duration |        | 超时时间  |
+  obtainVideoOption的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+        | ------- | ------------ | ------ | --------- |
+  | webUrls | string       |        | 取证的url |
+  | title   | string       |        | 标题      |
+  | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
+  | remark  | string       |        | 描述      |
+  | duration | int |        | 录屏时间，单位:秒，不超过1小时|
+
 
 * 返回值
 

@@ -97,7 +97,7 @@ type DciRighter struct {
 /**
 提交确权申请
  */
-func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClaimResp, error) {
+func (zxl *ZxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClaimResp, error) {
 	var resp DciClaimResp
 	if len(dci.AuthorList) > 5 {
 		return resp, errors.New("作者数量超限额错误")
@@ -189,7 +189,7 @@ func (zxl *zxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 /**
 查询确权结果
  */
-func (zxl *zxlImpl) QueryDciClaimResult(dciQuery DciClaimQuery, timeout time.Duration) (DciClaimQueryResp, error) {
+func (zxl *ZxlImpl) QueryDciClaimResult(dciQuery DciClaimQuery, timeout time.Duration) (DciClaimQueryResp, error) {
 	var resp DciClaimQueryResp
 
 	dciQuery.RequestType = "GET"
@@ -206,7 +206,7 @@ func (zxl *zxlImpl) QueryDciClaimResult(dciQuery DciClaimQuery, timeout time.Dur
 	return resp, nil
 }
 
-func (zxl *zxlImpl) checkDciAuthors(authors []DciAuthor) bool {
+func (zxl *ZxlImpl) checkDciAuthors(authors []DciAuthor) bool {
 	for _, author := range authors {
 		if author.AuthorType == "" || author.AuthorIdCard == "" || author.AuthorName == "" {
 			return false
@@ -215,7 +215,7 @@ func (zxl *zxlImpl) checkDciAuthors(authors []DciAuthor) bool {
 	return true
 }
 
-func (zxl *zxlImpl) getContent(url string) (string, error) {
+func (zxl *ZxlImpl) getContent(url string) (string, error) {
 	resp, err := http.Get(url)
 	defer resp.Body.Close()
 

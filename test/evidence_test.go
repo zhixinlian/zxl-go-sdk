@@ -3,10 +3,12 @@ package test
 import (
 	"encoding/hex"
 	"fmt"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"testing"
 	"time"
-	"github.com/zhixinlian/zxl-go-sdk"
+
+	zxl_go_sdk "github.com/zhixinlian/zxl-go-sdk"
+
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 )
 
 func TestCetc(t *testing.T) {
@@ -22,7 +24,7 @@ func TestCetc(t *testing.T) {
 	}
 	fmt.Println(result)
 	//根据orderNo查询取证任务状态及结果
-	result1, err := zxl.GetEvidenceStatus("",time.Second*2)
+	result1, err := zxl.GetEvidenceStatus("", time.Second*2)
 	if err != nil {
 		fmt.Println(err.Error())
 	}
@@ -196,3 +198,37 @@ func TestAgentUser(t *testing.T) {
 	}
 	fmt.Println(zxl.RepresentSave(evHash, "测试上链", "", "", 0))
 }
+
+//func TestContentCaptureVideoWithDuration(t *testing.T) {
+//	type fields struct {
+//		AppId  string
+//		AppKey string
+//	}
+//	type args struct {
+//		webUrls  string
+//		timeout  time.Duration
+//		duration int
+//	}
+//	tests := []struct {
+//		name    string
+//		fields  fields
+//		args    args
+//		want    string
+//		wantErr bool
+//	}{
+//		{name: "1", fields: fields{AppId: "", AppKey: ""}, args: args{webUrls: "", timeout: 10, duration: 500}, want: "", wantErr: true},
+//	}
+//	for _, tt := range tests {
+//		t.Run(tt.name, func(t *testing.T) {
+//			zxl, _ := zxl_go_sdk.NewZxlImpl("", "")
+//			got, err := zxl.ContentCaptureVideoWithDuration(tt.args.webUrls, tt.args.timeout, tt.args.duration)
+//			if (err != nil) != tt.wantErr {
+//				t.Errorf("ContentCaptureVideoWithDuration() error = %v, wantErr %v", err, tt.wantErr)
+//				return
+//			}
+//			if got != tt.want {
+//				t.Errorf("ContentCaptureVideoWithDuration() got = %v, want %v", got, tt.want)
+//			}
+//		})
+//	}
+//}
