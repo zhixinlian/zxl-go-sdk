@@ -238,6 +238,37 @@ func (sdk *ZxlImpl) evidenceObtainPic(webUrls, title, remark, representAppId str
 	return orderNo, nil
 }
 
+//云桌面取证接口
+func (sdk *ZxlImpl) EvidenceObtainCvd(title, remark string, timeout time.Duration) (*TxRetDetail, error) {
+	return sdk.NewEvidenceObtainCvd(&ObtainVideoOption{Title: title, Remark: remark, RepresentAppId: "",
+		Duration: DEFAULT_VIDEO_DURATION}, timeout)
+}
+
+//代理用户云桌面取证接口
+func (sdk *ZxlImpl) RepresentEvidenceObtainCvd(title, remark, representAppId string,
+	timeout time.Duration) (*TxRetDetail, error) {
+	return sdk.NewEvidenceObtainCvd(&ObtainVideoOption{Title: title, Remark: remark,
+		RepresentAppId: representAppId, Duration: DEFAULT_VIDEO_DURATION}, timeout)
+}
+
+func (sdk *ZxlImpl) NewEvidenceObtainCvd(obtainVideoOption *ObtainVideoOption, timeout time.Duration) (*TxRetDetail,
+	error) {
+	if len(obtainVideoOption.Title) == 0 {
+		return nil, errors.New("title 不能为空")
+	}
+	param := EvObtainTask{AppId: sdk.appId, Title: obtainVideoOption.Title, Type: 4,
+		RepresentAppId: obtainVideoOption.RepresentAppId, Remark: obtainVideoOption.Remark, RequestType: "POST",
+		RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/cvdobtain"}
+	paramBytes, _ := json.Marshal(&param)
+	sendRetBytes, cri, err := sendTxMidRequest(sdk.appId, sdk.appKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	if err != nil {
+		return nil, errors.New(err.Error() + ", requestId:" + cri.RequestId)
+	}
+	var txRetDetail TxRetDetail
+	json.Unmarshal(sendRetBytes, &txRetDetail)
+	return &txRetDetail, nil
+}
+
 func (sdk *ZxlImpl) GetEvidenceStatus(orderNo string, timeout time.Duration) (*EvIdData, error) {
 	return sdk.getEvidenceStatus(orderNo, "", timeout)
 }
@@ -276,6 +307,7 @@ func (sdk *ZxlImpl) getEvidenceStatus(orderNo, representAppId string, timeout ti
 		EvidUrl:    txRetDetail.EvIdUrl,
 		VoucherUrl: txRetDetail.VoucherUrl,
 		RequestId:  cri.RequestId,
+		Duration:   txRetDetail.Duration,
 	}
 	return &evIdData, nil
 }

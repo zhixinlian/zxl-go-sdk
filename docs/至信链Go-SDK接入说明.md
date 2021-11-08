@@ -14,6 +14,7 @@
 | 2021.05.12 | 接口优化            | v2.1.4 |
 | 2021.06.10 | 新增长视频录屏支持            | v2.1.4.4 |
 | 2021.10.25 | SDK 重构            | v2.3.0 |
+| 2021.11.03 | 支持云桌面取证            | v2.3.2 |
 
 
 
@@ -243,9 +244,9 @@ func main() {
 
 
 
-# 视频/图片取证
+# 视频/图片/云桌面取证
 
-## 取证服务
+## 视频/图片取证服务
 
 * 方法原型
 
@@ -299,6 +300,59 @@ func main() {
 
   具体的orderNo（任务单号）
 
+## 云桌面取证服务
+* 方法原型
+
+  * ```
+    //云桌面取证
+    EvidenceObtainCvd(title, remark, timeout time.Duration) (*TxRetDetail, error)
+    ```
+
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+    | ------- | ------------ | ------ | --------- |
+  | title   | string       |        | 标题      |
+  | remark  | string       |        | 描述      |
+  | timeout | time.Duration |        | 超时时间  |
+
+* 返回值
+    TxRetDetail的结构体如下
+
+    | 参数名  | 参数类型     | 默认值 | 参数描述  |
+    | ------- | ------------ | ------ | --------- |
+    | orderNo | string       |        | 任务单号 |
+    | msg   | string       |        | 云桌面调起登录信息      |
+
+* 方法原型
+
+  * ```
+    //云桌面取证接口
+    NewEvidenceObtainCvd(obtainVideoOption *ObtainVideoOption, timeout time.Duration)
+    ```
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+        | ------- | ------------ | ------ | --------- |
+  | obtainVideoOption | *ObtainVideoOption       |        | 取证参数 |
+  | timeout | time.Duration |        | 超时时间  |
+  obtainVideoOption的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+          | ------- | ------------ | ------ | --------- |
+  | title   | string       |        | 标题      |
+  | remark  | string       |        | 描述      |
+
+
+* 返回值
+
+  TxRetDetail的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+      | ------- | ------------ | ------ | --------- |
+  | orderNo | string       |        | 任务单号 |
+  | msg   | string       |        | 云桌面调起登录信息      |
+
 
 ## 查询取证结果
 
@@ -319,7 +373,7 @@ func main() {
 
   | 返回值类型 | 返回值描述                                                   |
   | ---------- | ------------------------------------------------------------ |
-  | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br />"voucherUrl":"成功状态下,取证证书下载地址"<br />} |
+  | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br  />"voucherUrl":"成功状态下,取证证书下载地址",<br />"duration":"成功状态下,云桌面取证证据时长"<br />} |
 
 * 示例
   ```go
@@ -1137,9 +1191,9 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
   | CreateTime  | string | 创建时间 |
   | Ext         | string | 扩展信息 |
 
-# 代理商模式下视频/图片取证
+# 代理商模式下视频/图片/云桌面取证
 
-## 代理商取证服务
+## 代理商视频/图片取证服务
 
 * 方法原型
 
@@ -1195,6 +1249,64 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
 
   具体的orderNo（任务单号）
 
+## 代理商云桌面取证服务
+
+* 方法原型
+
+  * ```
+    //云桌面取证接口
+    RepresentEvidenceObtainCvd(webUrls, title, remark, representAppId string, timeout time.Duration) (*TxRetDetail, error)
+    ```
+
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+    | ------- | ------------ | ------ | --------- |
+  | title   | string       |        | 标题      |
+  | remark  | string       |        | 描述      |
+  | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
+  | timeout | time.Duration |        | 超时时间  |
+
+* 返回值
+
+  TxRetDetail的结构体如下
+  
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+        | ------- | ------------ | ------ | --------- |
+  | orderNo | string       |        | 任务单号 |
+  | msg   | string       |        | 云桌面调起登录信息      |
+
+* 方法原型
+  * ```
+    //云桌面取证接口
+    NewEvidenceObtainCvd(obtainVideoOption *ObtainVideoOption, timeout time.Duration)
+    ```
+
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+        | ------- | ------------ | ------ | --------- |
+  | obtainVideoOption | *ObtainVideoOption       |        | 视频取证的参数 |
+  | timeout | time.Duration |        | 超时时间  |
+  obtainVideoOption的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+          | ------- | ------------ | ------ | --------- |
+  | title   | string       |        | 标题      |
+  | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
+  | remark  | string       |        | 描述      |
+
+
+* 返回值
+
+  TxRetDetail的结构体如下
+  
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+          | ------- | ------------ | ------ | --------- |
+  | orderNo | string       |        | 任务单号 |
+  | msg   | string       |        | 云桌面调起登录信息      |
+
+
 ## 代理商查询取证结果
 
 * 方法原型
@@ -1215,7 +1327,7 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
 
   | 返回值类型 | 返回值描述                                                   |
   | ---------- | ------------------------------------------------------------ |
-  | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br />"voucherUrl":"成功状态下,取证证书下载地址"<br />} |
-  
+  | EvIdData   | {<br />"status":"当前任务状态[0:执行中>>2成功>>10失败]",<br />"evidUrl":"成功状态下,取证证据下载地址",<br  />"voucherUrl":"成功状态下,取证证书下载地址",<br />"duration":"成功状态下,云桌面取证证据时长"<br />} |
+ 
 
 

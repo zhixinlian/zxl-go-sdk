@@ -159,6 +159,7 @@ type EvIdData struct {
 	Status     int    `json:"status"`
 	EvidUrl    string `json:"evidUrl"`
 	VoucherUrl string `json:"voucherUrl"`
+	Duration       int    `json:"duration"`
 	RequestId  string
 }
 
@@ -176,6 +177,7 @@ type EvIdDataZbl struct {
 	WebTitle    string `json:"webTitle"`
 	WebUrl      string `json:"webUrl"`
 	CreateTime  string `json:"createTime"`
+	Duration       int    `json:"duration"`
 	RequestId   string
 }
 
@@ -189,12 +191,14 @@ type TxRetCommonData struct {
 //定义tx接口返回结构体,最内层
 type TxRetDetail struct {
 	OrderNo    string `json:"orderNo"`
+	Msg    string `json:"msg"`
 	Status     int    `json:"status"`
 	StatusMsg  string `json:"statusMsg"`
 	Url        string `json:"url"`
 	Hash       string `json:"hash"`
 	EvIdUrl    string `json:"evidUrl"`
 	VoucherUrl string `json:"voucherUrl"`
+	Duration       int    `json:"duration"`
 }
 
 func (evData *EvSaveResult) GetEvId() string {
