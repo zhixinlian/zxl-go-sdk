@@ -15,6 +15,7 @@
 | 2021.06.10 | 新增长视频录屏支持            | v2.1.4.4 |
 | 2021.10.25 | SDK 重构            | v2.3.0 |
 | 2021.11.03 | 支持云桌面取证            | v2.3.2 |
+| 2021.12.10 | go module 升级到 v2      | v2.3.3 |
 
 
 
@@ -41,9 +42,11 @@
 
 ## 获取 SDK
 
-1. 进入到 go 根目录或者当前项目的 vendor 目录中的 github.com/zhixinlian目录下  
-2. 运行命令 git clone https://github.com/zhixinlian/zxl-go-sdk.git  
-3. 选择版本，tag：v2.3.0
+
+```shell
+$ go get -u github.com/zhixinlian/zxl-go-sdk/v2@v2.3.3  
+```
+
 
 ### 使用步骤
 1. 通过至信链线上首页注册账户并完成认证，获取生成的 APPID 与 APPKEY;
