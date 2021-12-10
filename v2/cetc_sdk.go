@@ -9,8 +9,8 @@ import (
 	"strings"
 	"time"
 
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm2"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm2"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm3"
 )
 
 const DEFAULT_VIDEO_DURATION = 300 // 默认录屏时长5分钟
