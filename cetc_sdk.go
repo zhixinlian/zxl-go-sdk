@@ -303,12 +303,15 @@ func (sdk *ZxlImpl) getEvidenceStatus(orderNo, representAppId string, timeout ti
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
 	var evIdData = EvIdData{
-		Status:     txRetDetail.Status,
-		EvidUrl:    txRetDetail.EvIdUrl,
-		VoucherUrl: txRetDetail.VoucherUrl,
-		WebTitle:   txRetDetail.WebTitle,
-		RequestId:  cri.RequestId,
-		Duration:   txRetDetail.Duration,
+		Status:      txRetDetail.Status,
+		EvidUrl:     txRetDetail.EvIdUrl,
+		VoucherUrl:  txRetDetail.VoucherUrl,
+		AbnormalTag: 0,
+		RequestId:   cri.RequestId,
+		Duration:    txRetDetail.Duration,
+	}
+	if txRetDetail.WebTitle != "" && strings.HasPrefix(txRetDetail.WebTitle, "【异常】") {
+		evIdData.AbnormalTag = 1
 	}
 	return &evIdData, nil
 }

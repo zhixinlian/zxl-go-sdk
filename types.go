@@ -156,12 +156,12 @@ type TaskEvData struct {
 
 //证书状态及结果
 type EvIdData struct {
-	Status     int    `json:"status"`
-	EvidUrl    string `json:"evidUrl"`
-	VoucherUrl string `json:"voucherUrl"`
-	WebTitle   string `json:"webTitle"`
-	Duration   int    `json:"duration"`
-	RequestId  string
+	Status      int    `json:"status"`
+	EvidUrl     string `json:"evidUrl"`
+	VoucherUrl  string `json:"voucherUrl"`
+	AbnormalTag int    `json:"abnormalTag"`
+	Duration    int    `json:"duration"`
+	RequestId   string
 }
 
 //中版链证书状态及结果
