@@ -310,6 +310,7 @@ func (sdk *ZxlImpl) getEvidenceStatus(orderNo, representAppId string, timeout ti
 		RequestId:   cri.RequestId,
 		Duration:    txRetDetail.Duration,
 	}
+	// 单独处理异常情况
 	if txRetDetail.WebTitle != "" && strings.HasPrefix(txRetDetail.WebTitle, "【异常】") {
 		evIdData.AbnormalTag = 1
 	}
