@@ -306,6 +306,7 @@ func (sdk *ZxlImpl) getEvidenceStatus(orderNo, representAppId string, timeout ti
 		Status:     txRetDetail.Status,
 		EvidUrl:    txRetDetail.EvIdUrl,
 		VoucherUrl: txRetDetail.VoucherUrl,
+		WebTitle:   txRetDetail.WebTitle,
 		RequestId:  cri.RequestId,
 		Duration:   txRetDetail.Duration,
 	}
