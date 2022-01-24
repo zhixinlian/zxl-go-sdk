@@ -5,12 +5,11 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm2"
+	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"io/ioutil"
 	"strings"
 	"time"
-
-	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm2"
-	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm3"
 )
 
 const DEFAULT_VIDEO_DURATION = 300 // 默认录屏时长5分钟
@@ -303,11 +302,16 @@ func (sdk *ZxlImpl) getEvidenceStatus(orderNo, representAppId string, timeout ti
 	var txRetDetail TxRetDetail
 	json.Unmarshal(sendRetBytes, &txRetDetail)
 	var evIdData = EvIdData{
-		Status:     txRetDetail.Status,
-		EvidUrl:    txRetDetail.EvIdUrl,
-		VoucherUrl: txRetDetail.VoucherUrl,
-		RequestId:  cri.RequestId,
-		Duration:   txRetDetail.Duration,
+		Status:      txRetDetail.Status,
+		EvidUrl:     txRetDetail.EvIdUrl,
+		VoucherUrl:  txRetDetail.VoucherUrl,
+		AbnormalTag: 0,
+		RequestId:   cri.RequestId,
+		Duration:    txRetDetail.Duration,
+	}
+	// 单独处理异常情况
+	if txRetDetail.WebTitle != "" && strings.HasPrefix(txRetDetail.WebTitle, "【异常】") {
+		evIdData.AbnormalTag = 1
 	}
 	return &evIdData, nil
 }

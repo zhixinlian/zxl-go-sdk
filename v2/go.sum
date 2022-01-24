@@ -153,6 +153,8 @@ github.com/stretchr/testify v1.7.0 h1:nwc3DEeHmmLAfoZucVR881uASk0Mfjw8xYJ99tb5Cc
 github.com/stretchr/testify v1.7.0/go.mod h1:6Fq8oRcR53rry900zMqJjRRixrwX3KX962/h/Wwjteg=
 github.com/tebeka/strftime v0.1.5 h1:1NQKN1NiQgkqd/2moD6ySP/5CoZQsKa1d3ZhJ44Jpmg=
 github.com/tebeka/strftime v0.1.5/go.mod h1:29/OidkoWHdEKZqzyDLUyC+LmgDgdHo4WAFCDT7D/Ig=
+github.com/zhixinlian/zxl-go-sdk v2.1.5+incompatible h1:qVMhcu38jamCSyxD1cpBLEdf3JSWJIIw2Ti6e5Bh6TY=
+github.com/zhixinlian/zxl-go-sdk v2.1.5+incompatible/go.mod h1:M0ElKsROoW0d/ZCoHDEfB6/duCyTCBeRGd5oirtwHrI=
 golang.org/x/arch v0.0.0-20171004143515-077ac972c2e4/go.mod h1:cYlCBUl1MsqxdiKgmc4uh7TxZfWSFLOGSRR090WDxt8=
 golang.org/x/crypto v0.0.0-20170930174604-9419663f5a44/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
 golang.org/x/crypto v0.0.0-20180614174826-fd5f17ee7299/go.mod h1:6SG95UA2DQfeDnfUPMdvaQW0Q7yPrPDi9nlGo2tz2b4=
