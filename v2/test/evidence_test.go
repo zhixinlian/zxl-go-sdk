@@ -6,9 +6,9 @@ import (
 	"testing"
 	"time"
 
-	zxl_go_sdk "github.com/zhixinlian/zxl-go-sdk"
+	zxl_go_sdk "github.com/zhixinlian/zxl-go-sdk/v2"
 
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm3"
 )
 
 func TestCetc(t *testing.T) {

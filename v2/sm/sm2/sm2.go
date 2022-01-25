@@ -11,7 +11,7 @@ import (
 	"encoding/asn1"
 	"encoding/hex"
 	"errors"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm3"
 	"io"
 	"math/big"
 )

@@ -2,7 +2,7 @@ package demo
 
 import (
 	"fmt"
-	zxl "github.com/zhixinlian/zxl-go-sdk"
+	zxl "github.com/zhixinlian/zxl-go-sdk/v2"
 )
 
 func main() {
