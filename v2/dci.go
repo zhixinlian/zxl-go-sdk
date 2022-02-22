@@ -21,6 +21,8 @@ const(
 	QUERY_DCI_RESULT = "sdk/zhixin-api/dci/get_dci_claim_result"
 )
 
+const MaxAuthorNum = 10
+
 /**
 确权相关接口
 */
@@ -99,7 +101,7 @@ type DciRighter struct {
  */
 func (zxl *ZxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClaimResp, error) {
 	var resp DciClaimResp
-	if len(dci.AuthorList) > 5 {
+	if len(dci.AuthorList) > MaxAuthorNum {
 		return resp, errors.New("作者数量超限额错误")
 	}
 
