@@ -9,10 +9,10 @@ import (
 	"bytes"
 	"crypto/elliptic"
 	"encoding/asn1"
-	"errors"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
 	"io"
 	"math"
+	"errors"
+	"github.com/flyinox/crypto/sm/sm3"
 	"math/big"
 )
 

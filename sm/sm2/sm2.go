@@ -11,7 +11,7 @@ import (
 	"encoding/asn1"
 	"encoding/hex"
 	"errors"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm3"
 	"io"
 	"math/big"
 )
@@ -32,6 +32,11 @@ type sm2Signature struct {
 
 var generateRandK  = _generateRandK
 
+// combinedMult implements fast multiplication S1*g + S2*p (g - generator, p - arbitrary point)
+type combinedMult interface {
+	CombinedMult(bigX, bigY *big.Int, baseScalar, scalar []byte) (x, y *big.Int)
+}
+
 // The SM2's private key contains the public key
 func (priv *PrivateKey) Public() crypto.PublicKey {
 	return &priv.PublicKey
@@ -45,13 +50,13 @@ func (priv *PrivateKey) Sign(rand io.Reader, msg []byte, opts crypto.SignerOpts)
 	return asn1.Marshal(sm2Signature{r, s})
 }
 
-func (pub *PublicKey) Verify(msg []byte, sign []byte) (bool, error) {
+func (pub *PublicKey) Verify(msg []byte, sign []byte) bool {
 	var sm2Sign sm2Signature
 	_, err := asn1.Unmarshal(sign, &sm2Sign)
 	if err != nil {
-		return false, err
+		return false
 	}
-	return Verify(pub, msg, sm2Sign.R, sm2Sign.S), nil
+	return Verify(pub, msg, sm2Sign.R, sm2Sign.S)
 }
 
 var one = new(big.Int).SetInt64(1)
@@ -119,6 +124,7 @@ func DecodePrivKey(base64String string) (*PrivateKey, error){
 	return priv, nil
 }
 
+
 var errZeroParam = errors.New("zero parameter")
 
 func _generateRandK(rand io.Reader, c elliptic.Curve) (k *big.Int) {
@@ -135,15 +141,16 @@ func _generateRandK(rand io.Reader, c elliptic.Curve) (k *big.Int) {
 	return
 }
 
-var zeroByteSlice = []byte{
-	0,0,0,0,
-	0,0,0,0,
-	0,0,0,0,
-	0,0,0,0,
-	0,0,0,0,
-	0,0,0,0,
-	0,0,0,0,
-	0,0,0,0,
+func zeroByteSlice() []byte{
+	return []byte{0,0,0,0,
+		0,0,0,0,
+		0,0,0,0,
+		0,0,0,0,
+		0,0,0,0,
+		0,0,0,0,
+		0,0,0,0,
+		0,0,0,0,
+	}
 }
 
 //公钥坐标（横坐标）长度小于32字节时，在前面补0
@@ -156,11 +163,11 @@ func getZById(pub *PublicKey, id []byte) []byte{
 	xBuf := pub.X.Bytes()
 	yBuf := pub.Y.Bytes()
 	if n := len(xBuf); n < 32 {
-		xBuf = append(zeroByteSlice[:32-n], xBuf...)
+		xBuf = append(zeroByteSlice()[:32-n], xBuf...)
 	}
 
 	if n := len(yBuf); n < 32 {
-		yBuf = append(zeroByteSlice[:32-n], yBuf...)
+		yBuf = append(zeroByteSlice()[:32-n], yBuf...)
 	}
 
 	z = append(z, ENTLa...)
@@ -173,7 +180,6 @@ func getZById(pub *PublicKey, id []byte) []byte{
 	z = append(z, yBuf...)
 	return sm3.SumSM3(z)
 }
-
 //Za = sm3(ENTL||IDa||a||b||Gx||Gy||Xa||Xy)
 func getZ(pub *PublicKey) []byte {
 	return getZById(pub, []byte("1234567812345678"))
@@ -262,9 +268,21 @@ func Verify(pub *PublicKey, msg []byte, r, s *big.Int) bool {
 	e := new(big.Int).SetBytes(sm3.SumSM3(m))
 
 	t := new(big.Int).Add(r, s)
-	x11, y11 := pub.Curve.ScalarMult(pub.X, pub.Y, t.Bytes())
-	x12, y12 := pub.Curve.ScalarBaseMult(s.Bytes())
-	x1, _ := pub.Curve.Add(x11, y11, x12, y12)
+	//x11, y11 := pub.Curve.ScalarMult(pub.X, pub.Y, t.Bytes())
+	//x12, y12 := pub.Curve.ScalarBaseMult(s.Bytes())
+	//x1, _ := pub.Curve.Add(x11, y11, x12, y12)
+
+	// Check if implements S1*g + S2*p
+	//Using fast multiplication CombinedMult.
+	var x1 *big.Int
+	if opt,ok := c.(combinedMult);ok {
+		x1,_ = opt.CombinedMult(pub.X, pub.Y,s.Bytes(),t.Bytes())
+	} else {
+		x11, y11 := c.ScalarMult(pub.X, pub.Y, t.Bytes())
+		x12, y12 := c.ScalarBaseMult(s.Bytes())
+		x1, _ = c.Add(x11, y11, x12, y12)
+	}
+
 	x := new(big.Int).Add(e, x1)
 	x = x.Mod(x, n)
 

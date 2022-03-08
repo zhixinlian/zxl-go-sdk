@@ -21,9 +21,10 @@ import (
 	"sync"
 )
 
-type p256Curve struct {
-		*elliptic.CurveParams
-}
+
+//type p256Curve struct {
+//		*elliptic.CurveParams
+//}
 
 var p256Sm2Params *elliptic.CurveParams
 var p256sm2Curve p256Curve
@@ -47,7 +48,12 @@ func initP256Sm2() {
 	p256sm2Curve = p256Curve{p256Sm2Params}
 }
 
+func initAll() {
+	initP256()
+	initP256Sm2()
+}
+
 func P256Sm2() elliptic.Curve {
-	initonce.Do(initP256Sm2)
+	initonce.Do(initAll)
 	return p256sm2Curve
 }
