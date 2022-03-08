@@ -11,7 +11,7 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"fmt"
-	"github.com/flyinox/crypto/sm/sm3"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm3"
 	"github.com/stretchr/testify/assert"
 	"io"
 	"math/big"

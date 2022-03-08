@@ -12,7 +12,7 @@ import (
 	"io"
 	"math"
 	"errors"
-	"github.com/flyinox/crypto/sm/sm3"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm3"
 	"math/big"
 )
 
