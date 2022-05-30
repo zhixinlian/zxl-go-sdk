@@ -45,7 +45,7 @@ func (sdk *ZxlImpl) Verify(pubKey string, sign string, data []byte) (bool, error
 	if err != nil {
 		return false, errors.New("Verify (DecodePubKey) error ")
 	}
-	return pk.Verify(data, signBytes)
+	return pk.Verify(data, signBytes), nil
 }
 
 func (sdk *ZxlImpl) EvidenceSave(evHash, extendInfo, sk, pk string, timeout time.Duration) (*EvSaveResult, error) {
