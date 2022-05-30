@@ -307,6 +307,11 @@ func (sdk *ZxlImpl) getEvidenceStatus(orderNo, representAppId string, timeout ti
 		VoucherUrl:  txRetDetail.VoucherUrl,
 		AbnormalTag: 0,
 		RequestId:   cri.RequestId,
+		Evid:        txRetDetail.Evid,
+		EvHash:      txRetDetail.EvHash,
+		TxHash:      txRetDetail.TxHash,
+		BlockHeight: txRetDetail.BlockHeight,
+		StorageTime: txRetDetail.StorageTime,
 		Duration:    txRetDetail.Duration,
 	}
 	// 单独处理异常情况

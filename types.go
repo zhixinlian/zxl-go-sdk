@@ -161,6 +161,11 @@ type EvIdData struct {
 	VoucherUrl  string `json:"voucherUrl"`
 	AbnormalTag int    `json:"abnormalTag"`
 	Duration    int    `json:"duration"`
+	Evid        string `json:"evid"`
+	EvHash      string `json:"evHash"`
+	TxHash      string `json:"txHash"`
+	BlockHeight string `json:"blockHeight"`
+	StorageTime string `json:"storageTime"`
 	RequestId   string
 }
 
@@ -191,16 +196,21 @@ type TxRetCommonData struct {
 
 //定义tx接口返回结构体,最内层
 type TxRetDetail struct {
-	OrderNo    string `json:"orderNo"`
-	Msg        string `json:"msg"`
-	Status     int    `json:"status"`
-	StatusMsg  string `json:"statusMsg"`
-	Url        string `json:"url"`
-	Hash       string `json:"hash"`
-	EvIdUrl    string `json:"evidUrl"`
-	VoucherUrl string `json:"voucherUrl"`
-	WebTitle   string `json:"webTitle"`
-	Duration   int    `json:"duration"`
+	OrderNo     string `json:"orderNo"`
+	Msg         string `json:"msg"`
+	Status      int    `json:"status"`
+	StatusMsg   string `json:"statusMsg"`
+	Url         string `json:"url"`
+	Hash        string `json:"hash"`
+	EvIdUrl     string `json:"evidUrl"`
+	VoucherUrl  string `json:"voucherUrl"`
+	WebTitle    string `json:"webTitle"`
+	Duration    int    `json:"duration"`
+	Evid        string `json:"evid"`
+	EvHash      string `json:"evHash"`
+	TxHash      string `json:"txHash"`
+	BlockHeight string `json:"blockHeight"`
+	StorageTime string `json:"storageTime"`
 }
 
 func (evData *EvSaveResult) GetEvId() string {
