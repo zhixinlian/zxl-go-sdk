@@ -1,68 +1,80 @@
 package test
 
 import (
+	"crypto/rand"
+	"encoding/hex"
+	"encoding/json"
+	"errors"
 	"fmt"
-	"testing"
-	"time"
 	zxl_go_sdk "github.com/zhixinlian/zxl-go-sdk/v2"
 	"github.com/zhixinlian/zxl-go-sdk/v2/constants"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm2"
+	"strings"
+	"testing"
+	"time"
 )
 
-
+func Sign(prvKey string, data []byte) (string, error) {
+	sk, err := sm2.DecodePrivKey(prvKey)
+	if err != nil {
+		return "", errors.New("Sign (DecodePriKey) error ")
+	}
+	signBytes, err := sk.Sign(rand.Reader, data, nil)
+	if err != nil {
+		return "", errors.New("Sign (Sign) error ")
+	}
+	return hex.EncodeToString(signBytes), nil
+}
 func TestDciClaim(t *testing.T) {
 
-	appId = ""
-	appKey = ""
-	pk = ""
-	sk = ""
-
-	zxlSDK, err := zxl_go_sdk.NewZxlImpl(appId, appKey)
-	if err != nil {
-		fmt.Println("初始化 SDK 错误")
-	}
-
 	righter := zxl_go_sdk.DciRighter{
-		RighterName: "",
-		RighterIdCard: "",
-		RighterEmail: "",
+		RighterName:      "",
+		RighterIdCard:    "",
+		RighterEmail:     "",
 		RighterGainedWay: constants.GAINED_WAY_ORIGINAL,
-		RighterSk: sk,
-		RighterType: constants.RIGHTER_TYPE_LEGAL,
+		RighterSk:        sk,
+		RighterType:      constants.RIGHTER_TYPE_LEGAL,
 	}
 
 	right := zxl_go_sdk.DciRight{
-		Type: constants.RIGHT_TYPE_ALL,
+		Type:            constants.RIGHT_TYPE_ALL,
 		RighterInfoList: []zxl_go_sdk.DciRighter{righter},
 	}
 
 	author := zxl_go_sdk.DciAuthor{
-		AuthorName: "",
+		AuthorName:   "",
 		AuthorIdCard: "",
-		AuthorType: constants.AUTHOR_TYPE_LEGAL,
+		AuthorType:   constants.AUTHOR_TYPE_LEGAL,
 	}
 
-	dciClaim := zxl_go_sdk.DciClaim{
-		DciName: "图片作品1",
-		DciUrl: "https://sports.sina.com.cn/basketball/nba/2021-02-19/doc-ikftssap7045257.shtml",
-		ProposerEmail: "",
-		ProposerSk: "",
-		DciType: constants.DCI_TYPE_FILMING,
+	dci := zxl_go_sdk.DciClaim{
+		DciName:           "图片作品1",
+		DciUrl:            "https://sports.sina.com.cn/basketball/nba/2021-02-19/doc-ikftssap7045257.shtml",
+		ProposerEmail:     "",
+		ProposerSk:        "",
+		DciType:           constants.DCI_TYPE_FILMING,
 		DciCreateProperty: constants.DCI_CREATE_PROPERTY_ADAPT,
-		RightInfoList: []zxl_go_sdk.DciRight{right},
-		AuthorList: []zxl_go_sdk.DciAuthor{author},
+		RightInfoList:     []zxl_go_sdk.DciRight{right},
+		AuthorList:        []zxl_go_sdk.DciAuthor{author},
 	}
-	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10 * time.Second)
+	authorJson, _ := json.Marshal(dci.AuthorList)
 
-	if err != nil {
-		fmt.Printf("提交确权请求出错 %+v", err)
-		return
-	}
+	signStr := strings.Join([]string{dci.ProposerEmail,
+		dci.DciName,
+		string(dci.DciType),
+		string(dci.DciCreateProperty),
+		dci.DciUrl,
+		dci.DciHash,
+		string(authorJson)}, "_")
 
-	fmt.Printf("确权结果为 %+v", resp)
+	signature, _ := Sign(dci.ProposerSk, []byte(signStr))
+	fmt.Println(signature)
+
+	//if err != nil {
+	//	return resp, nil
+	//}
+	//fmt.Printf("确权结果为 %+v", resp)
 }
-
-
-
 
 func TestDciClaimTwoAuthor(t *testing.T) {
 
@@ -77,42 +89,42 @@ func TestDciClaimTwoAuthor(t *testing.T) {
 	}
 
 	righter := zxl_go_sdk.DciRighter{
-		RighterName: "",
-		RighterIdCard: "",
-		RighterEmail: "",
+		RighterName:      "",
+		RighterIdCard:    "",
+		RighterEmail:     "",
 		RighterGainedWay: constants.GAINED_WAY_ORIGINAL,
-		RighterSk: sk,
-		RighterType: constants.RIGHTER_TYPE_LEGAL,
+		RighterSk:        sk,
+		RighterType:      constants.RIGHTER_TYPE_LEGAL,
 	}
 
 	right := zxl_go_sdk.DciRight{
-		Type: constants.RIGHT_TYPE_ALL,
+		Type:            constants.RIGHT_TYPE_ALL,
 		RighterInfoList: []zxl_go_sdk.DciRighter{righter},
 	}
 
 	author := zxl_go_sdk.DciAuthor{
-		AuthorName: "",
+		AuthorName:   "",
 		AuthorIdCard: "",
-		AuthorType: constants.AUTHOR_TYPE_LEGAL,
+		AuthorType:   constants.AUTHOR_TYPE_LEGAL,
 	}
 
 	author1 := zxl_go_sdk.DciAuthor{
-		AuthorName: "",
+		AuthorName:   "",
 		AuthorIdCard: "",
-		AuthorType: constants.AUTHOR_TYPE_LEGAL,
+		AuthorType:   constants.AUTHOR_TYPE_LEGAL,
 	}
 
 	dciClaim := zxl_go_sdk.DciClaim{
-		DciName: "图片作品1",
-		DciUrl: "https://k.sina.com.cn/article_1887344341_707e96d50200110wn.html?from=news&subch=onews",
-		ProposerEmail: "",
-		ProposerSk: "",
-		DciType: constants.DCI_TYPE_FILMING,
+		DciName:           "图片作品1",
+		DciUrl:            "https://k.sina.com.cn/article_1887344341_707e96d50200110wn.html?from=news&subch=onews",
+		ProposerEmail:     "",
+		ProposerSk:        "",
+		DciType:           constants.DCI_TYPE_FILMING,
 		DciCreateProperty: constants.DCI_CREATE_PROPERTY_ADAPT,
-		RightInfoList: []zxl_go_sdk.DciRight{right},
-		AuthorList: []zxl_go_sdk.DciAuthor{author, author1},
+		RightInfoList:     []zxl_go_sdk.DciRight{right},
+		AuthorList:        []zxl_go_sdk.DciAuthor{author, author1},
 	}
-	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10 * time.Second)
+	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10*time.Second)
 
 	if err != nil {
 		fmt.Printf("提交确权请求出错 %+v", err)
@@ -121,8 +133,6 @@ func TestDciClaimTwoAuthor(t *testing.T) {
 
 	fmt.Printf("确权结果为 %+v", resp)
 }
-
-
 
 func TestDciClaimTwoRighter(t *testing.T) {
 
@@ -137,45 +147,45 @@ func TestDciClaimTwoRighter(t *testing.T) {
 	}
 
 	righter := zxl_go_sdk.DciRighter{
-		RighterName: "",
-		RighterIdCard: "",
-		RighterEmail: "",
+		RighterName:      "",
+		RighterIdCard:    "",
+		RighterEmail:     "",
 		RighterGainedWay: constants.GAINED_WAY_ORIGINAL,
-		RighterSk: sk,
-		RighterType: constants.RIGHTER_TYPE_LEGAL,
+		RighterSk:        sk,
+		RighterType:      constants.RIGHTER_TYPE_LEGAL,
 	}
 
 	righter2 := zxl_go_sdk.DciRighter{
-		RighterName: "",
-		RighterIdCard: "",
-		RighterEmail: "",
+		RighterName:      "",
+		RighterIdCard:    "",
+		RighterEmail:     "",
 		RighterGainedWay: constants.GAINED_WAY_ORIGINAL,
-		RighterSk: sk,
-		RighterType: constants.RIGHTER_TYPE_LEGAL,
+		RighterSk:        sk,
+		RighterType:      constants.RIGHTER_TYPE_LEGAL,
 	}
 
 	right := zxl_go_sdk.DciRight{
-		Type: constants.RIGHT_TYPE_ALL,
+		Type:            constants.RIGHT_TYPE_ALL,
 		RighterInfoList: []zxl_go_sdk.DciRighter{righter, righter2},
 	}
 
 	author := zxl_go_sdk.DciAuthor{
-		AuthorName: "",
+		AuthorName:   "",
 		AuthorIdCard: "",
-		AuthorType: constants.AUTHOR_TYPE_LEGAL,
+		AuthorType:   constants.AUTHOR_TYPE_LEGAL,
 	}
 
 	dciClaim := zxl_go_sdk.DciClaim{
-		DciName: "图片作品1",
-		DciUrl: "https://news.sina.com.cn/o/2021-02-13/doc-ikftssap5618045.shtml",
-		ProposerEmail: "",
-		ProposerSk: "",
-		DciType: constants.DCI_TYPE_FILMING,
+		DciName:           "图片作品1",
+		DciUrl:            "https://news.sina.com.cn/o/2021-02-13/doc-ikftssap5618045.shtml",
+		ProposerEmail:     "",
+		ProposerSk:        "",
+		DciType:           constants.DCI_TYPE_FILMING,
 		DciCreateProperty: constants.DCI_CREATE_PROPERTY_ADAPT,
-		RightInfoList: []zxl_go_sdk.DciRight{right},
-		AuthorList: []zxl_go_sdk.DciAuthor{author},
+		RightInfoList:     []zxl_go_sdk.DciRight{right},
+		AuthorList:        []zxl_go_sdk.DciAuthor{author},
 	}
-	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10 * time.Second)
+	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10*time.Second)
 
 	if err != nil {
 		fmt.Printf("提交确权请求出错 %+v", err)
@@ -198,36 +208,36 @@ func TestDciClaimTortSearchNormal(t *testing.T) {
 	}
 
 	righter := zxl_go_sdk.DciRighter{
-		RighterName: "",
-		RighterIdCard: "",
-		RighterEmail: "",
+		RighterName:      "",
+		RighterIdCard:    "",
+		RighterEmail:     "",
 		RighterGainedWay: constants.GAINED_WAY_ORIGINAL,
-		RighterSk: sk,
-		RighterType: constants.RIGHTER_TYPE_LEGAL,
+		RighterSk:        sk,
+		RighterType:      constants.RIGHTER_TYPE_LEGAL,
 	}
 
 	right := zxl_go_sdk.DciRight{
-		Type: constants.RIGHT_TYPE_ALL,
+		Type:            constants.RIGHT_TYPE_ALL,
 		RighterInfoList: []zxl_go_sdk.DciRighter{righter},
 	}
 
 	author := zxl_go_sdk.DciAuthor{
-		AuthorName: "",
+		AuthorName:   "",
 		AuthorIdCard: "",
-		AuthorType: constants.AUTHOR_TYPE_LEGAL,
+		AuthorType:   constants.AUTHOR_TYPE_LEGAL,
 	}
 
 	dciClaim := zxl_go_sdk.DciClaim{
-		DciName: "图片作品1",
-		DciUrl: "https://pic2.zhimg.com/80/v2-73c0a03f0aead285983ade7764e32225_1440w.jpg",
-		ProposerEmail: "",
-		ProposerSk: "",
-		DciType: constants.DCI_TYPE_PIC_MODEL,
+		DciName:           "图片作品1",
+		DciUrl:            "https://pic2.zhimg.com/80/v2-73c0a03f0aead285983ade7764e32225_1440w.jpg",
+		ProposerEmail:     "",
+		ProposerSk:        "",
+		DciType:           constants.DCI_TYPE_PIC_MODEL,
 		DciCreateProperty: constants.DCI_CREATE_PROPERTY_ORIGINAL,
-		RightInfoList: []zxl_go_sdk.DciRight{right},
-		AuthorList: []zxl_go_sdk.DciAuthor{author},
+		RightInfoList:     []zxl_go_sdk.DciRight{right},
+		AuthorList:        []zxl_go_sdk.DciAuthor{author},
 	}
-	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10 * time.Second)
+	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10*time.Second)
 
 	if err != nil {
 		fmt.Printf("提交确权请求出错 %+v", err)
@@ -250,36 +260,36 @@ func TestDciClaimTortSearch(t *testing.T) {
 	}
 
 	righter := zxl_go_sdk.DciRighter{
-		RighterName: "",
-		RighterIdCard: "",
-		RighterEmail: "",
+		RighterName:      "",
+		RighterIdCard:    "",
+		RighterEmail:     "",
 		RighterGainedWay: constants.GAINED_WAY_ORIGINAL,
-		RighterSk: sk,
-		RighterType: constants.RIGHTER_TYPE_LEGAL,
+		RighterSk:        sk,
+		RighterType:      constants.RIGHTER_TYPE_LEGAL,
 	}
 
 	right := zxl_go_sdk.DciRight{
-		Type: constants.RIGHT_TYPE_ALL,
+		Type:            constants.RIGHT_TYPE_ALL,
 		RighterInfoList: []zxl_go_sdk.DciRighter{righter},
 	}
 
 	author := zxl_go_sdk.DciAuthor{
-		AuthorName: "",
+		AuthorName:   "",
 		AuthorIdCard: "",
-		AuthorType: constants.AUTHOR_TYPE_LEGAL,
+		AuthorType:   constants.AUTHOR_TYPE_LEGAL,
 	}
 
 	dciClaim := zxl_go_sdk.DciClaim{
-		DciName: "图片作品1",
-		DciUrl: "https://inews.gtimg.com/newsapp_bt/0/5001rcns97nr04er/1000?appid=ee22ce76657290e1",
-		ProposerEmail: "",
-		ProposerSk: "",
-		DciType: constants.DCI_TYPE_PIC_MODEL,
+		DciName:           "图片作品1",
+		DciUrl:            "https://inews.gtimg.com/newsapp_bt/0/5001rcns97nr04er/1000?appid=ee22ce76657290e1",
+		ProposerEmail:     "",
+		ProposerSk:        "",
+		DciType:           constants.DCI_TYPE_PIC_MODEL,
 		DciCreateProperty: constants.DCI_CREATE_PROPERTY_ORIGINAL,
-		RightInfoList: []zxl_go_sdk.DciRight{right},
-		AuthorList: []zxl_go_sdk.DciAuthor{author},
+		RightInfoList:     []zxl_go_sdk.DciRight{right},
+		AuthorList:        []zxl_go_sdk.DciAuthor{author},
 	}
-	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10 * time.Second)
+	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10*time.Second)
 
 	if err != nil {
 		fmt.Printf("提交确权请求出错 %+v", err)
@@ -288,8 +298,6 @@ func TestDciClaimTortSearch(t *testing.T) {
 
 	fmt.Printf("确权结果为 %+v", resp)
 }
-
-
 
 func TestDciClaimParamNotEnough(t *testing.T) {
 
@@ -304,29 +312,29 @@ func TestDciClaimParamNotEnough(t *testing.T) {
 	}
 
 	righter := zxl_go_sdk.DciRighter{
-		RighterName: "",
-		RighterIdCard: "",
-		RighterEmail: "",
+		RighterName:      "",
+		RighterIdCard:    "",
+		RighterEmail:     "",
 		RighterGainedWay: constants.GAINED_WAY_ORIGINAL,
-		RighterSk: sk,
-		RighterType: constants.RIGHTER_TYPE_LEGAL,
+		RighterSk:        sk,
+		RighterType:      constants.RIGHTER_TYPE_LEGAL,
 	}
 
 	right := zxl_go_sdk.DciRight{
-		Type: constants.RIGHT_TYPE_ALL, // 当前只能使用这个权利项
+		Type:            constants.RIGHT_TYPE_ALL, // 当前只能使用这个权利项
 		RighterInfoList: []zxl_go_sdk.DciRighter{righter},
 	}
 
 	dciClaim := zxl_go_sdk.DciClaim{
-		DciName: "图片作品1",
-		DciUrl: "https://inews.gtimg.com/newsapp_bt/0/5001rcns97nr04er/1000?appid=ee22ce76657290e1",
-		ProposerEmail: "",
-		ProposerSk: "",
-		DciType: constants.DCI_TYPE_PIC_MODEL,
+		DciName:           "图片作品1",
+		DciUrl:            "https://inews.gtimg.com/newsapp_bt/0/5001rcns97nr04er/1000?appid=ee22ce76657290e1",
+		ProposerEmail:     "",
+		ProposerSk:        "",
+		DciType:           constants.DCI_TYPE_PIC_MODEL,
 		DciCreateProperty: constants.DCI_CREATE_PROPERTY_ORIGINAL,
-		RightInfoList: []zxl_go_sdk.DciRight{right},
+		RightInfoList:     []zxl_go_sdk.DciRight{right},
 	}
-	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10 * time.Second)
+	resp, err := zxlSDK.SubmitDciClaim(dciClaim, 10*time.Second)
 
 	if err != nil {
 		fmt.Printf("提交确权请求出错 %+v", err)
@@ -350,7 +358,7 @@ func TestQueryResult(t *testing.T) {
 		TaskId: "",
 	}
 
-	resp, err := zxlSDK.QueryDciClaimResult(dciQuery, 10 * time.Second)
+	resp, err := zxlSDK.QueryDciClaimResult(dciQuery, 10*time.Second)
 	if err != nil {
 		fmt.Printf("确权查询出错 %+v", err)
 		return

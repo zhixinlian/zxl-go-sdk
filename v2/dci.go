@@ -15,8 +15,7 @@ import (
 	"time"
 )
 
-
-const(
+const (
 	SUBMIT_DCI_CLAIM = "sdk/zhixin-api/dci/dci_claim"
 	QUERY_DCI_RESULT = "sdk/zhixin-api/dci/get_dci_claim_result"
 )
@@ -28,8 +27,8 @@ const MaxAuthorNum = 10
 */
 
 type DciClaim struct {
-	AppId             string `json:"appId"`
-	DciName           string `json:"dciName"`
+	AppId             string                       `json:"appId"`
+	DciName           string                       `json:"dciName"`
 	ProposerEmail     string                       `json:"proposerEmail"`
 	DciType           constants.DciType            `json:"dciType"`
 	DciCreateProperty constants.DciCreateProperty  `json:"dciCreateProperty"`
@@ -39,9 +38,9 @@ type DciClaim struct {
 	AuthorList        []DciAuthor                  `json:"authorList"`
 	RightInfoList     []DciRight                   `json:"rightInfoList"`
 	RightSignatureDic map[string]map[string]string `json:"rightSignatureDic"`
-	RequestType string `json:"requestType"`
-	RedirectUrl string `json:"redirectUrl"`
-	ProposerSk  string `json:"-"`
+	RequestType       string                       `json:"requestType"`
+	RedirectUrl       string                       `json:"redirectUrl"`
+	ProposerSk        string                       `json:"-"`
 }
 
 type DciClaimResp struct {
@@ -50,9 +49,9 @@ type DciClaimResp struct {
 }
 
 type dciClaimResult struct {
-	Data interface{} `json:"data"`
-	RetCode int `json:"retCode"`
-	RetMsg string `json:"retMsg"`
+	Data    interface{} `json:"data"`
+	RetCode int         `json:"retCode"`
+	RetMsg  string      `json:"retMsg"`
 }
 
 type DciClaimQuery struct {
@@ -62,13 +61,14 @@ type DciClaimQuery struct {
 }
 
 type DciClaimQueryResp struct {
-	Status   int `json:"status"`
-	TortSearchList []TortSearch `json:"tortSearchList"`
-	RecordTimestamp int `json:"recordTimestamp"`
-	DciId         string `json:"dciId"`
-	Url           string `json:"url"`
-	Msg           string `json:"msg"`
-	RequestId     string
+	Status          int          `json:"status"`
+	TortSearchList  []TortSearch `json:"tortSearchList"`
+	RecordTimestamp int          `json:"recordTimestamp"`
+	DciId           string       `json:"dciId"`
+	Url             string       `json:"url"`
+	Msg             string       `json:"msg"`
+	TxHash          string       `json:"txHash"`
+	RequestId       string
 }
 
 type TortSearch struct {
@@ -76,29 +76,29 @@ type TortSearch struct {
 }
 
 type DciAuthor struct {
-	AuthorIdCard string `json:"authorIdCard"`
-	AuthorName string `json:"authorName"`
-	AuthorType constants.AuthorType `json:"authorType"`
+	AuthorIdCard string               `json:"authorIdCard"`
+	AuthorName   string               `json:"authorName"`
+	AuthorType   constants.AuthorType `json:"authorType"`
 }
 
 type DciRight struct {
-	DciKey string `json:"dciKey"`
-	Type constants.RightType `json:"type"`
-	RighterInfoList []DciRighter `json:"righterInfoList"`
+	DciKey          string              `json:"dciKey"`
+	Type            constants.RightType `json:"type"`
+	RighterInfoList []DciRighter        `json:"righterInfoList"`
 }
 
 type DciRighter struct {
-	RighterEmail string `json:"righterEmail"`
-	RighterGainedWay constants.GainedWay `json:"righterGainedWay"`
-	RighterIdCard string `json:"righterIdCard"`
-	RighterName  string `json:"righterName"`
-	RighterType  constants.RighterType `json:"righterType"`
-	RighterSk string `json:"-"`
+	RighterEmail     string                `json:"righterEmail"`
+	RighterGainedWay constants.GainedWay   `json:"righterGainedWay"`
+	RighterIdCard    string                `json:"righterIdCard"`
+	RighterName      string                `json:"righterName"`
+	RighterType      constants.RighterType `json:"righterType"`
+	RighterSk        string                `json:"-"`
 }
 
 /**
 提交确权申请
- */
+*/
 func (zxl *ZxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClaimResp, error) {
 	var resp DciClaimResp
 	if len(dci.AuthorList) > MaxAuthorNum {
@@ -121,7 +121,7 @@ func (zxl *ZxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 	dci.DciHash = dciHash
 
 	authorJson, err := json.Marshal(dci.AuthorList)
-	if err != nil{
+	if err != nil {
 		return resp, err
 	}
 	dci.AppId = zxl.appId
@@ -180,7 +180,7 @@ func (zxl *ZxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 
 	sendRetBytes, cri, err := sendDciRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return resp, errors.New("提交确权结果错误：" + err.Error()+ ", requestId:"+ cri.RequestId)
+		return resp, errors.New("提交确权结果错误：" + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	json.Unmarshal(sendRetBytes, &resp)
 
@@ -190,7 +190,7 @@ func (zxl *ZxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 
 /**
 查询确权结果
- */
+*/
 func (zxl *ZxlImpl) QueryDciClaimResult(dciQuery DciClaimQuery, timeout time.Duration) (DciClaimQueryResp, error) {
 	var resp DciClaimQueryResp
 
@@ -198,9 +198,9 @@ func (zxl *ZxlImpl) QueryDciClaimResult(dciQuery DciClaimQuery, timeout time.Dur
 	dciQuery.RedirectUrl = QUERY_DCI_RESULT
 	paramBytes, _ := json.Marshal(dciQuery)
 
-	sendRetBytes, cri,  err := sendDciRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
+	sendRetBytes, cri, err := sendDciRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
-		return resp, errors.New("查询确权结果错误：" + err.Error()+ ", requestId:"+ cri.RequestId)
+		return resp, errors.New("查询确权结果错误：" + err.Error() + ", requestId:" + cri.RequestId)
 	}
 
 	json.Unmarshal(sendRetBytes, &resp)
@@ -241,7 +241,7 @@ func sendDciRequest(appId, appKey, method, url string, body []byte, timeout time
 	cri := commReqInfo{}
 
 	cli := buildHttpClient(defConf.IsProxy, timeout)
-	
+
 	req, err := http.NewRequest(method, url, byteReader)
 	if err != nil {
 		return nil, &cri, errors.New("NewRequest error:" + err.Error())
@@ -249,8 +249,8 @@ func sendDciRequest(appId, appKey, method, url string, body []byte, timeout time
 	req.Header.Add("appId", appId)
 
 	// 不直接传递 appKey，和时间戳结合使用
-	signatureTime := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
-	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId+","+appKey+","+signatureTime)))
+	signatureTime := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
+	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId + "," + appKey + "," + signatureTime)))
 
 	req.Header.Add("signatureTime", signatureTime)
 	req.Header.Add("signature", signature)
@@ -260,7 +260,7 @@ func sendDciRequest(appId, appKey, method, url string, body []byte, timeout time
 		cri.RequestId = resp.Header.Get(REQUEST_ID)
 	}
 	if err != nil {
-		return nil, &cri, errors.New("cli.Do error:" + err.Error()+ ", requestId:"+ cri.RequestId)
+		return nil, &cri, errors.New("cli.Do error:" + err.Error() + ", requestId:" + cri.RequestId)
 	}
 	defer resp.Body.Close()
 	if resp.StatusCode != 200 {
