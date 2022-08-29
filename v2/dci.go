@@ -143,7 +143,7 @@ func (zxl *ZxlImpl) SubmitDciClaim(dci DciClaim, timeout time.Duration) (DciClai
 
 	for i, right := range dci.RightInfoList {
 
-		if right.Type != constants.RIGHT_TYPE_ALL {
+		if !constants.IncludeRightType(right.Type) {
 			return resp, errors.New("权利项选择不正确")
 		}
 
