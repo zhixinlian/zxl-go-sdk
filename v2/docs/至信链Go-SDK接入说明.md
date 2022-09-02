@@ -17,6 +17,7 @@
 | 2021.11.03 | 支持云桌面取证          | v2.3.2   |
 | 2021.12.10 | go module 升级到 v2 | v2.3.3   |
 | 2022.7.22  | 增加确权、取证返回字段      | v2.3.11  |
+| 2022.09.02  | 接口优化    | v2.3.14   |
 
 
 
@@ -670,7 +671,7 @@ ClueData 结构如下：
   | 1    | RIGHT_TYPE_PUBLIC       | 发表权         |
   | 2    | RIGHT_TYPE_SIGN         | 署名权         |
   | 3    | RIGHT_TYPE_MODIFY       | 修改权         |
-  | 4    | RIGHT_TYPE_FULL_PROTECT | 保护权         |
+  | 4    | RIGHT_TYPE_FULL_PROTECT | 保护作品完整权         |
   | 5    | RIGHT_TYPE_COPY         | 复制权         |
   | 6    | RIGHT_TYPE_DISTRIBUTION | 发行权         |
   | 7    | RIGHT_TYPE_RENT         | 出租权         |
