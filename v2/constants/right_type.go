@@ -17,7 +17,7 @@ const (
 	RIGHT_TYPE_SHOW         RightType = "表演权"     // 9
 	RIGHT_TYPE_PLAY         RightType = "放映权"     // 10
 	RIGHT_TYPE_BROADCAST    RightType = "广播权"     // 11
-	RIGHT_TYPE_NET_TRANS    RightType = "信息网络创博权" // 12
+	RIGHT_TYPE_NET_TRANS    RightType = "信息网络传播权" // 12
 	RIGHT_TYPE_FILMING      RightType = "摄制权"     // 13
 	RIGHT_TYPE_ADAPT        RightType = "改编权"     // 14
 	RIGHT_TYPE_TRANSLATE    RightType = "翻译权"     // 15
