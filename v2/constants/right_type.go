@@ -9,7 +9,7 @@ const (
 	RIGHT_TYPE_PUBLIC       RightType = "发表权"     // 1
 	RIGHT_TYPE_SIGN         RightType = "署名权"     // 2
 	RIGHT_TYPE_MODIFY       RightType = "修改权"     // 3
-	RIGHT_TYPE_FULL_PROTECT RightType = "保护权"     // 4
+	RIGHT_TYPE_FULL_PROTECT RightType = "保护作品完整权"     // 4
 	RIGHT_TYPE_COPY         RightType = "复制权"     // 5
 	RIGHT_TYPE_DISTRIBUTION RightType = "发行权"     // 6
 	RIGHT_TYPE_RENT         RightType = "出租权"     // 7
