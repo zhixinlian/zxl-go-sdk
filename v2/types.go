@@ -119,6 +119,7 @@ type QueryResp struct {
 	TxHash      string `json:"txHash"`
 	BlockHeight int64  `json:"blockHeight"`
 	CreateTime  string `json:"createTime"`
+	AccessCode  string `json:"accessCode"`
 }
 
 type EvSaveResult struct {
