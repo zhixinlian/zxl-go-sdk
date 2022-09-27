@@ -17,6 +17,7 @@
 | 2021.11.03  | 支持云桌面取证     | v2.3.2   |
 | 2022.01.21  | 支持取证异常状态    | v2.3.4   |
 | 2022.09.02  | 接口优化    | v2.3.14   |
+| 2022.09.27 | 存证查询接口返回 accessCode | v2.3.15  |
 
 
 
@@ -242,7 +243,7 @@ func main() {
 
   | 返回值类型   | 返回值描述                                                   |
   | ------------ | ------------------------------------------------------------ |
-  | EvSaveResult | {<br />"appId":"应用ID",<br />"evId":"记链唯一标识",<br />"evHash":"证据hash",<br />"txHash":"交易hash",<br />"extendInfo":"扩展信息",<br />"createTime": "出块时间",<br />"blockHeight": "区块高度",<br />"ext": "扩展信息，可通过 key ： queryCertUrl,获取证书"<br />} |
+  | EvSaveResult | {<br />"appId":"应用ID",<br />"evId":"记链唯一标识",<br />"evHash":"证据hash",<br />"txHash":"交易hash",<br />"extendInfo":"扩展信息",<br />"createTime": "出块时间",<br />"blockHeight": "区块高度",<br />"accessCode": "存证证书凭证"<br />} |
 
 
 
