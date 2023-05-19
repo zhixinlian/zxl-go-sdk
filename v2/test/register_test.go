@@ -2,8 +2,8 @@ package test
 
 import (
 	"fmt"
-	"github.com/zhixinlian/zxl-go-sdk"
-	"github.com/zhixinlian/zxl-go-sdk/constants"
+	zxl_go_sdk "github.com/zhixinlian/zxl-go-sdk/v2"
+	"github.com/zhixinlian/zxl-go-sdk/v2/constants"
 	"testing"
 	"time"
 )

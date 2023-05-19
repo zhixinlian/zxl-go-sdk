@@ -15,13 +15,11 @@ import (
 )
 
 const (
-	InvalidAppId   = "无效的appId"
-	InvalidAppKey  = "无效的appKey"
-	BadCipherKey   = "加密密码不能为空"
-	BadCipherData  = "加密内容不能为空"
-
+	InvalidAppId  = "无效的appId"
+	InvalidAppKey = "无效的appKey"
+	BadCipherKey  = "加密密码不能为空"
+	BadCipherData = "加密内容不能为空"
 )
-
 
 type ZxlConfig struct {
 	AppId      string
@@ -45,13 +43,12 @@ func NewZxlImpl(appId, appKey string) (*ZxlImpl, error) {
 		return nil, errors.New(InvalidAppId)
 	}
 	return &ZxlImpl{
-		appId: appId,
-		appKey: appKey,
+		appId:   appId,
+		appKey:  appKey,
 		appType: typeInt}, nil
 }
 
-
-func CreateZxlClientWithConfig(config ZxlConfig)(*ZxlImpl, error) {
+func CreateZxlClientWithConfig(config ZxlConfig) (*ZxlImpl, error) {
 	if len(config.AppId) < 15 {
 		return nil, errors.New(InvalidAppId)
 	}
@@ -72,12 +69,11 @@ func CreateZxlClientWithConfig(config ZxlConfig)(*ZxlImpl, error) {
 		defConf.ProxyPort = config.ProxyPort
 	}
 	return &ZxlImpl{
-		appId: config.AppId,
-		appKey: config.AppKey,
+		appId:   config.AppId,
+		appKey:  config.AppKey,
 		appType: typeInt,
-		}, nil
+	}, nil
 }
-
 
 // Deprecated
 func NewZxlImplWithConfig(config ZxlConfig) (*ZxlImpl, error) {
@@ -93,10 +89,10 @@ func NewZxlImplWithConfig(config ZxlConfig) (*ZxlImpl, error) {
 	}
 	defConf.ServerAddr = config.ServerAddr
 	return &ZxlImpl{
-		appId: config.AppId,
-		appKey:    config.AppKey,
-		appType:   typeInt,
-		}, nil
+		appId:   config.AppId,
+		appKey:  config.AppKey,
+		appType: typeInt,
+	}, nil
 }
 
 type ZxlImpl struct {
@@ -255,6 +251,43 @@ func (zxl *ZxlImpl) QueryWithHash(hash string, timeout time.Duration) ([]QueryRe
 		return nil, errors.New("QueryWithHash (Unmarshal) error: " + err.Error())
 	}
 	return result, nil
+}
+
+// EvCertWithEvId 证书生成
+func (zxl *ZxlImpl) EvCertWithEvId(evId string, timeout time.Duration) (*EvCertResp, error) {
+	certReq := EvCertReq{EvId: evId}
+	dataBytes, err := json.Marshal(&certReq)
+	if err != nil {
+		return nil, errors.New("EvCertError (Marshal): " + err.Error())
+	}
+	_, cri, err := sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.GenerateEvCert, dataBytes, timeout)
+	if err != nil {
+		return nil, errors.New("GenerateCertError (sendRequest): " + err.Error() + ", requestId:" + cri.RequestId)
+	}
+	result := &EvCertResp{
+		IsSuccess: true,
+	}
+	return result, nil
+}
+
+// EvCertQueryWithEvId 证书生成
+func (zxl *ZxlImpl) EvCertQueryWithEvId(evId string, timeout time.Duration) (*EvCertQueryResp, error) {
+	certReq := EvCertReq{EvId: evId}
+	dataBytes, err := json.Marshal(&certReq)
+	if err != nil {
+		return nil, errors.New("EvCertError (Marshal): " + err.Error())
+	}
+	resp, cri, err := sendRequest(zxl.appId, zxl.appKey, "POST", defConf.ServerAddr+defConf.QueryEvCert, dataBytes, timeout)
+	if err != nil {
+		return nil, errors.New("QueryCertError (sendRequest): " + err.Error() + ", requestId:" + cri.RequestId)
+	}
+	var result EvCertQueryResp
+	err = json.Unmarshal(resp, &result)
+	result.EvId = evId
+	if err != nil {
+		return nil, errors.New("QueryCertError (UnMarshal): " + err.Error())
+	}
+	return &result, nil
 }
 
 func padding(src []byte, blocksize int) []byte {

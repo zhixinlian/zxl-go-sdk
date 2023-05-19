@@ -13,5 +13,8 @@
 
 # goland configuration file
 .idea/*
+**/.DS_Store
+build.yml
 
 vendor
+.codecc

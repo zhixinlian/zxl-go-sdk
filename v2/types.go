@@ -29,6 +29,8 @@ type Config struct {
 	QueryWithTxHash    string `json:"queryWithTxHash"`
 	UserCert           string `json:"userCert"`
 	QueryWithHash      string `json:"queryWithHash"`
+	QueryEvCert        string `json:"queryEvCert"`
+	GenerateEvCert     string `json:"generateEvCert"`
 	ProxyHost          string
 	ProxyPort          string
 	IsProxy            bool
@@ -42,6 +44,20 @@ type CommonRet struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
+}
+
+type EvCertReq struct {
+	EvId string `json:"evId"`
+}
+
+type EvCertResp struct {
+	IsSuccess bool `json:"IsSuccess"`
+}
+
+type EvCertQueryResp struct {
+	EvId    string `json:"evId"`
+	CertUrl string `json:"certUrl"`
+	Status  int    `json:"status"`
 }
 
 type UserCertReq struct {
@@ -119,6 +135,7 @@ type QueryResp struct {
 	TxHash      string `json:"txHash"`
 	BlockHeight int64  `json:"blockHeight"`
 	CreateTime  string `json:"createTime"`
+	AccessCode  string `json:"accessCode"`
 }
 
 type EvSaveResult struct {
@@ -161,6 +178,11 @@ type EvIdData struct {
 	VoucherUrl  string `json:"voucherUrl"`
 	AbnormalTag int    `json:"abnormalTag"`
 	Duration    int    `json:"duration"`
+	Evid        string `json:"evid"`
+	EvHash      string `json:"evHash"`
+	TxHash      string `json:"txHash"`
+	BlockHeight string `json:"blockHeight"`
+	StorageTime string `json:"storageTime"`
 	RequestId   string
 }
 
@@ -191,16 +213,21 @@ type TxRetCommonData struct {
 
 //定义tx接口返回结构体,最内层
 type TxRetDetail struct {
-	OrderNo    string `json:"orderNo"`
-	Msg        string `json:"msg"`
-	Status     int    `json:"status"`
-	StatusMsg  string `json:"statusMsg"`
-	Url        string `json:"url"`
-	Hash       string `json:"hash"`
-	EvIdUrl    string `json:"evidUrl"`
-	VoucherUrl string `json:"voucherUrl"`
-	WebTitle   string `json:"webTitle"`
-	Duration   int    `json:"duration"`
+	OrderNo     string `json:"orderNo"`
+	Msg         string `json:"msg"`
+	Status      int    `json:"status"`
+	StatusMsg   string `json:"statusMsg"`
+	Url         string `json:"url"`
+	Hash        string `json:"hash"`
+	EvIdUrl     string `json:"evidUrl"`
+	VoucherUrl  string `json:"voucherUrl"`
+	WebTitle    string `json:"webTitle"`
+	Duration    int    `json:"duration"`
+	Evid        string `json:"evid"`
+	EvHash      string `json:"evHash"`
+	TxHash      string `json:"txHash"`
+	BlockHeight string `json:"blockHeight"`
+	StorageTime string `json:"storageTime"`
 }
 
 func (evData *EvSaveResult) GetEvId() string {

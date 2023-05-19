@@ -5,8 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"errors"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm2"
-	"github.com/zhixinlian/zxl-go-sdk/sm/sm3"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm2"
+	"github.com/zhixinlian/zxl-go-sdk/v2/sm/sm3"
 	"io/ioutil"
 	"strings"
 	"time"
@@ -307,6 +307,11 @@ func (sdk *ZxlImpl) getEvidenceStatus(orderNo, representAppId string, timeout ti
 		VoucherUrl:  txRetDetail.VoucherUrl,
 		AbnormalTag: 0,
 		RequestId:   cri.RequestId,
+		Evid:        txRetDetail.Evid,
+		EvHash:      txRetDetail.EvHash,
+		TxHash:      txRetDetail.TxHash,
+		BlockHeight: txRetDetail.BlockHeight,
+		StorageTime: txRetDetail.StorageTime,
 		Duration:    txRetDetail.Duration,
 	}
 	// 单独处理异常情况
