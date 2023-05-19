@@ -29,6 +29,8 @@ type Config struct {
 	QueryWithTxHash    string `json:"queryWithTxHash"`
 	UserCert           string `json:"userCert"`
 	QueryWithHash      string `json:"queryWithHash"`
+	QueryEvCert        string `json:"queryEvCert"`
+	GenerateEvCert     string `json:"generateEvCert"`
 	ProxyHost          string
 	ProxyPort          string
 	IsProxy            bool
@@ -42,6 +44,20 @@ type CommonRet struct {
 	Code    int         `json:"code"`
 	Message string      `json:"message"`
 	Data    interface{} `json:"data"`
+}
+
+type EvCertReq struct {
+	EvId string `json:"evId"`
+}
+
+type EvCertResp struct {
+	IsSuccess bool `json:"IsSuccess"`
+}
+
+type EvCertQueryResp struct {
+	EvId    string `json:"evId"`
+	CertUrl string `json:"certUrl"`
+	Status  int    `json:"status"`
 }
 
 type UserCertReq struct {
