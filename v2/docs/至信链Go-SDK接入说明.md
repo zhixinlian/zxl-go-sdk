@@ -6,19 +6,20 @@
 
 ### 文档历史
 
-| 修订日期       | 修订内容             | 修订版本     |
-|------------|------------------|----------|
-| 2020.08.11 | 新增接口             | v2.0.1   |
-| 2021.01.28 | 新增代理商相关接口        | v2.0.4   |
-| 2021.02.09 | 增加个人用户及确权接口      | v2.1.3   |
-| 2021.05.12 | 接口优化             | v2.1.4   |
-| 2021.06.10 | 新增长视频录屏支持        | v2.1.4.4 |
-| 2021.10.25 | SDK 重构           | v2.3.0   |
-| 2021.11.03 | 支持云桌面取证          | v2.3.2   |
-| 2021.12.10 | go module 升级到 v2 | v2.3.3   |
-| 2022.7.22  | 增加确权、取证返回字段      | v2.3.11  |
-| 2022.09.02  | 接口优化    | v2.3.14   |
-| 2022.09.27 | 存证查询接口返回 accessCode | v2.3.15  |
+| 修订日期       | 修订内容                | 修订版本           |
+|------------|---------------------|----------------|
+| 2020.08.11 | 新增接口                | v2.0.1         |
+| 2021.01.28 | 新增代理商相关接口           | v2.0.4         |
+| 2021.02.09 | 增加个人用户及确权接口         | v2.1.3         |
+| 2021.05.12 | 接口优化                | v2.1.4         |
+| 2021.06.10 | 新增长视频录屏支持           | v2.1.4.4       |
+| 2021.10.25 | SDK 重构              | v2.3.0         |
+| 2021.11.03 | 支持云桌面取证             | v2.3.2         |
+| 2021.12.10 | go module 升级到 v2    | v2.3.3         |
+| 2022.7.22  | 增加确权、取证返回字段         | v2.3.11        |
+| 2022.09.02 | 接口优化                | v2.3.14        |
+| 2022.09.27 | 存证查询接口返回 accessCode | v2.3.15        |
+| 2023.12.04 | 增加移动取证接口            | v2.3.16-mobile |
 
 
 
@@ -250,7 +251,7 @@ func main() {
 
 
 
-# 视频/图片/云桌面取证
+# 视频/图片/云桌面取证/手机取证
 
 ## 视频/图片取证服务
 
@@ -358,6 +359,66 @@ func main() {
       | ------- | ------------ | ------ | --------- |
   | orderNo | string       |        | 任务单号 |
   | msg   | string       |        | 云桌面调起登录信息      |
+
+## 手机取证服务
+* 方法原型
+
+  * ```
+    //手机取证
+    EvidenceObtainMobile(shareUrl, appName, title, remark string, duration int,
+	timeout time.Duration) (string, error) {
+    ```
+
+* 参数说明
+
+  | 参数名      | 参数类型          | 默认值 | 参数描述             |
+      |----------|---------------| ------ |------------------|
+  | shareUrl | string        |        | 分享链接             |
+  | appName  | string        |        | 应用名称（目前只支持lizhi） |
+  | title    | string        |        | 标题               |
+  | remark   | string        |        | 描述               |
+  | duration | int           |        | 录制时长（单位：秒）       |
+  | timeout  | time.Duration |        | 超时时间             |
+
+* 返回值
+  TxRetDetail的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+      | ------- | ------------ | ------ | --------- |
+  | orderNo | string       |        | 任务单号 |
+
+* 方法原型
+
+  * ```
+    //手机取证接口
+     NewEvidenceObtainMobile(obtainMobileOption *ObtainMobileOption, timeout time.Duration) (string,
+	error) 
+    ```
+* 参数说明
+
+  | 参数名                | 参数类型     | 默认值 | 参数描述   |
+          |--------------------| ------------ | ------ |--------|
+  | obtainMobileOption | *ObtainMobileOption       |        | 手机取证参数 |
+  | timeout            | time.Duration |        | 超时时间   |
+  ObtainMobileOption的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+            | ------- | ------------ | ------ | --------- |
+  | shareUrl | string        |        | 分享链接             |
+  | appName  | string        |        | 应用名称（目前只支持lizhi） |
+  | title    | string        |        | 标题               |
+  | remark   | string        |        | 描述               |
+  | duration | int           |        | 录制时长（单位：秒）       |
+
+
+* 返回值
+
+  TxRetDetail的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+        | ------- | ------------ | ------ | --------- |
+  | orderNo | string       |        | 任务单号 |
+
 
 
 ## 查询取证结果
@@ -1198,7 +1259,7 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
   | CreateTime  | string | 创建时间 |
   | Ext         | string | 扩展信息 |
 
-# 代理商模式下视频/图片/云桌面取证
+# 代理商模式下视频/图片/云桌面取证/手机取证
 
 ## 代理商视频/图片取证服务
 
@@ -1313,6 +1374,68 @@ queryResp, err := sdk.KvQuery(queryReq, 5 * time.Second)
   | orderNo | string       |        | 任务单号 |
   | msg   | string       |        | 云桌面调起登录信息      |
 
+## 代理商手机取证服务
+
+* 方法原型
+
+  * ```
+    //手机取证接口
+    RepresentEvidenceObtainMobile(shareUrl, appName, title, remark,reresentAppId string, duration int,tieout time.Duration) (string, error) 
+    ```
+
+* 参数说明
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+  | ------- | ------------ | ------ | --------- |
+  | shareUrl | string        |        | 分享链接             |
+  | appName  | string        |        | 应用名称（目前只支持lizhi） |
+  | title    | string        |        | 标题               |
+  | remark   | string        |        | 描述               |
+  | duration | int           |        | 录制时长（单位：秒）       |
+  | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
+  | timeout | time.Duration |        | 超时时间  |
+
+* 返回值
+
+  TxRetDetail的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+  | ------- | ------------ | ------ | --------- |
+  | orderNo | string       |        | 任务单号 |
+
+* 方法原型
+  * ```
+    //手机取证接口
+    NewEvidenceObtainMobile(obtainMobileOption *ObtainMobileOption, timeout time.Duration) (string,
+	error)
+    ```
+
+ 参数说明
+
+  | 参数名                | 参数类型                | 默认值 | 参数描述  |
+          |--------------------|---------------------| ------ | --------- |
+  | obtainMobileOption | *ObtainMobileOption |        | 视频取证的参数 |
+  | timeout            | time.Duration       |        | 超时时间  |
+  obtainVideoOption的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+            | ------- | ------------ | ------ | --------- |
+  | title   | string       |        | 标题      |
+  | shareUrl | string        |        | 分享链接             |
+  | appName  | string        |        | 应用名称（目前只支持lizhi） |
+  | title    | string        |        | 标题               |
+  | remark   | string        |        | 描述               |
+  | duration | int           |        | 录制时长（单位：秒）       |
+  | representAppId  | string       |        | 代理用户id，传入""时则表示代理商本身做存取证      |
+
+
+* 返回值
+
+  TxRetDetail的结构体如下
+
+  | 参数名  | 参数类型     | 默认值 | 参数描述  |
+            | ------- | ------------ | ------ | --------- |
+  | orderNo | string       |        | 任务单号 |
 
 ## 代理商查询取证结果
 

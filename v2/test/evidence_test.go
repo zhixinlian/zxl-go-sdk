@@ -232,3 +232,131 @@ func TestAgentUser(t *testing.T) {
 //		})
 //	}
 //}
+
+func TestMobileObtain(t *testing.T) {
+	// 测试环境
+	var appID = ""
+	var appKey = ""
+
+	fmt.Printf("appID is %v,appKey is %v\n", appID, appKey)
+	var config = &zxl_go_sdk.ZxlConfig{
+		AppId:      appID,
+		AppKey:     appKey,
+		ServerAddr: "https://testsdk.zxinchain.com",
+	}
+	// 正式环境
+	//config.ServerAddr = "https://sdk.zxinchain.com"
+	zxlSdk, err := zxl_go_sdk.CreateZxlClientWithConfig(*config)
+	if err != nil {
+		panic(err)
+	}
+	var concurrent = 5
+	var orderMap = make(map[string]bool)
+	for i := 0; i < concurrent; i++ {
+		order, err := zxlSdk.EvidenceObtainMobile("http://command.lizhi.fm/SL/6NLeVAIxLMF", "lizhi", "lizhi直播间",
+			"remark'",
+			60, time.Second*15)
+		if err != nil {
+			fmt.Println(err.Error())
+			continue
+		}
+		fmt.Printf("order is %v\n", order)
+		orderMap[order] = false
+	}
+	var resultMap = make(map[string]string)
+	for {
+		for order, status := range orderMap {
+			if status {
+				continue
+			}
+			evIdData := &zxl_go_sdk.EvIdData{}
+			evIdData, err = zxlSdk.GetEvidenceStatus(order, 0)
+			if err != nil {
+				panic(err)
+			}
+			fmt.Printf("evIdData is %v\n", evIdData)
+			if evIdData.Status != 0 {
+				orderMap[order] = true
+				resultMap[order] = fmt.Sprintf("%+v", evIdData)
+			} else {
+				continue
+			}
+		}
+		time.Sleep(5 * time.Second)
+		if len(resultMap) >= len(orderMap) {
+			break
+		}
+	}
+	fmt.Println(fmt.Sprintf("Result:%+v", resultMap))
+}
+
+func TestMobileObtainInfo(t *testing.T) {
+	// 测试环境
+	var appID = ""
+	var appKey = ""
+
+	fmt.Printf("appID is %v,appKey is %v\n", appID, appKey)
+	var config = &zxl_go_sdk.ZxlConfig{
+		AppId:      appID,
+		AppKey:     appKey,
+		ServerAddr: "https://testsdk.zxinchain.com",
+	}
+	// 正式环境
+	//config.ServerAddr = "https://sdk.zxinchain.com"
+	zxlSdk, err := zxl_go_sdk.CreateZxlClientWithConfig(*config)
+	if err != nil {
+		panic(err)
+	}
+	for {
+		evIdData := &zxl_go_sdk.EvIdData{}
+		evIdData, err = zxlSdk.GetEvidenceStatus("1702522368446981026167726", 0)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("evIdData is %+v\n", evIdData)
+		if evIdData.Status != 0 {
+			break
+		}
+	}
+}
+
+func TestTime(t *testing.T) {
+	fmt.Println(time.Now().Unix())
+}
+
+func TestRepresentMobileObtain(t *testing.T) {
+	// 代理商
+	var representAppid = ""
+	var representAppKey = ""
+
+	var appID = ""
+
+	var config = &zxl_go_sdk.ZxlConfig{
+		AppId:      representAppid,
+		AppKey:     representAppKey,
+		ServerAddr: "https://testsdk.zxinchain.com",
+	}
+	zxlSdk, err := zxl_go_sdk.CreateZxlClientWithConfig(*config)
+	order, err := zxlSdk.RepresentEvidenceObtainMobile("http://command.lizhi.fm/SL/6NLeVAIxLMF", "lizhi",
+		"某直播间", "remark'", appID, 60, time.Second*15)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("order is %v\n,time is :%v \n", order, time.Now().Unix())
+
+	evIdData := &zxl_go_sdk.EvIdData{}
+
+	for {
+		evIdData, err = zxlSdk.RepresentGetEvidenceStatus(order, appID, 0)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("evIdData is %v\n", evIdData)
+		if evIdData.Status != 0 {
+			break
+		}
+
+		time.Sleep(5 * time.Second)
+
+	}
+}

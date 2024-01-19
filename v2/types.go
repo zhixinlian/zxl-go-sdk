@@ -151,6 +151,9 @@ type EvSaveResult struct {
 //下发截屏/录屏任务
 type EvObtainTask struct {
 	WebUrls        string `json:"webUrls"`
+	ShareUrl       string `json:"shareUrl"`
+	AppName        string `json:"appName"`
+	ReqTime        int64  `json:"reqTime"`
 	Type           int    `json:"type"`
 	AppId          string `json:"appId"`
 	RequestType    string `json:"requestType"`
@@ -174,6 +177,7 @@ type TaskEvData struct {
 //证书状态及结果
 type EvIdData struct {
 	Status      int    `json:"status"`
+	ResultMsg   string `json:"resultMsg"`
 	EvidUrl     string `json:"evidUrl"`
 	VoucherUrl  string `json:"voucherUrl"`
 	AbnormalTag int    `json:"abnormalTag"`
@@ -217,6 +221,7 @@ type TxRetDetail struct {
 	Msg         string `json:"msg"`
 	Status      int    `json:"status"`
 	StatusMsg   string `json:"statusMsg"`
+	ResultMsg   string `json:"resultMsg"`
 	Url         string `json:"url"`
 	Hash        string `json:"hash"`
 	EvIdUrl     string `json:"evidUrl"`

@@ -51,14 +51,14 @@ func buildHttpClient(isProxy bool, timeout time.Duration) *http.Client {
 		addTrust(pool, defConf.ServerCrtPath)
 		transport := &http.Transport{
 			TLSClientConfig: &tls.Config{
-				RootCAs: pool,
+				RootCAs:            pool,
 				InsecureSkipVerify: false}, Proxy: proxy}
 		client := &http.Client{Transport: transport, Timeout: timeout}
 		return client
 	} else {
 		transport := &http.Transport{
 			TLSClientConfig: &tls.Config{
-				RootCAs: nil,
+				RootCAs:            nil,
 				InsecureSkipVerify: false}, Proxy: proxy}
 		client := &http.Client{Transport: transport, Timeout: timeout}
 		return client
@@ -70,7 +70,7 @@ func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Du
 	if body != nil {
 		byteReader = bytes.NewReader(body)
 	}
-	cri :=  commReqInfo{}
+	cri := commReqInfo{}
 	cli := buildHttpClient(defConf.IsProxy, timeout)
 
 	req, err := http.NewRequest(method, url, byteReader)
@@ -78,8 +78,8 @@ func sendRequest(appId, appKey, method, url string, body []byte, timeout time.Du
 		return nil, &cri, errors.New("NewRequest error:" + err.Error())
 	}
 	req.Header.Add("appId", appId)
-	signatureTime := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
-	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId+","+appKey+","+signatureTime)))
+	signatureTime := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
+	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId + "," + appKey + "," + signatureTime)))
 
 	req.Header.Add("signatureTime", signatureTime)
 	req.Header.Add("signature", signature)
@@ -131,6 +131,7 @@ func retErrMsg(msg string) (errMsg string) {
 	errorCodeLst.PushBack(&TxErrorCodeType{"563006", "更新消费流水状态失败"})
 	errorCodeLst.PushBack(&TxErrorCodeType{"-101", "此编号未查到对应信息"})
 	errorCodeLst.PushBack(&TxErrorCodeType{"3108", "服务不可用,调用后端服务失败"})
+	errorCodeLst.PushBack(&TxErrorCodeType{"3116", "调用取证工具失败"})
 	for e := errorCodeLst.Front(); e != nil; e = e.Next() {
 		if strings.Index(msg, (e.Value).(*TxErrorCodeType).Code) == -1 {
 			continue
@@ -155,8 +156,8 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 		return nil, &cri, errors.New("NewRequest error:" + err.Error())
 	}
 	req.Header.Add("appId", appId)
-	signatureTime := strconv.FormatInt(time.Now().UnixNano() / 1e6, 10)
-	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId+","+appKey+","+signatureTime)))
+	signatureTime := strconv.FormatInt(time.Now().UnixNano()/1e6, 10)
+	signature := hex.EncodeToString(sm3.SumSM3([]byte(appId + "," + appKey + "," + signatureTime)))
 
 	req.Header.Add("signatureTime", signatureTime)
 	req.Header.Add("signature", signature)
@@ -187,12 +188,12 @@ func sendTxMidRequest(appId, appKey, method, url string, body []byte, timeout ti
 		return nil, &cri, errors.New("returned data format error:" + string(data))
 	}
 	if commonData.RetCode != 0 {
-		return nil, &cri, errors.New("http response error info : " + retErrMsg(strconv.Itoa(commonData.RetCode)))
+		return nil, &cri, errors.New("http response error info : " + retErrMsg(strconv.Itoa(commonData.
+			RetCode)) + "	" + commonData.RetMsg)
 	}
 	retBytes, _ := json.Marshal(&commonData.Detail)
 	return retBytes, &cri, nil
 }
-
 
 func isInnerIpFromUrl(originUrl string) bool {
 	u, err := url.Parse(originUrl)
