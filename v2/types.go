@@ -182,6 +182,7 @@ type EvIdData struct {
 	VoucherUrl  string `json:"voucherUrl"`
 	AbnormalTag int    `json:"abnormalTag"`
 	Duration    int    `json:"duration"`
+	RecordTime  int    `json:"recordTime"`
 	Evid        string `json:"evid"`
 	EvHash      string `json:"evHash"`
 	TxHash      string `json:"txHash"`
@@ -228,6 +229,7 @@ type TxRetDetail struct {
 	VoucherUrl  string `json:"voucherUrl"`
 	WebTitle    string `json:"webTitle"`
 	Duration    int    `json:"duration"`
+	RecordTime  int    `json:"recordTime"`
 	Evid        string `json:"evid"`
 	EvHash      string `json:"evHash"`
 	TxHash      string `json:"txHash"`

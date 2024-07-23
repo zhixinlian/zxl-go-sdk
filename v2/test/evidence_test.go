@@ -326,10 +326,10 @@ func TestTime(t *testing.T) {
 
 func TestRepresentMobileObtain(t *testing.T) {
 	// 代理商
-	var representAppid = ""
-	var representAppKey = ""
+	var representAppid = "201103000400001"
+	var representAppKey = "96502de7f5694b98bfd19ce6b86949c8"
 
-	var appID = ""
+	var appID = "201105000110001"
 
 	var config = &zxl_go_sdk.ZxlConfig{
 		AppId:      representAppid,
@@ -339,6 +339,78 @@ func TestRepresentMobileObtain(t *testing.T) {
 	zxlSdk, err := zxl_go_sdk.CreateZxlClientWithConfig(*config)
 	order, err := zxlSdk.RepresentEvidenceObtainMobile("http://command.lizhi.fm/SL/6NLeVAIxLMF", "lizhi",
 		"某直播间", "remark'", appID, 60, time.Second*15)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("order is %v\n,time is :%v \n", order, time.Now().Unix())
+
+	evIdData := &zxl_go_sdk.EvIdData{}
+
+	for {
+		evIdData, err = zxlSdk.RepresentGetEvidenceStatus(order, appID, 0)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("evIdData is %v\n", evIdData)
+		if evIdData.Status != 0 {
+			break
+		}
+
+		time.Sleep(5 * time.Second)
+
+	}
+}
+
+func TestRepresentObtain(t *testing.T) {
+	// 代理商
+	var representAppid = "201103000400001"
+	var representAppKey = "96502de7f5694b98bfd19ce6b86949c8"
+
+	var appID = "201105000110001"
+
+	var config = &zxl_go_sdk.ZxlConfig{
+		AppId:      representAppid,
+		AppKey:     representAppKey,
+		ServerAddr: "https://testsdk.zxinchain.com",
+	}
+	zxlSdk, err := zxl_go_sdk.CreateZxlClientWithConfig(*config)
+	order, err := zxlSdk.RepresentEvidenceObtainVideo("https://www.bilibili.com/video/BV1G6421g7Sh/", "实时取证测试title",
+		"实时取证测试", appID, time.Second*15)
+	if err != nil {
+		panic(err)
+	}
+	fmt.Printf("order is %v\n,time is :%v \n", order, time.Now().Unix())
+
+	evIdData := &zxl_go_sdk.EvIdData{}
+
+	for {
+		evIdData, err = zxlSdk.RepresentGetEvidenceStatus(order, appID, 0)
+		if err != nil {
+			panic(err)
+		}
+		fmt.Printf("evIdData is %v\n", evIdData)
+		if evIdData.Status != 0 {
+			break
+		}
+
+		time.Sleep(5 * time.Second)
+
+	}
+}
+
+func TestVideoObtain(t *testing.T) {
+	var appID = "231221000100001"
+	var appKey = "aa23f01618064c0786a6cfd0fd2fdf14"
+
+	var config = &zxl_go_sdk.ZxlConfig{
+		AppId:      appID,
+		AppKey:     appKey,
+		ServerAddr: "https://testsdk.zxinchain.com",
+	}
+	zxlSdk, err := zxl_go_sdk.CreateZxlClientWithConfig(*config)
+	order, err := zxlSdk.NewEvidenceObtainVideo(&zxl_go_sdk.ObtainVideoOption{WebUrls: "https://www.bilibili." +
+		"com/video/BV1G6421g7Sh/", Title: "实时取证测试title", Remark: "实时取证测试",
+		RepresentAppId: "", Duration: 100}, time.Second*15)
 	if err != nil {
 		panic(err)
 	}

@@ -297,6 +297,7 @@ func (sdk *ZxlImpl) getEvidenceStatus(orderNo, representAppId string, timeout ti
 		BlockHeight: txRetDetail.BlockHeight,
 		StorageTime: txRetDetail.StorageTime,
 		Duration:    txRetDetail.Duration,
+		RecordTime:  txRetDetail.RecordTime,
 	}
 	// 单独处理异常情况
 	if txRetDetail.WebTitle != "" && strings.HasPrefix(txRetDetail.WebTitle, "【异常】") {
