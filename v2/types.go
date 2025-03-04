@@ -152,6 +152,7 @@ type EvSaveResult struct {
 type EvObtainTask struct {
 	WebUrls        string `json:"webUrls"`
 	ShareUrl       string `json:"shareUrl"`
+	SearchKey      string `json:"search_key"`
 	AppName        string `json:"appName"`
 	ReqTime        int64  `json:"reqTime"`
 	Type           int    `json:"type"`

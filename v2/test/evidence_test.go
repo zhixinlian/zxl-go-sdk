@@ -13,7 +13,7 @@ import (
 
 func TestCetc(t *testing.T) {
 	/** 2020-07-24 add start */
-	zxl, err := zxl_go_sdk.NewZxlImpl("", "")
+	zxl, err := zxl_go_sdk.NewZxlImpl("231221000100001", "aa23f01618064c0786a6cfd0fd2fdf14")
 	if err != nil {
 		fmt.Println("错误")
 	}
@@ -253,7 +253,7 @@ func TestMobileObtain(t *testing.T) {
 	var concurrent = 5
 	var orderMap = make(map[string]bool)
 	for i := 0; i < concurrent; i++ {
-		order, err := zxlSdk.EvidenceObtainMobile("http://command.lizhi.fm/SL/6NLeVAIxLMF", "lizhi", "lizhi直播间",
+		order, err := zxlSdk.EvidenceObtainMobile("http://command.lizhi.fm/SL/6NLeVAIxLMF", "", "lizhi", "lizhi直播间",
 			"remark'",
 			60, time.Second*15)
 		if err != nil {
@@ -337,7 +337,7 @@ func TestRepresentMobileObtain(t *testing.T) {
 		ServerAddr: "https://testsdk.zxinchain.com",
 	}
 	zxlSdk, err := zxl_go_sdk.CreateZxlClientWithConfig(*config)
-	order, err := zxlSdk.RepresentEvidenceObtainMobile("http://command.lizhi.fm/SL/6NLeVAIxLMF", "lizhi",
+	order, err := zxlSdk.RepresentEvidenceObtainMobile("http://command.lizhi.fm/SL/6NLeVAIxLMF", "", "lizhi",
 		"某直播间", "remark'", appID, 60, time.Second*15)
 	if err != nil {
 		panic(err)
@@ -399,13 +399,13 @@ func TestRepresentObtain(t *testing.T) {
 }
 
 func TestVideoObtain(t *testing.T) {
-	var appID = "231221000100001"
-	var appKey = "aa23f01618064c0786a6cfd0fd2fdf14"
+	var appID = "201215000100001"
+	var appKey = "911bd232a2b149c7a771c631cb8d339f"
 
 	var config = &zxl_go_sdk.ZxlConfig{
 		AppId:      appID,
 		AppKey:     appKey,
-		ServerAddr: "https://testsdk.zxinchain.com",
+		ServerAddr: "https://sdk.zxinchain.com",
 	}
 	zxlSdk, err := zxl_go_sdk.CreateZxlClientWithConfig(*config)
 	order, err := zxlSdk.NewEvidenceObtainVideo(&zxl_go_sdk.ObtainVideoOption{WebUrls: "https://www.bilibili." +

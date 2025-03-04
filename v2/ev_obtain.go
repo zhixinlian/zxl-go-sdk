@@ -142,6 +142,7 @@ func (sdk *ZxlImpl) NewEvidenceObtainVideo(obtainVideoOption *ObtainVideoOption,
 
 type ObtainMobileOption struct {
 	ShareUrl       string
+	SearchKey      string
 	Title          string
 	Remark         string
 	AppName        string
@@ -151,24 +152,27 @@ type ObtainMobileOption struct {
 }
 
 // EvidenceObtainMobile 手机取证接口
-func (sdk *ZxlImpl) EvidenceObtainMobile(shareUrl, appName, title, remark string, duration int,
+func (sdk *ZxlImpl) EvidenceObtainMobile(shareUrl, searchKey, appName, title, remark string, duration int,
 	timeout time.Duration) (string, error) {
-	return sdk.NewEvidenceObtainMobile(&ObtainMobileOption{ShareUrl: shareUrl, AppName: appName, Title: title,
-		Remark: remark, RepresentAppId: "", Duration: duration}, timeout)
+	return sdk.NewEvidenceObtainMobile(&ObtainMobileOption{ShareUrl: shareUrl, SearchKey: searchKey, AppName: appName,
+		Title: title, Remark: remark, RepresentAppId: "", Duration: duration}, timeout)
 }
 
 // RepresentEvidenceObtainMobile 代理用户手机取证接口
-func (sdk *ZxlImpl) RepresentEvidenceObtainMobile(shareUrl, appName, title, remark,
+func (sdk *ZxlImpl) RepresentEvidenceObtainMobile(shareUrl, searchKey, appName, title, remark,
 	representAppId string, duration int,
 	timeout time.Duration) (string, error) {
-	return sdk.NewEvidenceObtainMobile(&ObtainMobileOption{ShareUrl: shareUrl, AppName: appName, Title: title, Remark: remark,
-		RepresentAppId: representAppId, Duration: duration}, timeout)
+	return sdk.NewEvidenceObtainMobile(&ObtainMobileOption{ShareUrl: shareUrl, SearchKey: searchKey, AppName: appName,
+		Title: title, Remark: remark, RepresentAppId: representAppId, Duration: duration}, timeout)
 }
 
 func (sdk *ZxlImpl) NewEvidenceObtainMobile(obtainMobileOption *ObtainMobileOption, timeout time.Duration) (string,
 	error) {
-	if len(obtainMobileOption.ShareUrl) == 0 || len(obtainMobileOption.Title) == 0 {
-		return "", errors.New("shareUrl or title 不能为空")
+	if len(obtainMobileOption.Title) == 0 {
+		return "", errors.New("title 不能为空")
+	}
+	if len(obtainMobileOption.ShareUrl) == 0 && len(obtainMobileOption.SearchKey) == 0 {
+		return "", errors.New("webUrls or searchKey 不能同时为空")
 	}
 	duration := obtainMobileOption.Duration
 	if obtainMobileOption.Duration > 60*60 {
@@ -178,9 +182,13 @@ func (sdk *ZxlImpl) NewEvidenceObtainMobile(obtainMobileOption *ObtainMobileOpti
 		return "", errors.New("duration 录屏任务时间错误")
 	}
 	param := EvObtainTask{AppId: sdk.appId, WebUrls: obtainMobileOption.ShareUrl, Title: obtainMobileOption.Title,
-		Type: 5, ShareUrl: obtainMobileOption.ShareUrl, AppName: obtainMobileOption.AppName, ReqTime: time.Now().Unix(),
+		Type: 5, ShareUrl: obtainMobileOption.ShareUrl, SearchKey: obtainMobileOption.SearchKey,
+		AppName: obtainMobileOption.AppName, ReqTime: time.Now().Unix(),
 		Duration: duration, RepresentAppId: obtainMobileOption.RepresentAppId, Remark: obtainMobileOption.Remark,
 		RequestType: "POST", RedirectUrl: "sdk/zhixin-api/v2/busi/evobtain/mobileobtain"}
+	if obtainMobileOption.ShareUrl == "" {
+		param.WebUrls = obtainMobileOption.SearchKey
+	}
 	paramBytes, _ := json.Marshal(&param)
 	sendRetBytes, cri, err := sendTxMidRequest(sdk.appId, sdk.appKey, "POST", defConf.ServerAddr+defConf.ContentCapture, paramBytes, timeout)
 	if err != nil {
